@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Ajout au Panier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #222;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 667px;
+            background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=375&q=80');
+            background-size: cover;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            border-radius: 45px;
+            overflow: hidden;
+            border: 8px solid #333;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal {
+            background: #fff;
+            width: 100%;
+            border-radius: 35px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 900;
+            color: #78290f;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .question {
+            font-size: 15px;
+            color: #001524;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-side {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: #001524;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.1s;
+        }
+
+        .btn-side:active {
+            transform: scale(0.9);
+        }
+
+        .val-display {
+            margin: 0 15px;
+            padding: 0 15px;
+            height: 46px;
+            background: #f5f5f5;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            font-size: 18px;
+            font-weight: 900;
+            color: #001524;
+        }
+
+        .price-box {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 30px;
+        }
+
+        .price-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #777;
+            margin-right: 8px;
+        }
+
+        .price-val {
+            font-size: 24px;
+            font-weight: 900;
+            color: #ff7d00;
+        }
+
+        .command-btn {
+            background: #ff7d00;
+            width: 100%;
+            height: 56px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 125, 0, 0.3);
+            transition: all 0.2s;
+        }
+
+        .command-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 10px rgba(255, 125, 0, 0.2);
+        }
+
+        .toggle-mode {
+            margin-top: 15px;
+            font-size: 11px;
+            cursor: pointer;
+            color: #bbb;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone-container">
+        <div class="overlay">
+            <div class="modal">
+                <h2 class="title" id="m-title">ajout au panier</h2>
+                <p class="question">Combien voulez vous ajouter ce produit au panier?</p>
+
+                <div class="selector">
+                    <button class="btn-side" onclick="changeVal(-1)"><ion-icon name="remove"></ion-icon></button>
+                    <div class="val-display" id="val-text">50g</div>
+                    <button class="btn-side" onclick="changeVal(1)"><ion-icon name="add"></ion-icon></button>
+                </div>
+
+                <div class="price-box">
+                    <span class="price-label">Prix:</span>
+                    <span class="price-val" id="price-text">22.50 DZD</span>
+                </div>
+
+                <button class="command-btn" onclick="orderConfirm()">Commander</button>
+                <p class="toggle-mode" onclick="toggleMode()">Mode: Au Kilo (cliquer pour changer)</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isWeight = true;
+        let value = 50;
+        let unitPrice = 450; // 450 DZD per kg or per unit
+
+        function updateUI() {
+            let valStr = "";
+            let totalPrice = 0;
+
+            if (isWeight) {
+                if (value < 1000) {
+                    valStr = value + "g";
+                } else {
+                    valStr = (value / 1000).toFixed(1) + "kg";
+                }
+                totalPrice = (value / 1000) * unitPrice;
+            } else {
+                valStr = value + " unité(s)";
+                totalPrice = value * unitPrice;
+            }
+
+            document.getElementById('val-text').innerText = valStr;
+            document.getElementById('price-text').innerText = totalPrice.toFixed(2) + " DZD";
+        }
+
+        function changeVal(dir) {
+            if (isWeight) {
+                value += (dir * 50);
+                if (value < 50) value = 50;
+            } else {
+                value += dir;
+                if (value < 1) value = 1;
+            }
+            updateUI();
+        }
+
+        function toggleMode() {
+            isWeight = !isWeight;
+            value = isWeight ? 50 : 1;
+            document.querySelector('.toggle-mode').innerText = "Mode: " + (isWeight ? "Au Kilo" : "Par Unité") + " (cliquer pour changer)";
+            updateUI();
+        }
+
+        function orderConfirm() {
+            alert("produit ajouté avec succès");
+        }
+
+        updateUI();
+    </script>
+</body>
+
+</html>

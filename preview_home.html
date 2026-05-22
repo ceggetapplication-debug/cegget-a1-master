@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cégget - Accueil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        body {
+            background: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* ── PHONE SHELL ── */
+        .phone {
+            width: 390px;
+            height: 844px;
+            border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+            background: #fafafa;
+        }
+
+        /* ══════════════════════════════════════
+       ALL SCREENS : absolute, fill phone
+    ══════════════════════════════════════ */
+        .screen {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            /* hidden by default */
+            flex-direction: column;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* ══════════════════════════════════════
+       SCREEN 1 : HOME (5 figures)
+    ══════════════════════════════════════ */
+        #s-home {
+            background-color: #ff7d00;
+            padding: 30px 10px;
+            overflow: hidden;
+        }
+
+        /* Overlay demi-transparent */
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: #ff7d00;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Gouttes */
+        .drop {
+            position: absolute;
+            background-color: #15616d;
+            opacity: 0.5;
+            border-radius: 999px;
+            pointer-events: none;
+        }
+
+        /* Bouton GPS */
+        .gps-btn {
+            position: absolute;
+            top: 35px;
+            right: 20px;
+            z-index: 100;
+            background-color: #ffecd1;
+            border-radius: 50px;
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Figures */
+        .figures-root {
+            position: relative;
+            z-index: 2;
+        }
+
+        .fig-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .fig-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .fig-label {
+            font-size: 18px;
+            color: #001524;
+            font-style: italic;
+            font-weight: bold;
+            margin-top: -8px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* ══════════════════════════════════════
+       SCREEN 2 : GROUPE (types de magasin)
+       SCREEN 3 : MAGASINS
+       SCREEN 4 : CATEGORIES / PRODUITS
+       SCREEN 5 : DETAIL MAGASIN
+    ══════════════════════════════════════ */
+        .hier-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0 10px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0;
+        }
+
+        .back-btn svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .hier-title {
+            font-size: 18px;
+            font-weight: bold;
+            font-style: italic;
+            color: #001524;
+        }
+
+        /* scroll area inside hierarchy screens */
+        .hier-scroll {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ── Types Container ── */
+        .types-grid {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            padding: 10px 16px 40px;
+            gap: 0;
+        }
+
+        .type-btn {
+            width: 160px;
+            height: 70px;
+            margin: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .type-btn svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .type-btn-label {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            width: 140px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Magasin list ── */
+        .magasin-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 16px 40px;
+            gap: 16px;
+        }
+
+        .magasin-card {
+            width: 100%;
+            border-radius: 25px;
+            overflow: hidden;
+            background-color: #e5e5e5;
+            cursor: pointer;
+        }
+
+        .magasin-img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+        }
+
+        .magasin-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #001524;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* ── Categorie chips ── */
+        .cat-chips {
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            padding: 0 12px;
+            gap: 20px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .chip {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .chip-img-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chip-img {
+            width: 52px;
+            height: 52px;
+            object-fit: cover;
+        }
+
+        .chip-border {
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            border: 2px solid transparent;
+        }
+
+        .chip-border.on {
+            border-color: #15616d;
+        }
+
+        .chip-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #c8c8c8;
+            text-align: center;
+            max-width: 80px;
+            white-space: normal;
+        }
+
+        .chip-label.on {
+            color: #15616d;
+            font-weight: 800;
+        }
+
+        /* ── Produits ── */
+        .produits-wrap {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 16px 40px;
+        }
+
+        .type-accordion {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 4px;
+            margin-top: 10px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+        }
+
+        .type-acc-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #15616d;
+            border-bottom: 1.5px solid #ff7d00;
+        }
+
+        .prod-card {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            border-radius: 12px;
+            padding: 10px 5px;
+            overflow: hidden;
+            background-color: #ececec;
+            cursor: pointer;
+        }
+
+        .prod-card.rev {
+            flex-direction: row-reverse;
+        }
+
+        .prod-img-box {
+            width: 45%;
+            position: relative;
+        }
+
+        .prod-img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+        }
+
+        /* badge promo */
+        .discount-badge {
+            position: absolute;
+            top: -10px;
+            left: -5px;
+            width: 47px;
+            height: 47px;
+        }
+
+        .discount-badge.right {
+            left: auto;
+            right: -5px;
+        }
+
+        .prod-info {
+            flex: 1;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .prod-nom {
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 4px;
+            margin-left: 5px;
+        }
+
+        .prod-marq {
+            font-size: 14px;
+            color: #001524;
+            margin-bottom: 6px;
+            font-style: italic;
+            margin-left: 25px;
+        }
+
+        .prod-prix {
+            font-size: 13px;
+            font-weight: 600;
+            color: #000;
+            margin-left: 25px;
+        }
+
+        .prod-old {
+            font-size: 13px;
+            color: #7d7d7d;
+            text-decoration: line-through;
+        }
+
+        .prix-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            margin-left: 5px;
+        }
+
+        /* empty text */
+        .empty-txt {
+            color: #001524;
+            font-size: 15px;
+            opacity: 0.6;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        /* ── Detail magasin ── */
+        .detail-scroll {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 16px 40px;
+        }
+
+        .detail-nom {
+            font-size: 18px;
+            font-weight: bold;
+            font-style: italic;
+            color: #15616d;
+            margin-bottom: 12px;
+        }
+
+        .detail-cover {
+            width: 100%;
+            height: 150px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            object-fit: cover;
+        }
+
+        .detail-lbl {
+            font-size: 15px;
+            font-weight: bold;
+            font-style: italic;
+            color: #001524;
+            margin-bottom: 4px;
+            margin-top: 10px;
+        }
+
+        .detail-txt {
+            font-size: 14px;
+            color: #000;
+            margin-bottom: 4px;
+            padding: 0 4px;
+        }
+
+        .detail-gris {
+            font-size: 14px;
+            color: #595959;
+            margin-bottom: 4px;
+            padding: 0 4px;
+        }
+
+        .detail-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+            flex-wrap: wrap;
+            padding: 0 4px;
+        }
+
+        /* ── Modals (Product Info, Order, Map) ── */
+        .modal-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 500;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            border-radius: 45px 45px 0 0;
+            padding: 35px 30px 40px;
+            max-height: 90%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .modal-close-circle {
+            position: absolute;
+            top: -65px;
+            right: 20px;
+            background: #fff;
+            width: 54px;
+            height: 54px;
+            border-radius: 27px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .modal-fav-circle {
+            position: absolute;
+            top: -65px;
+            left: 20px;
+            background: #fff;
+            width: 54px;
+            height: 54px;
+            border-radius: 27px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        /* ── Map Modal Styles ── */
+        #modal-map {
+            align-items: stretch;
+            background: #fff;
+            overflow-y: auto;
+        }
+
+        .map-mockup {
+            height: 300px;
+            background: #e0e0e0;
+            position: relative;
+            background-image: url('https://user-images.githubusercontent.com/10972410/37456728-66236b3e-282e-11e8-96f3-176f920f7f32.png');
+            background-size: cover;
+            flex-shrink: 0;
+        }
+
+        .map-content-scroll {
+            flex: 1;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .info-section {
+            background: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .info-lbl {
+            font-size: 14px;
+            font-weight: bold;
+            color: #15616d;
+        }
+
+        .info-val {
+            font-size: 15px;
+            color: #333;
+        }
+
+        .photo-box {
+            width: 100%;
+            height: 120px;
+            background: #eee;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+            border: 1px dashed #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+
+        <!-- ══════════════════════════════════════
+       SCREEN 1 : HOME
+  ══════════════════════════════════════ -->
+        <div id="s-home" class="screen active">
+            <div class="bg-overlay"></div>
+
+            <!-- GPS button -->
+            <button class="gps-btn" onclick="openMap()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="red">
+                    <path
+                        d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5c-1.381 0-2.5-1.119-2.5-2.5S10.619 6.5 12 6.5s2.5 1.119 2.5 2.5S13.381 11.5 12 11.5z" />
+                </svg>
+            </button>
+
+            <!-- Gouttes déco (DROPS de home.tsx) -->
+            <div class="drop" style="width:10px;height:18px;top:10px;left:10px;transform:rotate(10deg)"></div>
+            <div class="drop" style="width:25px;height:40px;top:25px;left:200px;transform:rotate(100deg)"></div>
+            <div class="drop" style="width:5px;height:12px;top:100px;left:80px;transform:rotate(10deg)"></div>
+            <div class="drop" style="width:25px;height:40px;top:150px;left:300px;transform:rotate(45deg)"></div>
+            <div class="drop" style="width:10px;height:18px;top:200px;left:50px;transform:rotate(20deg)"></div>
+            <div class="drop" style="width:25px;height:40px;top:250px;left:250px;transform:rotate(130deg)"></div>
+            <div class="drop" style="width:10px;height:18px;top:300px;left:150px;transform:rotate(60deg)"></div>
+            <div class="drop" style="width:25px;height:40px;top:350px;left:320px;transform:rotate(80deg)"></div>
+            <div class="drop" style="width:10px;height:18px;top:400px;left:20px;transform:rotate(10deg)"></div>
+            <div class="drop" style="width:25px;height:40px;top:450px;left:280px;transform:rotate(160deg)"></div>
+            <div class="drop" style="width:10px;height:18px;top:500px;left:100px;transform:rotate(30deg)"></div>
+            <div class="drop" style="width:25px;height:40px;top:550px;left:350px;transform:rotate(90deg)"></div>
+            <div class="drop" style="width:10px;height:18px;top:600px;left:60px;transform:rotate(50deg)"></div>
+            <div class="drop" style="width:20px;height:35px;top:650px;left:300px;transform:rotate(120deg)"></div>
+            <div class="drop" style="width:12px;height:22px;top:30px;left:330px;transform:rotate(70deg)"></div>
+            <div class="drop" style="width:18px;height:30px;top:80px;left:180px;transform:rotate(140deg)"></div>
+            <div class="drop" style="width:8px;height:15px;top:130px;left:360px;transform:rotate(30deg)"></div>
+            <div class="drop" style="width:22px;height:38px;top:180px;left:120px;transform:rotate(55deg)"></div>
+            <div class="drop" style="width:14px;height:24px;top:230px;left:340px;transform:rotate(100deg)"></div>
+            <div class="drop" style="width:18px;height:32px;top:280px;left:30px;transform:rotate(15deg)"></div>
+            <div class="drop" style="width:10px;height:18px;top:330px;left:260px;transform:rotate(75deg)"></div>
+            <div class="drop" style="width:28px;height:45px;top:380px;left:180px;transform:rotate(150deg)"></div>
+            <div class="drop" style="width:8px;height:14px;top:430px;left:340px;transform:rotate(40deg)"></div>
+            <div class="drop" style="width:20px;height:35px;top:480px;left:70px;transform:rotate(110deg)"></div>
+            <div class="drop" style="width:15px;height:26px;top:530px;left:310px;transform:rotate(25deg)"></div>
+            <div class="drop" style="width:10px;height:18px;top:580px;left:160px;transform:rotate(85deg)"></div>
+            <div class="drop" style="width:25px;height:42px;top:620px;left:240px;transform:rotate(135deg)"></div>
+            <div class="drop" style="width:8px;height:14px;top:670px;left:50px;transform:rotate(60deg)"></div>
+            <div class="drop" style="width:18px;height:30px;top:710px;left:320px;transform:rotate(95deg)"></div>
+            <div class="drop" style="width:12px;height:20px;top:750px;left:130px;transform:rotate(170deg)"></div>
+
+
+            <!-- 5 Figures -->
+            <div class="figures-root">
+
+                <!-- Rangée 1 : figure 0 (marginTop 40) + figure 1 (marginTop 85) -->
+                <div class="fig-row">
+                    <div style="margin-top:40px">
+                        <div class="fig-wrap" onclick="goGroupe(0)">
+                            <svg width="168" height="176" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <clipPath id="clip0">
+                                        <path
+                                            d="M 250,18 C 350,18 400,95 395,200 C 390,295 325,375 220,395 C 130,412 30,365 12,265 C -2,180 30,95 100,52 C 90,30 85,15 145,12 C 178,10 218,18 250,18 Z" />
+                                    </clipPath>
+                                </defs>
+                                <path
+                                    d="M 250,18 C 350,18 400,95 395,200 C 390,295 325,375 220,395 C 130,412 30,365 12,265 C -2,180 30,95 100,52 C 90,30 85,15 145,12 C 178,10 218,18 250,18 Z"
+                                    fill="#e5e5e5" />
+                                <image href="icones/Écran d'accueil/Courses.png" x="50" y="50" width="300" height="320"
+                                    preserveAspectRatio="xMidYMid meet" clip-path="url(#clip0)" />
+                                <path
+                                    d="M 250,18 C 350,18 400,95 395,200 C 390,295 325,375 220,395 C 130,412 30,365 12,265 C -2,180 30,95 100,52 C 90,30 85,15 145,12 C 178,10 218,18 250,18 Z"
+                                    fill="none" stroke="#001524" stroke-width="6" stroke-linejoin="round" />
+                            </svg>
+                            <span class="fig-label">Courses</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:85px">
+                        <div class="fig-wrap" onclick="goGroupe(1)">
+                            <svg width="168" height="176" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <clipPath id="clip1">
+                                        <path
+                                            d="M 160,15 C 270,8 370,80 385,185 C 400,290 340,390 230,408 C 135,424 35,370 12,260 C 5,210 18,155 55,110 C 75,85 80,55 120,32 C 140,20 152,16 160,15 Z" />
+                                    </clipPath>
+                                </defs>
+                                <path
+                                    d="M 160,15 C 270,8 370,80 385,185 C 400,290 340,390 230,408 C 135,424 35,370 12,260 C 5,210 18,155 55,110 C 75,85 80,55 120,32 C 140,20 152,16 160,15 Z"
+                                    fill="#e5e5e5" />
+                                <image href="icones/Écran d'accueil/Frais.png" x="50" y="50" width="300" height="320"
+                                    preserveAspectRatio="xMidYMid meet" clip-path="url(#clip1)" />
+                                <path
+                                    d="M 160,15 C 270,8 370,80 385,185 C 400,290 340,390 230,408 C 135,424 35,370 12,260 C 5,210 18,155 55,110 C 75,85 80,55 120,32 C 140,20 152,16 160,15 Z"
+                                    fill="none" stroke="#001524" stroke-width="6" stroke-linejoin="round" />
+                            </svg>
+                            <span class="fig-label">Frais</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rangée 2 : figure 2 (marginTop -20) + figure 3 (marginTop 15) -->
+                <div class="fig-row">
+                    <div style="margin-top:-20px">
+                        <div class="fig-wrap" onclick="goGroupe(2)">
+                            <svg width="176" height="168" viewBox="0 0 420 400" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <clipPath id="clip2">
+                                        <path
+                                            d="M 260,15 C 355,15 415,80 410,175 C 405,265 355,340 260,370 C 175,397 75,365 30,280 C -5,210 10,120 65,70 C 90,48 95,20 160,12 C 195,8 228,15 260,15 Z" />
+                                    </clipPath>
+                                </defs>
+                                <path
+                                    d="M 260,15 C 355,15 415,80 410,175 C 405,265 355,340 260,370 C 175,397 75,365 30,280 C -5,210 10,120 65,70 C 90,48 95,20 160,12 C 195,8 228,15 260,15 Z"
+                                    fill="#e5e5e5" />
+                                <image href="icones/Écran d'accueil/Snack.png" x="50" y="50" width="320" height="300"
+                                    preserveAspectRatio="xMidYMid meet" clip-path="url(#clip2)" />
+                                <path
+                                    d="M 260,15 C 355,15 415,80 410,175 C 405,265 355,340 260,370 C 175,397 75,365 30,280 C -5,210 10,120 65,70 C 90,48 95,20 160,12 C 195,8 228,15 260,15 Z"
+                                    fill="none" stroke="#001524" stroke-width="6" stroke-linejoin="round" />
+                            </svg>
+                            <span class="fig-label">Snack</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:15px">
+                        <div class="fig-wrap" onclick="goGroupe(3)">
+                            <svg width="172" height="174" viewBox="0 0 410 415" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <clipPath id="clip3">
+                                        <path
+                                            d="M 155,18 C 105,5 55,20 30,70 C 8,115 15,175 45,220 C 20,260 5,310 30,360 C 55,408 125,422 205,410 C 295,396 390,335 405,235 C 418,140 370,50 280,22 C 245,10 200,18 155,18 Z" />
+                                    </clipPath>
+                                </defs>
+                                <path
+                                    d="M 155,18 C 105,5 55,20 30,70 C 8,115 15,175 45,220 C 20,260 5,310 30,360 C 55,408 125,422 205,410 C 295,396 390,335 405,235 C 418,140 370,50 280,22 C 245,10 200,18 155,18 Z"
+                                    fill="#e5e5e5" />
+                                <image href="icones/Écran d'accueil/Déjeuner.png" x="50" y="50" width="310" height="315"
+                                    preserveAspectRatio="xMidYMid meet" clip-path="url(#clip3)" />
+                                <path
+                                    d="M 155,18 C 105,5 55,20 30,70 C 8,115 15,175 45,220 C 20,260 5,310 30,360 C 55,408 125,422 205,410 C 295,396 390,335 405,235 C 418,140 370,50 280,22 C 245,10 200,18 155,18 Z"
+                                    fill="none" stroke="#001524" stroke-width="6" stroke-linejoin="round" />
+                            </svg>
+                            <span class="fig-label">Déjeuner</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Figure 4 centrée à gauche (paddingLeft 5%, marginTop -30) -->
+                <div style="padding-left:calc(390px * 0.05); margin-top:-30px">
+                    <div class="fig-wrap" onclick="goGroupe(4)">
+                        <svg width="174" height="172" viewBox="0 0 415 410" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="clip4">
+                                    <path
+                                        d="M 200,12 C 320,8 415,80 410,185 C 407,260 370,320 300,358 C 265,376 245,370 230,355 C 195,380 140,410 90,398 C 40,385 5,340 8,280 C 10,220 50,175 25,120 C 5,75 20,20 100,10 C 135,5 170,13 200,12 Z" />
+                                </clipPath>
+                            </defs>
+                            <path
+                                d="M 200,12 C 320,8 415,80 410,185 C 407,260 370,320 300,358 C 265,376 245,370 230,355 C 195,380 140,410 90,398 C 40,385 5,340 8,280 C 10,220 50,175 25,120 C 5,75 20,20 100,10 C 135,5 170,13 200,12 Z"
+                                fill="#e5e5e5" />
+                            <image href="icones/Écran d'accueil/Magasin.png" x="50" y="50" width="315" height="310"
+                                preserveAspectRatio="xMidYMid meet" clip-path="url(#clip4)" />
+                            <path
+                                d="M 200,12 C 320,8 415,80 410,185 C 407,260 370,320 300,358 C 265,376 245,370 230,355 C 195,380 140,410 90,398 C 40,385 5,340 8,280 C 10,220 50,175 25,120 C 5,75 20,20 100,10 C 135,5 170,13 200,12 Z"
+                                fill="none" stroke="#001524" stroke-width="6" stroke-linejoin="round" />
+                        </svg>
+                        <span class="fig-label">Magasins</span>
+                    </div>
+                </div>
+
+            </div><!-- /figures-root -->
+        </div><!-- /s-home -->
+
+        <!-- ══════════════════════════════════════
+       SCREEN 2 : TYPES DE MAGASIN (groupe)
+  ══════════════════════════════════════ -->
+        <div id="s-groupe" class="screen">
+            <div class="hier-header">
+                <button class="back-btn" onclick="goHome()">
+                    <svg viewBox="0 0 24 24" fill="#001524">
+                        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
+                </button>
+                <span class="hier-title" id="groupe-title">Courses</span>
+            </div>
+            <div class="hier-scroll">
+                <div class="types-grid" id="types-grid">
+                    <!-- injecté par JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+       SCREEN 3 : MAGASINS
+  ══════════════════════════════════════ -->
+        <div id="s-magasins" class="screen">
+            <div class="hier-header">
+                <button class="back-btn" onclick="goGroupe(currentGroupeIdx)">
+                    <svg viewBox="0 0 24 24" fill="#001524">
+                        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
+                </button>
+                <span class="hier-title" id="magasins-title">Superette</span>
+            </div>
+            <div class="hier-scroll">
+                <div class="magasin-list" id="magasin-list">
+                    <!-- injecté par JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+       SCREEN 4 : CATEGORIES / PRODUITS
+  ══════════════════════════════════════ -->
+        <div id="s-categories" class="screen">
+            <div class="hier-header">
+                <button class="back-btn" onclick="goBackFromCategories()">
+                    <svg viewBox="0 0 24 24" fill="#001524">
+                        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
+                </button>
+                <span class="hier-title" id="cat-magasin-title">Mon magasin</span>
+            </div>
+
+            <!-- Chips catégories -->
+            <div class="cat-chips" id="cat-chips">
+                <!-- injecté par JS -->
+            </div>
+
+            <!-- Liste de produits -->
+            <div class="produits-wrap" id="produits-wrap">
+                <!-- injecté par JS -->
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+       SCREEN 5 : DETAIL MAGASIN (Groupe 5 – Magasins)
+  ══════════════════════════════════════ -->
+        <div id="s-detail" class="screen">
+            <div class="hier-header">
+                <button class="back-btn" onclick="goGroupe(currentGroupeIdx)">
+                    <svg viewBox="0 0 24 24" fill="#001524">
+                        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
+                </button>
+                <span class="hier-title" id="detail-type-title">Magasins</span>
+            </div>
+            <div class="detail-scroll" id="detail-content">
+                <!-- injecté par JS -->
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+       MODAL : PRODUCT INFO (Mirror de ModalProductInfos)
+  ══════════════════════════════════════ -->
+        <div class="modal-overlay" id="modal-product">
+            <div class="modal-content">
+                <div class="modal-close-circle" onclick="closeProductModal()">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="#001524">
+                        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+                    </svg>
+                </div>
+                <!-- Favori circle -->
+                <div class="modal-fav-circle" id="prod-fav-btn">
+                    <span style="font-size:24px;">♡</span>
+                </div>
+
+                <div id="product-detail-body" style="overflow-y:auto;">
+                    <!-- Injecté par JS -->
+                </div>
+
+                <button class="modal-close"
+                    style="background:#ff7d00; width:100%; height:50px; border-radius:30px; font-weight:900; letter-spacing:2px; margin-top:20px;">COMMANDER</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+       MODAL : MAP BUYER (Mirror de ModalMapBuyer)
+  ══════════════════════════════════════ -->
+        <div class="modal-overlay" id="modal-map" style="display:none; flex-direction:column;">
+            <div class="map-mockup">
+                <div class="map-close-btn" onclick="closeMap()"
+                    style="position: absolute; top: 40px; right: 20px; z-index: 999; cursor: pointer;">
+                    <svg width="40" height="40" viewBox="0 0 512 512" fill="#001524">
+                        <path
+                            d="M256 48C141.31 48 48 141.31 48 256s93.31 208 208 208 208-93.31 208-208S370.69 48 256 48zm75.31 260.69a16 16 0 11-22.62 22.62L256 278.63l-52.69 52.68a16 16 0 01-22.62-22.62L233.37 256l-52.68-52.69a16 16 0 0122.62-22.62L256 233.37l52.69-52.68a16 16 0 0122.62 22.62L278.63 256z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="map-content-scroll" style="overflow-y:auto;">
+                <h3 style="font-size:18px; font-weight:bold; margin-bottom:15px; color:#001524;">Ma Localisation</h3>
+
+                <div class="info-section">
+                    <div class="info-row"><span class="info-lbl">Position GPS</span></div>
+                    <div class="info-val">36.7538, 3.0588</div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-row">
+                        <span class="info-lbl">Type de domicile</span>
+                        <span style="color:#15616d; font-size:12px;">✎</span>
+                    </div>
+                    <div class="info-val">Appartement</div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-row">
+                        <span class="info-lbl">N° de porte / Etage</span>
+                        <span style="color:#15616d; font-size:12px;">✎</span>
+                    </div>
+                    <div class="info-val">B12, 4ème étage</div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-row">
+                        <span class="info-lbl">Photo de la porte</span>
+                        <span style="color:#15616d; font-size:12px;">✎</span>
+                    </div>
+                    <div class="photo-box">Aucune photo sélectionnée</div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-row">
+                        <span class="info-lbl">Autres informations</span>
+                        <span style="color:#15616d; font-size:12px;">✎</span>
+                    </div>
+                    <div class="info-val" style="font-style:italic; color:#777;">Code porte 1234, sonnerie "Martin"
+                    </div>
+                </div>
+
+                <button class="modal-close"
+                    style="background:#15616d; color:white; width:100%; padding:15px; border-radius:12px; font-weight:bold; margin-top:10px;">ENREGISTRER
+                    L'ADRESSE</button>
+            </div>
+        </div>
+
+    </div><!-- /phone -->
+
+    <script>
+        /* ════════════════════════════════════
+           DONNÉES (miroir du TSX)
+        ════════════════════════════════════ */
+        const SHAPES = [
+            {
+                vbW: 400, vbH: 420,
+                path: 'M 250,18 C 350,18 400,95 395,200 C 390,295 325,375 220,395 C 130,412 30,365 12,265 C -2,180 30,95 100,52 C 90,30 85,15 145,12 C 178,10 218,18 250,18 Z',
+            },
+            {
+                vbW: 400, vbH: 420,
+                path: 'M 160,15 C 270,8 370,80 385,185 C 400,290 340,390 230,408 C 135,424 35,370 12,260 C 5,210 18,155 55,110 C 75,85 80,55 120,32 C 140,20 152,16 160,15 Z',
+            },
+            {
+                vbW: 420, vbH: 400,
+                path: 'M 260,15 C 355,15 415,80 410,175 C 405,265 355,340 260,370 C 175,397 75,365 30,280 C -5,210 10,120 65,70 C 90,48 95,20 160,12 C 195,8 228,15 260,15 Z',
+            },
+            {
+                vbW: 410, vbH: 415,
+                path: 'M 155,18 C 105,5 55,20 30,70 C 8,115 15,175 45,220 C 20,260 5,310 30,360 C 55,408 125,422 205,410 C 295,396 390,335 405,235 C 418,140 370,50 280,22 C 245,10 200,18 155,18 Z',
+            },
+            {
+                vbW: 415, vbH: 410,
+                path: 'M 200,12 C 320,8 415,80 410,185 C 407,260 370,320 300,358 C 265,376 245,370 230,355 C 195,380 140,410 90,398 C 40,385 5,340 8,280 C 10,220 50,175 25,120 C 5,75 20,20 100,10 C 135,5 170,13 200,12 Z',
+            },
+        ];
+
+        const groupes = [
+            {
+                nom: 'Courses',
+                types: [
+                    { nom: 'Superette', hasDetail: false },
+                    { nom: 'Épicerie', hasDetail: false },
+                    { nom: 'Produits cosmétiques', hasDetail: false },
+                    { nom: 'Bureau-tabac', hasDetail: false },
+                    { nom: 'Alimentation générale', hasDetail: false },
+                ]
+            },
+            {
+                nom: 'Frais',
+                types: [
+                    { nom: 'Fruits et légumes', hasDetail: false },
+                    { nom: 'Boucherie (viande rouge)', hasDetail: false },
+                    { nom: 'Boucherie (viande blanche)', hasDetail: false },
+                    { nom: 'Poissonnerie', hasDetail: false },
+                ]
+            },
+            {
+                nom: 'Snack',
+                types: [
+                    { nom: 'Pizzeria et pâtisserie', hasDetail: false },
+                    { nom: 'Gâteaux traditionnels', hasDetail: false },
+                    { nom: 'Boulangerie', hasDetail: false },
+                ]
+            },
+            {
+                nom: 'Déjeuner',
+                types: [
+                    { nom: 'Fast-food', hasDetail: false },
+                    { nom: 'Restaurant', hasDetail: false },
+                    { nom: 'Crèmerie', hasDetail: false },
+                ]
+            },
+            {
+                nom: 'Magasins',
+                types: [
+                    { nom: 'Superette', hasDetail: true },
+                    { nom: 'Épicerie', hasDetail: true },
+                    { nom: 'Produits cosmétiques', hasDetail: true },
+                    { nom: 'Bureau-tabac', hasDetail: true },
+                    { nom: 'Alimentation générale', hasDetail: true },
+                    { nom: 'Fruits et légumes', hasDetail: true },
+                    { nom: 'Boucherie (viande rouge)', hasDetail: true },
+                    { nom: 'Boucherie (viande blanche)', hasDetail: true },
+                    { nom: 'Poissonnerie', hasDetail: true },
+                    { nom: 'Pizzeria et pâtisserie', hasDetail: true },
+                    { nom: 'Gâteaux traditionnels', hasDetail: true },
+                    { nom: 'Boulangerie', hasDetail: true },
+                    { nom: 'Fast-food', hasDetail: true },
+                    { nom: 'Restaurant', hasDetail: true },
+                    { nom: 'Crèmerie', hasDetail: true },
+                ]
+            }
+        ];
+
+        /* Exemple de catégories + produits pour la démo */
+        const demoCategories = [
+            {
+                nom: 'Top ventes',
+                img: 'icones/Partagées/Top ventes.png',
+                productTypes: [],
+                produits: [
+                    {
+                        nom: 'Huile végétale', marque: '', prix: 280, oldPrice: null,
+                        img: 'https://images.unsplash.com/photo-1607006411062-098c37d0484a?w=300&q=80'
+                    },
+                ]
+            },
+            {
+                nom: 'Promotion',
+                img: 'icones/Partagées/Promotion.png',
+                productTypes: [],
+                produits: [
+                    {
+                        nom: 'Lait entier frais', marque: 'Soummam', prix: 110, oldPrice: 145,
+                        img: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300&q=80'
+                    },
+                ]
+            },
+            {
+                nom: 'Produits laitiers',
+                img: 'icones/Partagées/Produits laitiers.png',
+                productTypes: [
+                    {
+                        nom: 'Lait & crème',
+                        produits: [
+                            {
+                                nom: 'Lait entier UHT', marque: 'Candia', prix: 120, oldPrice: null,
+                                img: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300&q=80'
+                            },
+                        ]
+                    }
+                ],
+                produits: []
+            },
+            {
+                nom: 'Snacks',
+                img: 'icones/Partagées/Snacks.png',
+                productTypes: [],
+                produits: [
+                    {
+                        nom: 'Chips nature', marque: 'Chipsy', prix: 65, oldPrice: null,
+                        img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=300&q=80'
+                    },
+                ]
+            },
+            {
+                nom: 'Hygiène',
+                img: 'icones/Partagées/Hygiène.png',
+                productTypes: [],
+                produits: []
+            },
+            {
+                nom: 'Boissons',
+                img: 'icones/Partagées/Boissons.png',
+                productTypes: [],
+                produits: []
+            },
+            {
+                nom: 'Spécialités',
+                img: 'icones/Partagées/Spécialités.png',
+                productTypes: [],
+                produits: []
+            }
+        ];
+
+        /* Demo magasin (pour les 4 premiers groupes) */
+        const demoMagasin = {
+            nom: 'Superette du quartier',
+            photo: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600&q=80',
+        };
+
+        /* Demo magasin détaillé (groupe 5) */
+        const demoMagasinD = {
+            nom: 'Superette Tizi Centre',
+            photo: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600&q=80',
+            likes: 328,
+            adresse: 'Rue principale, Tizi Ouzou, Algérie',
+            email: 'superette.tizi@exemple.dz',
+            telephone: '0555 12 34 56',
+            photosPartagees: [
+                'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80',
+                'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&q=80',
+            ],
+            horaires: {
+                lundi: { o: '08:00', f: '20:00' },
+                mardi: { o: '08:00', f: '20:00' },
+                mercredi: { o: '08:00', f: '20:00' },
+                jeudi: { o: '08:00', f: '20:00' },
+                vendredi: { o: '08:00', f: '12:00' },
+                samedi: { o: '08:00', f: '20:00' },
+            }
+        };
+
+        /* ── ÉTAT / NAVIGATION ── */
+        let currentGroupeIdx = 0;
+        let currentTypeName = '';
+        let currentCatIdx = 0;
+        let currentHasDetail = false;
+        let userFavoris = []; // État des favoris pour le preview
+        let previousScreen = ""; // <--- AJOUTÉ
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function goBackFromCategories() {
+            if (previousScreen === 's-detail') showScreen('s-detail');
+            else showScreen('s-magasins');
+        }
+
+        /* HOME */
+        function goHome() { showScreen('s-home'); }
+
+        /* GROUPE → types de magasin */
+        function goGroupe(idx) {
+            currentGroupeIdx = idx;
+            const g = groupes[idx];
+
+            document.getElementById('groupe-title').textContent = g.nom;
+
+            const grid = document.getElementById('types-grid');
+            grid.innerHTML = '';
+
+            g.types.forEach(type => {
+                const btn = document.createElement('div');
+                btn.className = 'type-btn';
+
+                const w = 160, h = 70;
+                const svgPath = `M ${w / 2},6 C ${w * 0.85},6 ${w - 6},${h * 0.25} ${w - 6},${h / 2} C ${w - 6},${h * 0.82} ${w * 0.72},${h - 6} ${w / 2},${h - 6} C ${w * 0.18},${h - 6} 6,${h * 0.72} 6,${h * 0.45} C 6,${h * 0.18} ${w * 0.18},6 ${w / 2},6 Z`;
+
+                btn.innerHTML = `
+      <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+        <path d="${svgPath}" fill="#15616d" stroke="#ff7d00" stroke-width="1.5"/>
+      </svg>
+      <span class="type-btn-label">${type.nom}</span>
+    `;
+
+                btn.onclick = () => goMagasins(type.nom, type.hasDetail);
+                grid.appendChild(btn);
+            });
+
+            showScreen('s-groupe');
+        }
+
+        /* TYPES → MAGASINS */
+        function goMagasins(typeName, hasDetail) {
+            currentTypeName = typeName;
+            currentHasDetail = hasDetail;
+
+            document.getElementById('magasins-title').textContent = typeName;
+
+            const list = document.getElementById('magasin-list');
+            list.innerHTML = '';
+
+            if (hasDetail) {
+                /* Groupe 5 : on affiche des magasinsD (avec fiche détail) */
+                const card = buildMagasinCard(demoMagasinD.nom, demoMagasinD.photo, () => goDetail(typeName));
+                list.appendChild(card);
+            } else {
+                /* Groupes 1-4 : magasins normaux → categories */
+                const card = buildMagasinCard(demoMagasin.nom, demoMagasin.photo, () => goCategories(demoMagasin.nom));
+                list.appendChild(card);
+            }
+
+            showScreen('s-magasins');
+        }
+
+        function buildMagasinCard(nom, photo, onClick) {
+            const card = document.createElement('div');
+            card.className = 'magasin-card';
+            card.onclick = onClick;
+            card.innerHTML = `
+    <img class="magasin-img" src="${photo}" alt="${nom}" onerror="this.style.background='#ccc';this.style.height='130px'">
+    <div class="magasin-name">${nom}</div>
+  `;
+            return card;
+        }
+
+        /* MAGASIN → CATEGORIES / PRODUITS */
+        function goCategories(magasinNom) {
+            previousScreen = document.querySelector('.screen.active').id; // <--- AJOUTÉ
+            document.getElementById('cat-magasin-title').textContent = magasinNom;
+
+            /* Chips */
+            const chipsEl = document.getElementById('cat-chips');
+            chipsEl.innerHTML = '';
+            demoCategories.forEach((cat, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.onclick = () => selectCat(idx);
+                chip.innerHTML = `
+      <div class="chip-img-box">
+        <img class="chip-img" src="${cat.img}" alt="${cat.nom}">
+        <div class="chip-border${idx === 0 ? ' on' : ''}" id="chip-border-${idx}"></div>
+      </div>
+      <span class="chip-label${idx === 0 ? ' on' : ''}" id="chip-lbl-${idx}">${cat.nom}</span>
+    `;
+                chipsEl.appendChild(chip);
+            });
+
+            renderProduits(0);
+            showScreen('s-categories');
+        }
+
+        /* Rend les produits de la catégorie sélectionnée */
+        function selectCat(idx) {
+            currentCatIdx = idx;
+            /* Met à jour les chips */
+            demoCategories.forEach((_, i) => {
+                document.getElementById(`chip-border-${i}`).classList.toggle('on', i === idx);
+                document.getElementById(`chip-lbl-${i}`).classList.toggle('on', i === idx);
+            });
+            renderProduits(idx);
+        }
+
+        function renderProduits(idx) {
+            const cat = demoCategories[idx];
+            const wrap = document.getElementById('produits-wrap');
+            wrap.innerHTML = '';
+
+            const isProm = cat.nom === 'Promotion';
+
+            if (cat.productTypes && cat.productTypes.length > 0) {
+                /* Affichage par type (accordion) */
+                cat.productTypes.forEach(pt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'type-accordion';
+                    btn.dataset.open = '1';
+                    btn.innerHTML = `
+        <span class="type-acc-label">${pt.nom}</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#15616d">
+          <path d="M7.41 15.41 8.83 17l6-6-6-6-1.42 1.41L12.17 11z"/>
+        </svg>
+      `;
+                    btn.onclick = function () { toggleAcc(this); };
+                    wrap.appendChild(btn);
+
+                    const prodWrap = document.createElement('div');
+                    prodWrap.id = 'pt-' + pt.nom.replace(/\s/g, '');
+                    pt.produits.forEach((p, i) => {
+                        prodWrap.appendChild(buildProdCard(p, i, isProm));
+                    });
+                    wrap.appendChild(prodWrap);
+                });
+            } else if (cat.produits && cat.produits.length > 0) {
+                /* Affichage direct */
+                cat.produits.forEach((p, i) => {
+                    wrap.appendChild(buildProdCard(p, i, isProm));
+                });
+            } else {
+                const empty = document.createElement('p');
+                empty.className = 'empty-txt';
+                empty.textContent = 'Aucun produit disponible';
+                wrap.appendChild(empty);
+            }
+        }
+
+        function buildProdCard(p, idx, isPromo) {
+            const card = document.createElement('div');
+            card.className = 'prod-card' + (idx % 2 !== 0 ? ' rev' : '');
+
+            const discountPct = (isPromo && p.oldPrice && p.oldPrice > p.prix)
+                ? Math.round(((p.oldPrice - p.prix) / p.oldPrice) * 100)
+                : null;
+
+            const badgeSide = (idx % 2 === 0) ? '' : ' right';
+
+            card.innerHTML = `
+    <div class="prod-img-box">
+      <img class="prod-img" src="${p.img}" alt="${p.nom}">
+      ${discountPct ? `<svg class="discount-badge${badgeSide}" viewBox="0 0 1024 1024" fill="red">
+        <g transform="translate(0,1024) scale(0.1,-0.1)">
+          <path d="M5065 9867 c-73 -39 -199 -104 -855 -440 -118 -60 -271 -139 -339 -174 l-124 -65 -796 -100 c-438 -55 -799 -103 -802 -106 -4 -4 -158 -308 -344 -677 -186 -368 -343 -677 -349 -686 -9 -12 -850 -774 -1110 -1005 l-57 -52 26 -138 c14 -77 32 -170 40 -209 8 -38 42 -212 75 -385 102 -529 120 -622 136 -696 15 -69 15 -75 -15 -225 -56 -283 -120 -611 -181 -929 -33 -173 -66 -339 -71 -369 -6 -29 -7 -57 -2 -61 4 -4 267 -240 583 -525 l575 -518 347 -686 c190 -377 350 -687 355 -688 7 -2 946 -122 1123 -143 41 -5 164 -20 272 -34 l198 -25 102 -54 c57 -30 216 -112 353 -182 248 -127 393 -201 762 -391 l192 -99 83 42 c46 23 191 98 323 166 132 68 380 194 550 281 171 88 343 177 384 198 l74 39 311 39 c1001 126 1282 162 1287 168 3 4 105 203 226 442 121 239 278 548 347 685 l127 250 201 180 c111 99 370 333 577 519 363 328 376 340 374 373 -2 30 -75 415 -118 628 -8 39 -35 178 -60 310 -26 132 -59 306 -76 386 l-29 146 29 149 c16 82 50 257 75 389 26 132 53 272 61 310 21 102 113 584 120 625 l5 35 -580 520 -579 520 -180 355 c-422 834 -520 1025 -528 1027 -4 2 -364 47 -800 102 l-792 99 -103 55 c-57 30 -215 112 -353 182 -416 212 -653 334 -802 411 -77 41 -147 74 -155 74 -7 0 -49 -20 -93 -43z"/>
+        </g>
+        <text x="12" y="28" font-size="280" font-weight="900" fill="white" font-family="sans-serif">-${discountPct}%</text>
+      </svg>` : ''}
+    </div>
+    <div class="prod-info">
+      <span class="prod-nom">${p.nom}</span>
+      ${p.marque ? `<span class="prod-marq">${p.marque}</span>` : ''}
+      ${isPromo && p.oldPrice
+                    ? `<div class="prix-row"><span class="prod-old">${p.oldPrice} DZD</span><span class="prod-prix" style="margin-left:0">${p.prix} DZD</span></div>`
+                    : `<span class="prod-prix">${p.prix} DZD</span>`}
+    </div>
+  `;
+            card.onclick = function () { openProduct(p); };
+            return card;
+        }
+
+        /* Basculer favori dans le preview */
+        function toggleFavoriPreview(magasinNom) {
+            const idx = userFavoris.indexOf(magasinNom);
+            if (idx > -1) {
+                userFavoris.splice(idx, 1);
+            } else {
+                userFavoris.push(magasinNom);
+            }
+            // On rafraîchit la vue
+            goDetail(currentTypeName);
+        }
+
+        /* GROUPE 5 → DETAIL MAGASIN */
+        function goDetail(typeName) {
+            document.getElementById('detail-type-title').textContent = typeName;
+
+            const m = demoMagasinD;
+            const jours = [
+                ['Lundi', m.horaires.lundi],
+                ['Mardi', m.horaires.mardi],
+                ['Mercredi', m.horaires.mercredi],
+                ['Jeudi', m.horaires.jeudi],
+                ['Vendredi', m.horaires.vendredi],
+                ['Samedi', m.horaires.samedi],
+            ];
+
+            let photosHtml = '';
+            if (m.photosPartagees && m.photosPartagees.length > 0) {
+                const imgs = m.photosPartagees.map(uri =>
+                    `<img src="${uri}" style="width:200px;height:200px;border-radius:12px;margin-right:10px;object-fit:cover;flex-shrink:0;">`
+                ).join('');
+                photosHtml = `
+      <span class="detail-lbl">Photos partagées</span>
+      <div style="display:flex;overflow-x:auto;padding:10px 0;gap:10px;">${imgs}</div>
+    `;
+            }
+
+            const horaireRows = jours.filter(([_, h]) => h).map(([jour, h]) => `
+    <div class="detail-row">
+      <span class="detail-txt">${jour}</span>
+      <span class="detail-gris">${h.o} - ${h.f}</span>
+    </div>
+  `).join('');
+
+            document.getElementById('detail-content').innerHTML = `
+    <span class="detail-nom">${m.nom}</span>
+    <img class="detail-cover" src="${m.photo}" alt="${m.nom}">
+
+    <div class="detail-row">
+      <span class="detail-lbl">${userFavoris.includes(m.nom) ? 'Retirer des favoris' : 'Ajouter aux favoris'}</span>
+      <span style="font-size:28px;cursor:pointer;color:${userFavoris.includes(m.nom) ? 'red' : '#ccc'};" onclick="toggleFavoriPreview('${m.nom}')">
+        ${userFavoris.includes(m.nom) ? '♥' : '♡'}
+      </span>
+    </div>
+
+    <div style="display:flex;align-items:center;flex-wrap:wrap;">
+      <span class="detail-lbl">Ce magasin est aimé par&nbsp;</span>
+      <span class="detail-gris">${m.likes}&nbsp;</span>
+      <span class="detail-lbl">personnes</span>
+    </div>
+
+    <span class="detail-lbl">Adresse:</span>
+    <span class="detail-txt">${m.adresse}</span>
+
+    ${photosHtml}
+
+    <div class="detail-row">
+      <span class="detail-lbl">Aller au magasin</span>
+      <span style="font-size:22px;cursor:pointer;" onclick="goCategories('${m.nom}')">🔗</span>
+    </div>
+
+    <span class="detail-lbl">Horaires d'ouverture</span>
+    ${horaireRows}
+
+    <span class="detail-lbl">Contact du magasin</span>
+    <div class="detail-row">
+      <span class="detail-txt">Email:</span>
+      <span class="detail-gris">${m.email ?? 'Non disponible'}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-txt">Téléphone:</span>
+      <span class="detail-gris">${m.telephone ?? 'Non disponible'}</span>
+    </div>
+  `;
+
+            showScreen('s-detail');
+        }
+
+        /* ── MODALS ── */
+        function openMap() { document.getElementById('modal-map').style.display = 'flex'; }
+        function closeMap() { document.getElementById('modal-map').style.display = 'none'; }
+
+        function openProduct(p) {
+            const body = document.getElementById('product-detail-body');
+            body.innerHTML = `
+                <h2 style="font-size:18px; font-weight:900; color:#15616d; margin-bottom:15px; text-transform:uppercase;">SUR LE PRODUIT</h2>
+                <img src="${p.img}" style="width:100%; height:200px; border-radius:20px; margin-bottom:20px; object-fit:cover;">
+                <div style="display:flex; margin-bottom:10px;"><span style="font-weight:800; margin-right:8px;">Nom:</span><span>${p.nom}</span></div>
+                <div style="display:flex; margin-bottom:10px;"><span style="font-weight:800; margin-right:8px;">Marque:</span><span>${p.marque || 'N/A'}</span></div>
+                <div style="display:flex; margin-bottom:10px;"><span style="font-weight:800; margin-right:8px;">Prix:</span><span style="color:#ff7d00; font-weight:900; font-size:18px;">${p.prix} DZD</span></div>
+                <div style="margin-top:20px;">
+                    <span style="font-weight:800;">Détails:</span>
+                    <p style="margin-top:5px; font-size:14px; line-height:1.5;">${p.description || 'Pas de description disponible pour ce produit.'}</p>
+                </div>
+            `;
+            document.getElementById('modal-product').classList.add('open');
+        }
+        function closeProductModal() { document.getElementById('modal-product').classList.remove('open'); }
+    </script>
+</body>
+
+</html>

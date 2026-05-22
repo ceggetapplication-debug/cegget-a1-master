@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invite Friends Mirror Preview</title>
+    <!-- Ionicons CDN to match the Ionicons in React Native -->
+    <script src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #ff7d00;
+            --secondary-color: #6c757d;
+            --overlay-bg: rgba(0, 0, 0, 0.5);
+            --modal-bg: #ffffff;
+            --text-main: #333333;
+            --text-secondary: #666666;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: var(--font-family);
+            background-color: #f0f2f5;
+            overflow: hidden;
+        }
+
+        /* Centered View (Modal Overlay) */
+        .centered-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--overlay-bg);
+            z-index: 1000;
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .centered-view.hidden {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        /* Modal View */
+        .invite-friends-modal-view {
+            width: 90%;
+            max-width: 400px;
+            max-height: 80%;
+            background-color: var(--modal-bg);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            transform: translateY(0);
+            transition: transform 0.3s;
+        }
+
+        .centered-view.hidden .invite-friends-modal-view {
+            transform: translateY(100px);
+        }
+
+        /* Header */
+        .credit-modal-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+            justify-content: center;
+        }
+
+        .credit-modal-back-button {
+            position: absolute;
+            left: 0;
+            padding: 5px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .credit-modal-back-button ion-icon {
+            font-size: 30px;
+            color: #666;
+        }
+
+        .credit-modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        /* Content */
+        .invite-scroll-view {
+            width: 100%;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .invite-scroll-content {
+            padding-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .invite-description-text {
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .order-button {
+            padding: 6px 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+
+        .order-button:active {
+            opacity: 0.7;
+        }
+
+        /* Styles mirroring styles.shareButton */
+        .share-button {
+            background-color: var(--success-color);
+        }
+
+        /* Styles mirroring styles.closeButton */
+        .close-button {
+            background-color: var(--secondary-color);
+        }
+
+        /* Styles mirroring styles.orderButtonText */
+        .order-button-text {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .share-icon {
+            font-size: 20px;
+            color: #ffffff;
+            margin-right: 10px;
+        }
+
+        /* Simulated Share Sheet (iOS/Android style) */
+        #shareSheetOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .share-sheet {
+            width: 100%;
+            max-width: 500px;
+            background: #f8f8f8;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .share-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .share-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .share-message {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .share-icon-circle {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .share-option-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .share-cancel {
+            width: 100%;
+            padding: 15px;
+            background: #fff;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            color: #007bff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Main Modal -->
+    <div class="centered-view" id="modalOverlay">
+        <div class="invite-friends-modal-view">
+            <div class="credit-modal-header">
+                <button class="credit-modal-back-button" onclick="closeModal()">
+                    <ion-icon name="close-circle-outline"></ion-icon>
+                </button>
+                <h2 class="credit-modal-title">Livraison gratuite</h2>
+            </div>
+
+            <!-- Scrollable content -->
+            <div class="invite-scroll-view">
+                <div class="invite-scroll-content">
+                    <p class="invite-description-text" id="message">
+                        Voulez-vous des livraisons gratuites? Invitez des amis.
+                    </p>
+
+                    <button class="order-button share-button" onclick="openShareSheet()">
+                        <ion-icon name="share-social-outline" class="share-icon" id="shareIcon"></ion-icon>
+                        <span class="order-button-text">Inviter</span>
+                    </button>
+
+                    <button class="order-button close-button" onclick="closeModal()">
+                        <span class="order-button-text">Fermer</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulated Share Sheet -->
+        <div id="shareSheetOverlay" onclick="closeShareSheet()">
+            <div class="share-sheet" onclick="event.stopPropagation()">
+                <div class="share-header">
+                    <span class="share-title">Partager</span>
+                    <ion-icon name="close" style="font-size: 24px; cursor: pointer;"
+                        onclick="closeShareSheet()"></ion-icon>
+                </div>
+
+                <div class="share-message" id="shareContent"></div>
+
+                <div class="share-options">
+                    <div class="share-option">
+                        <div class="share-icon-circle" style="color: #25D366;"><ion-icon name="logo-whatsapp"
+                                size="large"></ion-icon></div>
+                        <span class="share-option-label">WhatsApp</span>
+                    </div>
+                    <div class="share-option">
+                        <div class="share-icon-circle" style="color: #0088cc;"><ion-icon name="paper-plane"
+                                size="large"></ion-icon></div>
+                        <span class="share-option-label">Telegram</span>
+                    </div>
+                    <div class="share-option">
+                        <div class="share-icon-circle" style="color: #4267B2;"><ion-icon name="logo-facebook"
+                                size="large"></ion-icon></div>
+                        <span class="share-option-label">Facebook</span>
+                    </div>
+                    <div class="share-option">
+                        <div class="share-icon-circle" style="color: #333;"><ion-icon name="copy-outline"
+                                size="large"></ion-icon></div>
+                        <span class="share-option-label">Copier</span>
+                    </div>
+                </div>
+
+                <button class="share-cancel" onclick="closeShareSheet()">Annuler</button>
+            </div>
+        </div>
+
+        <script>
+            const username = "RosaH";
+            const referralLink = `monapp://referral?referrerId=${username}`;
+
+            const translations = {
+                "modal": "Voulez-vous des livraisons gratuites? Invitez des amis.",
+                "sharePrefix": "Voulez vous essayer l'appli?"
+            };
+
+            function closeModal() {
+                document.getElementById('modalOverlay').classList.add('hidden');
+                setTimeout(() => {
+                    document.getElementById('modalOverlay').classList.remove('hidden');
+                }, 1500);
+            }
+
+            function openShareSheet() {
+                const shareContent = document.getElementById('shareContent');
+                shareContent.innerText = `${translations.sharePrefix}\n\n${referralLink}`;
+                document.getElementById('shareSheetOverlay').style.display = 'flex';
+            }
+
+            function closeShareSheet() {
+                document.getElementById('shareSheetOverlay').style.display = 'none';
+            }
+        </script>
+
+</body>
+
+</html>

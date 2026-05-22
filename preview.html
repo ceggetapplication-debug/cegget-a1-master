@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panier - Preview</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800;900&display=swap');
+
+        :root {
+            --primary-bg: #FFFFFF;
+            --secondary-bg: #F8F9FA;
+            --pure-black: #000000;
+            --soft-gray: #000000;
+            /* User requested removing gray */
+            --active-color: #15616d;
+            /* Teal for specific elements */
+            --btn-color: #ff7d00;
+            /* Orange buttons */
+            --separator-color: #78290f;
+            --price-color: #ff7d00;
+            /* Orange for PRICE as requested */
+        }
+
+        body {
+            font-family: 'Urbanist', sans-serif;
+            background-color: var(--primary-bg);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 414px;
+            background: #FFF;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 120px;
+        }
+
+        .header {
+            padding: 30px 25px 10px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--pure-black);
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+        }
+
+        /* NAVIGATION BAR */
+        .nav-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 10px 0 15px;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            gap: 5px;
+        }
+
+        .nav-item {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--pure-black);
+            padding: 5px 10px;
+            position: relative;
+            cursor: pointer;
+            transition: color 0.2s;
+            white-space: normal;
+            /* Allow wrap */
+            text-align: center;
+            max-width: 120px;
+            line-height: 1.1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-item.active {
+            color: var(--active-color);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--active-color);
+            border-radius: 1px;
+        }
+
+        .nav-separator {
+            width: 2px;
+            height: 18px;
+            background-color: var(--separator-color);
+            border-radius: 1px;
+            margin: 0 5px;
+            flex-shrink: 0;
+        }
+
+        .content {
+            padding: 20px 20px;
+        }
+
+        /* PAPER LIST STYLE */
+        .product-list-container {
+            background: #FFFFFF;
+            border-radius: 15px;
+            padding: 5px 0;
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .item-card {
+            background: transparent;
+            border-bottom: 1px solid #F0F0F0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0;
+            margin: 0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .item-card:last-child {
+            border-bottom: none;
+        }
+
+        .item-card:active {
+            background: #FAFAFA;
+        }
+
+        .item-excluded {
+            opacity: 0.4;
+        }
+
+        .item-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 2-LINE LAYOUT */
+        .item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .item-title-row {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--pure-black);
+            line-height: 1.3;
+            width: 100%;
+        }
+
+        .item-qty {
+            /* Basic styling */
+        }
+
+        .item-name {
+            /* Basic styling */
+        }
+
+        .item-brand {
+            font-size: 13px;
+            color: #444;
+            /* Slightly lighter than black (which is #000) for contrast, but close to black */
+            font-weight: 600;
+            /* Removed uppercase per request */
+            letter-spacing: 0.5px;
+        }
+
+        .item-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--price-color);
+            /* Orange #ff7d00 */
+        }
+
+        .check-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 11px;
+            border: 2px solid #DDD;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .check-circle-active {
+            background: var(--pure-black);
+            /* Matching TSX logic PALETTE.deep */
+            border-color: var(--pure-black);
+            color: white;
+        }
+
+        .section-header {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            /* User requested 14 */
+            font-weight: 800;
+            color: var(--pure-black);
+            /* Removed uppercase */
+        }
+
+        .pills-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+
+        .pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            background: #FFFFFF;
+            border: 1px solid #EFEFEF;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .pill.active {
+            background: #15616d;
+            /* Teal */
+            color: white;
+        }
+
+        .pill-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--soft-gray);
+        }
+
+        .pill.active .pill-text {
+            color: white;
+        }
+
+        /* Specific Option Rows for CC & Free Delivery */
+        .option-rows-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .option-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #EEE;
+        }
+
+        .option-text {
+            font-size: 14px;
+            /* Requested 14 */
+            color: var(--pure-black);
+            font-weight: 600;
+        }
+
+        .control-btn {
+            background: var(--btn-color);
+            /* Orange #ff7d00 */
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .control-btn:active {
+            opacity: 0.8;
+        }
+
+        .control-btn.used {
+            background: #CCC;
+            cursor: default;
+        }
+
+        /* Summary Box - SMALLER BUTTON */
+        .summary-box {
+            background: transparent;
+            /* Cleaner look at bottom */
+            padding: 20px;
+            margin-bottom: 20px;
+            /* Removed shadow/border for 'sheet' look flow */
+            border-top: 1px solid #EEE;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .total-label {
+            font-size: 14px;
+            /* User requested 14 */
+            font-weight: 800;
+            color: var(--pure-black);
+            /* Removed uppercase */
+        }
+
+        .total-value {
+            font-size: 16px;
+            /* User requested 16 */
+            font-weight: 900;
+            color: #ff7d00;
+            /* Teal #15616d */
+        }
+
+        .checkout-btn {
+            background: #001524;
+            color: white;
+            padding: 15px 40px;
+            /* Smaller padding */
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            /* Smaller button */
+            cursor: pointer;
+            margin: 0 auto;
+            /* Align right or center? User said "petit". Leaving auto width based on content */
+            width: fit-content;
+            border: none;
+        }
+
+        .checkout-btn-txt {
+            font-weight: 800;
+            font-size: 16px;
+            /* Requested 16 */
+        }
+
+        .checkout-btn.disabled {
+            background: #E0E0E0;
+            cursor: not-allowed;
+        }
+
+        /* Modal Styles matching modalOrderQuantity.tsx */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            /* Changed to 0.8 as per React Native style */
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: #FFFFFF;
+            border-radius: 45px;
+            padding: 25px;
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            color: black;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .top-header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .back-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background-color: #f8f8f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .modal-title-text {
+            font-size: 18px;
+            font-weight: 900;
+            color: #15616d;
+            /* Teal */
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-question {
+            font-size: 15px;
+            color: #001524;
+            font-weight: 600;
+            line-height: 20px;
+            margin-bottom: 25px;
+        }
+
+        .selector-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            gap: 15px;
+        }
+
+        .side-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            background-color: #001524;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .input-wrapper {
+            width: 100px;
+            height: 50px;
+            background-color: #f8f8f8;
+            border-radius: 15px;
+            border: 1.5px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-val {
+            font-size: 18px;
+            font-weight: 900;
+            color: #000;
+        }
+
+        .formatted-text {
+            font-size: 15px;
+            color: #000;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .modal-price-container {
+            display: flex;
+            flex-direction: row;
+            align-items: baseline;
+            justify-content: center;
+            margin-bottom: 35px;
+        }
+
+        .modal-price-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #001524;
+            margin-right: 10px;
+        }
+
+        .modal-price-val {
+            font-size: 18px;
+            font-weight: 900;
+            color: #ff7d00;
+        }
+
+        .command-btn {
+            background-color: #ff7d00;
+            width: 100%;
+            height: 50px;
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            box-shadow: 0 8px 15px rgba(255, 125, 0, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-container">
+        <div class="header">
+            <div class="header-title">Panier</div>
+        </div>
+
+        <!-- Navigation Bar (Original structure restored with exact JSON labels) -->
+        <div class="nav-container">
+            <div class="nav-wrapper">
+                <div class="nav-item active" id="tabCart" onclick="switchTab('cart')">
+                    Produits sélectionnés
+                </div>
+                <div class="nav-separator"></div>
+                <div class="nav-item" id="tabDelivery" onclick="switchTab('tracking')">
+                    État de la livraison
+                </div>
+                <div class="nav-separator"></div>
+                <div class="nav-item" id="tabList" onclick="switchTab('list')">
+                    Liste des courses
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- VIEW: CART -->
+        <div id="cartView">
+            <!-- PAPER LIST CONTAINER -->
+            <div class="product-list-container" id="productList">
+                <!-- Items rendered via JS -->
+            </div>
+
+            <div class="section-header">Type de livraison</div>
+            <div class="delivery-vertical-layout" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Row 1: Rapid & Standard -->
+                <div style="display: flex; gap: 10px;">
+                    <div class="pill active" onclick="selectDelivery(this, 'rapid')"
+                        style="flex: 1; justify-content: center;">
+                        <ion-icon name="flash"></ion-icon>
+                        <span class="pill-text" id="btnRapid">Rapide (300 DZD)</span>
+                    </div>
+                    <div class="pill" onclick="selectDelivery(this, 'normal')"
+                        style="flex: 1; justify-content: center;">
+                        <ion-icon name="bicycle"></ion-icon>
+                        <span class="pill-text" id="btnNormal">Standard (150 DZD)</span>
+                    </div>
+                </div>
+                <!-- Row 2: Pickup -->
+                <div class="pill" onclick="selectDelivery(this, 'pickup')"
+                    style="width: auto; align-self: flex-start; justify-content: center;">
+                    <ion-icon name="walk"></ion-icon>
+                    <span class="pill-text">Retrait (Gratuit)</span>
+                </div>
+            </div>
+
+            <!-- OPTIONS CC & FREE DELIVERY -->
+            <div class="option-rows-container" id="optionsContainer">
+                <!-- CC Row (Rapid & Normal only) -->
+                <div class="option-row" id="ccRow">
+                    <div class="option-text">Solde CC: 5000 DZD</div>
+                    <button class="control-btn" id="btnCC" onclick="toggleCC()">Utiliser</button>
+                </div>
+
+                <!-- Free Delivery Row (Normal only) -->
+                <div class="option-row" id="freeDeliveryRow" style="display:none;">
+                    <div class="option-text">Livraisons gratuites: 3</div>
+                    <button class="control-btn" id="btnFree" onclick="toggleFreeDelivery()">Utiliser</button>
+                </div>
+            </div>
+
+            <div id="paymentSection" style="margin-top: 25px;">
+                <div class="section-header">Moyen de paiement</div>
+                <div class="pills-row">
+                    <div class="pill" onclick="selectPayment(this, 'cash')">
+                        <ion-icon name="cash"></ion-icon>
+                        <span class="pill-text">Espèces à la livraison</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <div class="total-row">
+                    <span class="total-label">Frais de maintien de l'appli :</span>
+                    <span class="total-value" style="font-size: 16px; color: #ff7d00;" id="appFeesDisplay">50.00
+                        DZD</span>
+                </div>
+                <div class="total-row">
+                    <span class="total-label">Total à payer</span>
+                    <span class="total-value" id="totalDisplay">0.00 DZD</span>
+                </div>
+                <div style="display: flex; justify-content: flex-end;">
+                    <button class="checkout-btn" onclick="placeOrder()">
+                        <span class="checkout-btn-txt">Commander</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: TRACKING -->
+        <div id="trackingView" style="display: none;">
+            <div class="delivery-status-container">
+                <div class="delivery-status-message" id="deliveryStatusMsg">
+                    La commande est en cours de traitement, veuillez patientez.
+                </div>
+                <div class="delivery-info-labels">
+                    <div class="delivery-info-text">ID Livreur: <span class="delivery-info-value" id="driverId">/</span>
+                    </div>
+                    <div class="delivery-info-text">Nom Livreur: <span class="delivery-info-value"
+                            id="driverName">/</span></div>
+                    <div class="delivery-info-text">Distance: <span class="delivery-info-value"
+                            id="driverDistance">/</span></div>
+                    <div class="delivery-info-text">Temps de livraison: <span class="delivery-info-value"
+                            id="deliveryTime">/</span></div>
+                    <div class="delivery-info-text">Total final: <span class="delivery-info-value"
+                            style="color: #ff7d00; font-weight: bold; font-size: 18px;" id="finalTotal">0.00 DZD</span>
+                    </div>
+                </div>
+                <button class="cancel-order-btn" onclick="cancelOrder()" id="cancelBtn">Annuler la commande</button>
+            </div>
+        </div>
+
+        <!-- VIEW: LIST -->
+        <div id="listView" style="display: none;">
+            <div class="list-input-row">
+                <input type="text" class="list-input" placeholder="Ajouter un produit" id="listInput">
+                <button class="list-add-btn" onclick="addToList()">
+                    <ion-icon name="add" style="font-size: 28px;"></ion-icon>
+                </button>
+            </div>
+            <div class="list-scroll" id="listScroll">
+                <div class="empty-box">
+                    <div class="empty-text">Votre liste est vide.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Status Section (hidden by default) -->
+    <div id="deliverySection" class="delivery-section" style="display: none;">
+        <div class="delivery-status-container">
+            <div class="delivery-status-message" id="deliveryStatusMsg">
+                En attente de confirmation...
+            </div>
+
+            <div class="delivery-info-labels">
+                <div class="delivery-info-text">
+                    ID Livreur: <span class="delivery-info-value" id="driverId">/</span>
+                </div>
+                <div class="delivery-info-text">
+                    Nom Livreur: <span class="delivery-info-value" id="driverName">/</span>
+                </div>
+                <div class="delivery-info-text">
+                    Distance: <span class="delivery-info-value" id="driverDistance">/</span>
+                </div>
+                <div class="delivery-info-text">
+                    Temps de livraison: <span class="delivery-info-value" id="deliveryTime">/</span>
+                </div>
+                <div class="delivery-info-text">
+                    Total final: <span class="delivery-info-value"
+                        style="color: #d9534f; font-weight: bold; font-size: 18px;" id="finalTotal">0.00 DZD</span>
+                </div>
+            </div>
+
+            <button class="cancel-order-btn" onclick="cancelOrder()" id="cancelBtn">
+                Annuler la commande
+            </button>
+        </div>
+    </div>
+
+    <!-- Shopping List Section (hidden by default) -->
+    <div id="listSection" class="list-section" style="display: none;">
+        <div class="list-input-row">
+            <input type="text" class="list-input" placeholder="Ajouter un produit" id="listInput">
+            <button class="list-add-btn" onclick="addToList()">
+                <ion-icon name="add" style="font-size: 28px;"></ion-icon>
+            </button>
+        </div>
+        <div class="list-scroll" id="listScroll">
+            <div class="empty-box">
+                <div class="empty-text">Liste vide</div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Full Modal -->
+    <div class="modal-overlay" id="qtyModal">
+        <div class="modal-body">
+            <div class="top-header">
+                <div class="back-btn" onclick="closeModal()">
+                    <ion-icon name="arrow-back" style="font-size: 24px; color: #001524;"></ion-icon>
+                </div>
+            </div>
+
+            <div class="modal-title-text">Ajouter au panier</div>
+            <div class="modal-question">Combien de packs voulez-vous ?</div>
+
+            <div class="selector-container">
+                <div class="side-btn" onclick="updateModalQty(-1)"><ion-icon name="remove"></ion-icon></div>
+                <div class="input-wrapper">
+                    <span class="input-val" id="modalQtyVal">1</span>
+                </div>
+                <div class="side-btn" onclick="updateModalQty(1)"><ion-icon name="add"></ion-icon></div>
+            </div>
+
+            <div class="formatted-text" id="modalFormattedText">1 x 250g (250g)</div>
+
+            <div class="modal-price-container">
+                <div class="modal-price-label">Prix unitaire</div>
+                <div class="modal-price-val" id="modalPriceVal">450.00 DZD</div>
+            </div>
+
+            <button class="command-btn" onclick="confirmQty()">Commander</button>
+        </div>
+    </div>
+
+    <!-- CREDIT MODAL -->
+    <div class="modal-overlay" id="creditModal">
+        <div class="modal-body"
+            style="background: white; border-radius: 20px; padding: 35px; width: 90%; max-width: 400px; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.25);">
+            <div class="header-row" style="display:flex; width:100%; align-items:center; margin-bottom:20px;">
+                <div onclick="closeCreditModal()" style="cursor:pointer; margin-right:10px;">
+                    <ion-icon name="arrow-back" style="font-size:24px; color:#333;"></ion-icon>
+                </div>
+                <div style="font-size:18px; fontWeight:bold; color:#333;">UTILISER CRÉDIT</div>
+            </div>
+
+            <div style="font-size:16px; color:#333; margin-bottom:15px; text-align:center;">
+                Tu as <span style="font-weight:bold; color:#ff7d00;">5000.00 DZD</span> de crédits
+            </div>
+            <div style="font-size:16px; color:#555; margin-bottom:15px; text-align:center;">
+                Combien veux-tu utiliser ?
+            </div>
+
+            <input type="number" id="creditInput" placeholder="0.00"
+                style="height:50px; width:100%; border:1px solid #ccc; border-radius:10px; margin-bottom:20px; padding:0 10px; text-align:center; font-size:20px; color:#000;">
+
+            <div style="display:flex; justify-content:space-between; width:100%; gap:10px;">
+                <button onclick="closeCreditModal()"
+                    style="flex:1; padding:10px; border-radius:20px; background:#ccc; border:none; color:white; font-weight:bold;">ANNULER</button>
+                <button onclick="confirmCreditUse()"
+                    style="flex:1; padding:10px; border-radius:20px; background:#2196F3; border:none; color:white; font-weight:bold;">CONFIRMER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock Data
+        const products = [
+            { id: 1, nom: 'Lait Nutritif', marque: 'Candia', prix: 120, valeurQuantite: 1, unitWeight: 1000 },
+            { id: 2, nom: 'Eau Minérale', marque: 'Ifri', prix: 40, valeurQuantite: 6, unitWeight: 1500 },
+            { id: 3, nom: 'Fromage Fondu', marque: 'La Vache Qui Rit', prix: 350, valeurQuantite: 1, unitWeight: 200 }
+        ];
+
+        let selectedIds = [1, 2, 3];
+        let currentModalId = null;
+        let deliveryPrice = 300; // Default Rapid
+        let useCC = false;
+        let useFree = false;
+        let appFees = 50; // Mock fixed fee
+        let currentDeliveryType = 'rapid'; // Starts with rapid selected? Actually line 924 selects it. Let's make it consistent.
+        // But wait, line 924 calls selectDuration. Let's initialize null to be safe so selectDelivery sets it.
+        // Actually, let's keep it 'rapid' but define payment null.
+        let currentPayment = null;
+
+        // Modal State
+        let currentQty = 1;
+
+        function renderProducts() {
+            const container = document.getElementById('productList');
+            container.innerHTML = '';
+
+            products.forEach(p => {
+                const isChecked = selectedIds.includes(p.id);
+                const item = document.createElement('div');
+                item.className = 'item-card ' + (isChecked ? '' : 'item-excluded');
+                const itemTotal = (p.valeurQuantite * p.prix).toFixed(2);
+
+                // ULTRA COMPACT 1 LINE: Qty | Name (Brand) | Price
+                item.innerHTML = `
+                <div class="item-content" onclick="openQtyModal(${p.id})">
+                    <div class="item-info" style="flex: 1; min-width: 0;">
+                        <div class="item-title-row" style="display: flex; align-items: baseline; width: 100%;">
+                            <span class="item-qty" style="width: 25px; font-weight:700;">${p.valeurQuantite}</span>
+                            <div style="flex: 1; padding: 0 10px; display: flex; flex-direction: column;">
+                                <span class="item-name" style="text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;">${p.nom}</span>
+                                <span style="font-size: 13px; color: #aaa; font-weight: 600; text-align: left;">${p.marque}</span>
+                            </div>
+                            <span class="item-price" style="color: #ff7d00; font-weight: 700;">${itemTotal} DZD</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; margin-left: 10px;" onclick="event.stopPropagation()">
+                         <div class="check-circle ${isChecked ? 'check-circle-active' : ''}" onclick="toggleCheck(${p.id})">
+                             ${isChecked ? '<ion-icon name="checkmark"></ion-icon>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+                container.appendChild(item);
+            });
+            updateTotal();
+        }
+
+        function toggleCheck(id) {
+            // event stop propagation handled inline
+            if (selectedIds.includes(id)) {
+                selectedIds = selectedIds.filter(i => i !== id);
+            } else {
+                selectedIds.push(id);
+            }
+            renderProducts();
+        }
+
+        function updateTotal() {
+            let itemsTotal = 0;
+            products.forEach(p => {
+                if (selectedIds.includes(p.id)) {
+                    itemsTotal += p.valeurQuantite * p.prix;
+                }
+            });
+
+            // If Free Delivery, price is 0
+            let finalPrice = (useFree) ? 0 : deliveryPrice;
+            if (currentDeliveryType === 'pickup') finalPrice = 0;
+
+            let grandTotal = itemsTotal + finalPrice + appFees;
+
+            if (useCC) {
+                // Deduct mock CC
+                grandTotal = Math.max(0, grandTotal - 500);
+            }
+
+            document.getElementById('totalDisplay').textContent = grandTotal.toFixed(2) + ' DZD';
+        }
+
+        function selectDelivery(el, type) {
+            // Toggle Logic
+            if (currentDeliveryType === type) {
+                // Deselect
+                el.classList.remove('active');
+                currentDeliveryType = null;
+                deliveryPrice = 0; // Or whatever default when nothing selected
+                document.getElementById('ccRow').style.display = 'none';
+                document.getElementById('freeDeliveryRow').style.display = 'none';
+            } else {
+                // Select new
+                document.querySelectorAll('.pills-row .pill, .delivery-vertical-layout .pill').forEach(p => p.classList.remove('active'));
+                el.classList.add('active');
+                currentDeliveryType = type;
+
+                // Show/Hide Logic
+                const ccRow = document.getElementById('ccRow');
+                const freeRow = document.getElementById('freeDeliveryRow');
+
+                ccRow.style.display = 'none';
+                freeRow.style.display = 'none';
+
+                if (type === 'rapid') {
+                    deliveryPrice = 300;
+                    ccRow.style.display = 'flex'; // Rapid: CC only
+                }
+                if (type === 'normal') {
+                    deliveryPrice = 150;
+                    ccRow.style.display = 'flex'; // Normal: CC + Free
+                    freeRow.style.display = 'flex';
+                }
+                if (type === 'pickup') {
+                    deliveryPrice = 0;
+                    // Pickup: Nothing
+                }
+            }
+            updateTotal();
+            updateCheckoutBtnState();
+        }
+
+        function toggleCC() {
+            // Open Modal instead of immediate toggle
+            if (useCC) {
+                // If already used, we can cancel it directly or ask confirmation. 
+                // For simplicity, let's just untoggle.
+                useCC = false;
+                updateCCBtn();
+                updateTotal();
+            } else {
+                openCreditModal();
+            }
+        }
+
+        function updateCCBtn() {
+            const btn = document.getElementById('btnCC');
+            if (useCC) {
+                btn.textContent = 'Non';
+                btn.style.background = '#000';
+            } else {
+                btn.textContent = 'Utiliser';
+                btn.style.background = '#ff7d00';
+            }
+        }
+
+        // Credit Modal Logic
+        function openCreditModal() {
+            document.getElementById('creditModal').style.display = 'flex';
+            document.getElementById('creditInput').value = Math.min(5000, 300 + 450).toString(); // Mock max
+        }
+
+        function closeCreditModal() {
+            document.getElementById('creditModal').style.display = 'none';
+        }
+
+        function confirmCreditUse() {
+            useCC = true;
+            updateCCBtn();
+            updateTotal();
+            closeCreditModal();
+        }
+
+        function toggleFreeDelivery() {
+            useFree = !useFree;
+            const btn = document.getElementById('btnFree');
+            if (useFree) {
+                btn.textContent = 'Non';
+                btn.style.background = '#000';
+            } else {
+                btn.textContent = 'Utiliser';
+                btn.style.background = '#ff7d00';
+            }
+            updateTotal();
+        }
+
+        function selectPayment(el, type) {
+            el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            currentPayment = type;
+            updateCheckoutBtnState();
+        }
+
+        function updateCheckoutBtnState() {
+            const btn = document.querySelector('.checkout-btn');
+            // Empty cart check: selectedIds length
+            const isEmpty = selectedIds.length === 0;
+            const isDisabled = (!currentDeliveryType || !currentPayment || isEmpty);
+
+            if (isDisabled) {
+                btn.classList.add('disabled');
+                btn.disabled = true;
+                btn.style.background = '#E0E0E0';
+                btn.style.cursor = 'not-allowed';
+            } else {
+                btn.classList.remove('disabled');
+                btn.disabled = false;
+                btn.style.background = '#001524';
+                btn.style.cursor = 'pointer';
+            }
+        }
+
+        function placeOrder() {
+            alert('Commande validée !');
+        }
+
+        // Modal Logic - SIMULATING THE REACT COMPONENT LOGIC
+        function openQtyModal(id) {
+            currentModalId = id;
+            const p = products.find(prod => prod.id === id);
+            currentQty = p.valeurQuantite;
+
+            updateModalDisplay(p);
+            document.getElementById('qtyModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('qtyModal').style.display = 'none';
+        }
+
+        function updateModalQty(delta) {
+            const newQty = currentQty + delta;
+            if (newQty > 0) {
+                currentQty = newQty;
+                const p = products.find(prod => prod.id === currentModalId);
+                updateModalDisplay(p);
+            }
+        }
+
+        function updateModalDisplay(product) {
+            document.getElementById('modalQtyVal').textContent = currentQty;
+
+            // Format logic from TSX: numericValue * unitWeight
+            const totalWeight = currentQty * (product.unitWeight || 250);
+            const weightStr = totalWeight < 1000 ? `${totalWeight}g` : `${(totalWeight / 1000).toFixed(1)}kg`;
+            const formatted = `${currentQty} x ${product.unitWeight || 250}g (${weightStr})`;
+
+            document.getElementById('modalFormattedText').textContent = formatted;
+
+            // Price calc - show TOTAL for this quantity like main screen usually implies, or UNIT? 
+            // TSX says "calculatePrice() => numericValue * basePrice"
+            // And label says "Prix unitaire" but value is total.
+            // I will match TSX LOGIC exactly:
+            const totalP = (currentQty * product.prix).toFixed(2);
+            document.getElementById('modalPriceVal').textContent = `${totalP} DZD`;
+        }
+
+        function confirmQty() {
+            const p = products.find(prod => prod.id === currentModalId);
+            if (p) {
+                p.valeurQuantite = currentQty;
+                // Main list render call
+                renderProducts(); // Updates list + totals
+            }
+            closeModal();
+        }
+
+        // TAB SWITCHING FUNCTIONS
+        let shoppingList = [];
+
+        function switchTab(tabName) {
+            // Hide all sections
+            const cartSection = document.getElementById('cartSection');
+            const deliverySection = document.getElementById('deliverySection');
+            const listSection = document.getElementById('listSection');
+
+            if (cartSection) cartSection.style.display = 'none';
+            if (deliverySection) deliverySection.style.display = 'none';
+            if (listSection) listSection.style.display = 'none';
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+
+            // Show selected section and activate tab
+            if (tabName === 'cart') {
+                if (cartSection) cartSection.style.display = 'block';
+                const tab = document.getElementById('tabCart');
+                if (tab) tab.classList.add('active');
+            } else if (tabName === 'delivery') {
+                if (deliverySection) deliverySection.style.display = 'block';
+                const tab = document.getElementById('tabDelivery');
+                if (tab) tab.classList.add('active');
+            } else if (tabName === 'list') {
+                if (listSection) listSection.style.display = 'block';
+                const tab = document.getElementById('tabList');
+                if (tab) tab.classList.add('active');
+                renderShoppingList();
+            }
+        }
+
+        // PLACE ORDER (modified to switch to delivery tab)
+        function placeOrder() {
+            if (selectedIds.length === 0) {
+                alert('Votre panier est vide!');
+                return;
+            }
+            if (!currentDeliveryType) {
+                alert('Veuillez sélectionner un type de livraison!');
+                return;
+            }
+            if (!currentPayment) {
+                alert('Veuillez sélectionner un mode de paiement!');
+                return;
+            }
+
+            // Calculate total
+            const total = selectedIds.reduce((sum, id) => {
+                const p = products.find(pr => pr.id === id);
+                return sum + (p ? p.valeurQuantite * p.prix : 0);
+            }, 0);
+
+            // Update delivery status
+            document.getElementById('deliveryStatusMsg').textContent = 'Commande en cours de traitement...';
+            document.getElementById('driverId').textContent = '/';
+            document.getElementById('driverName').textContent = '/';
+            document.getElementById('driverDistance').textContent = '/';
+            document.getElementById('deliveryTime').textContent = '/';
+            document.getElementById('finalTotal').textContent = (total + deliveryPrice + appFees).toFixed(2) + ' DZD';
+
+            // Enable cancel button
+            const cancelBtn = document.getElementById('cancelBtn');
+            if (cancelBtn) cancelBtn.disabled = false;
+
+            // Switch to delivery tab
+            switchTab('delivery');
+        }
+
+        // CANCEL ORDER
+        function cancelOrder() {
+            if (confirm('Voulez-vous vraiment annuler votre commande?')) {
+                document.getElementById('deliveryStatusMsg').textContent = 'Commande annulée';
+                const cancelBtn = document.getElementById('cancelBtn');
+                if (cancelBtn) cancelBtn.disabled = true;
+            }
+        }
+
+        // SHOPPING LIST MANAGEMENT
+        function addToList() {
+            const input = document.getElementById('listInput');
+            if (!input || !input.value.trim()) return;
+
+            shoppingList.push({
+                id: Date.now(),
+                text: input.value.trim(),
+                done: false
+            });
+
+            input.value = '';
+            renderShoppingList();
+        }
+
+        function toggleListItem(id) {
+            const item = shoppingList.find(i => i.id === id);
+            if (item) {
+                item.done = !item.done;
+                renderShoppingList();
+            }
+        }
+
+        function renderShoppingList() {
+            const container = document.getElementById('listScroll');
+            if (!container) return;
+
+            if (shoppingList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-box">
+                        <div class="empty-text">Liste vide</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = shoppingList.map(item => `
+                <div class="list-card" onclick="toggleListItem(${item.id})">
+                    <div class="list-check ${item.done ? 'active' : ''}">
+                        ${item.done ? '<ion-icon name="checkmark" style="color: white; font-size: 14px;"></ion-icon>' : ''}
+                    </div>
+                    <div class="list-text ${item.done ? 'done' : ''}">${item.text}</div>
+                </div>
+            `).join('');
+        }
+
+
+        // Init with logic
+        renderProducts();
+        selectDelivery(document.querySelector('.pill.active'), 'rapid');
+        // Initialize tab bar
+        switchTab('cart');
+    </script>
+
+</body>
+
+</html>

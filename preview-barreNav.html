@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Barre Navigation - Sauvegardée</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 667px;
+            background-color: #fff;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=375&q=80');
+            background-size: cover;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+            border-radius: 40px;
+            overflow: hidden;
+            border: 8px solid #333;
+            padding: 20px;
+        }
+
+        .nav-bar {
+            position: absolute;
+            bottom: 25px;
+            left: 20px;
+            right: 20px;
+            height: 50px;
+            /* ~1cm hauteur */
+            background-color: rgba(255, 236, 209, 0.6);
+            /* #ffecd1 avec 60% transparence */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 25px;
+            /* Très arrondis */
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item ion-icon {
+            font-size: 24px;
+            color: #001524;
+            /* Couleur inactive */
+        }
+
+        .nav-item.active ion-icon {
+            color: #ff7d00;
+            /* Couleur active */
+        }
+
+        .separator {
+            width: 1px;
+            height: 20px;
+            background-color: #78290f;
+            /* Trait fin */
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        h2 {
+            font-weight: 900;
+            margin-bottom: 5px;
+            color: #001524;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 14px;
+            color: #78290f;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone-container">
+        <div class="content">
+            <h2>Cegget Premium</h2>
+            <p>Navigation personnalisée</p>
+        </div>
+        <div class="nav-bar">
+            <div class="nav-item active" onclick="setActive(this, 'home')">
+                <ion-icon name="home"></ion-icon>
+            </div>
+            <div class="separator"></div>
+            <div class="nav-item" onclick="setActive(this, 'search')">
+                <ion-icon name="search-outline"></ion-icon>
+            </div>
+            <div class="separator"></div>
+            <div class="nav-item" onclick="setActive(this, 'heart')">
+                <ion-icon name="heart-outline"></ion-icon>
+            </div>
+            <div class="separator"></div>
+            <div class="nav-item" onclick="setActive(this, 'cart')">
+                <ion-icon name="cart-outline"></ion-icon>
+            </div>
+            <div class="separator"></div>
+            <div class="nav-item" onclick="setActive(this, 'person')">
+                <ion-icon name="person-outline"></ion-icon>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setActive(el, type) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                const icon = item.querySelector('ion-icon');
+                const name = icon.getAttribute('name');
+                if (!name.includes('-outline')) icon.setAttribute('name', name + '-outline');
+            });
+
+            el.classList.add('active');
+            const icon = el.querySelector('ion-icon');
+            const name = icon.getAttribute('name');
+            icon.setAttribute('name', name.replace('-outline', ''));
+        }
+    </script>
+</body>
+
+</html>

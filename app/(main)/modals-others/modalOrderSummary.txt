@@ -1,0 +1,328 @@
+import React from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+
+const ModalOrderSummary = ({
+    visible,
+    onClose,
+    onConfirm,
+    productTotal = 0,
+    deliveryFee = 0,
+    appFee = 50,
+    appliedCredit = 0,
+    finalTotal = 0
+}) => {
+    const { t } = useTranslation();
+
+export interface OrderSummaryEmailData {
+    orderReference: string;
+    username: string;
+    fullName: string;
+    adresse: string;
+    totalCommand: number;
+    deliveryCost: number;
+    reductionTotalProduits: number;
+    fraisAppli: number;
+    appliedCreditAmount: number;
+    finalTotalPrice: number;
+    deliveryType: TypeLivraison | null;
+    products: {
+        nom: string;
+        marque?: string;
+        valeurQuantite?: number;
+        uniteQuantite?: string;
+        prixUnitaire: number;
+        prixTotal: number;
+        magasin: string;
+    }[];
+}
+
+
+const [showOrderSummary, setShowOrderSummary] = useState<boolean>(false);
+const [orderReference, setOrderReference] = useState<string>('');
+const [orderSummaryEmailData, setOrderSummaryEmailData] = useState<OrderSummaryEmailData | null>(null);
+
+
+const buildOrderSummaryEmailData = (): OrderSummaryEmailData => {
+    const productsForEmail = selectedProductsInSummary.map(product => {
+        const store = stores.find(s => s.id === product.storeId);
+        return {
+            nom: product.nom,
+            marque: product.marque,
+            valeurQuantite: product.valeurQuantite,
+            uniteQuantite: product.uniteQuantite,
+            prixUnitaire: product.prix,
+            prixTotal: (product.valeurQuantite ?? 0) * product.prix,
+            magasin: store?.nom ?? 'Magasin inconnu',
+        };
+    });
+
+    return {
+        orderReference,
+        username: userLocation!.username,
+        fullName: userLocation!.fullName,
+        adresse: userLocation!.address,
+        totalCommand,
+        deliveryCost: selectedDeliveryType !== TypeLivraison.Pickup ? deliveryCost : 0,
+        reductionTotalProduits: calculationResult?.reductionTotalProduits ?? 0,
+        fraisAppli: calculationResult?.fraisAppli ?? 0,
+        appliedCreditAmount,
+        finalTotalPrice,
+        deliveryType: selectedDeliveryType,
+        products: productsForEmail,
+    };
+};
+
+
+const handlePlaceOrderClick = () => {
+    const fullName = userLocation!.fullName || '';
+    let nameInitials = '';
+    const nameParts = fullName.split(' ').filter(part => part.length > 0);
+    if (nameParts.length > 0) {
+        nameInitials += nameParts[0].charAt(0).toUpperCase();
+    }
+    if (nameParts.length > 1) {
+        nameInitials += nameParts[nameParts.length - 1].charAt(0).toUpperCase();
+    }
+
+    const username = userLocation!.username || '';
+    const usernamePart = username.length > 0 ? username.substring(0, Math.min(username.length, 3)).toUpperCase() : '';
+    let userIdentifier = `${nameInitials}${usernamePart}`;
+    if (userIdentifier.length === 0) userIdentifier = 'USER';
+
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    const formattedDate = `${day}${month}${year}`;
+
+    const ref = `${userIdentifier}-${formattedDate}-${userOrderCount}`;
+    setOrderReference(ref);
+
+    const emailData = buildOrderSummaryEmailData();
+    setOrderSummaryEmailData(emailData);
+
+    setShowOrderSummary(true);
+};
+
+
+const handleConfirmOrderSummary = () => {
+    handleOrderConfirmation();
+};
+
+
+const renderOrderedProductsSummary = () => {
+    if (selectedProductsInSummary.length === 0) {
+        return <Text style={styles.emptyCartText}>{t('no_products_selected')}</Text>;
+    }
+
+    return selectedProductsInSummary.map(product => {
+        const store = stores.find(s => s.id === product.storeId);
+        const itemPrice = (product.valeurQuantite ?? 0) * product.prix;
+        return (
+            <View key={product.id} style={styles.summaryProductItem}>
+                <Text style={styles.summaryProductName}>{product.nom} - {product.marque}</Text>
+                <Text style={styles.summaryProductDetails}>
+                    {product.valeurQuantite} /@/ {product.uniteQuantite} /@/ {product.prix.toFixed(2)} DZD
+                </Text>
+                <Text style={styles.summaryProductPrice}>
+                    {itemPrice.toFixed(2)} DZD
+                </Text>
+                {store && <Text style={styles.summaryStoreName}>Magasin: {store.nom}</Text>}
+            </View>
+        );
+    });
+};
+
+
+{showOrderSummary ? (
+    <ScrollView style={styles.fullScreenOrderSummaryContainer} contentContainerStyle={styles.fullScreenOrderSummaryContent}>
+
+        <Text style={styles.orderSummaryHeaderTitle}>{t('recap_commande_title')}</Text>
+
+        <Text style={styles.orderSummaryModalText}>
+            {t('commandList.reference')} <Text style={styles.orderSummaryValue}>{orderReference}</Text>
+        </Text>
+
+        <Text style={styles.orderSummaryModalText}>
+            {t('fullName')} : <Text style={styles.orderSummaryValue}>{userLocation!.fullName}</Text>
+        </Text>
+
+        <Text style={styles.orderSummaryModalText}>
+            {t('username')} : <Text style={styles.orderSummaryValue}>{userLocation!.username}</Text>
+        </Text>
+
+        <Text style={styles.orderSummaryModalText}>
+            {t('adresse')} : <Text style={styles.orderSummaryValue}>{userLocation!.address}</Text>
+        </Text>
+
+        <Text style={styles.orderSummaryModalText}>
+            {t('total_command_label')} : <Text style={styles.orderSummaryValue}>{totalCommand.toFixed(2)} DZD</Text>
+        </Text>
+
+        {selectedDeliveryType !== TypeLivraison.Pickup && (
+            <>
+                <Text style={styles.orderSummaryModalText}>
+                    {t('delivery_service_base_cost_label')} : <Text style={styles.orderSummaryValue}>
+                        {deliveryCost.toFixed(2)} DZD
+                    </Text>
+                </Text>
+
+                {(calculationResult?.reductionTotalProduits ?? 0) > 0 && (
+                    <Text style={styles.orderSummaryModalText}>
+                        {t('reduction_total_produits_label')} : <Text style={styles.orderSummaryValue}>
+                            -{(calculationResult!.reductionTotalProduits!).toFixed(2)} DZD
+                        </Text>
+                    </Text>
+                )}
+
+                {(calculationResult?.fraisAppli ?? 0) > 0 && (
+                    <Text style={styles.orderSummaryModalText}>
+                        {t('app_fees_label')} : <Text style={styles.summaryProductPrice}>
+                            {(calculationResult!.fraisAppli!).toFixed(2)} DZD
+                        </Text>
+                    </Text>
+                )}
+            </>
+        )}
+
+        {appliedCreditAmount > 0 && (
+            <Text style={styles.orderSummaryModalText}>
+                {t('credit_applied_label')} : <Text style={styles.orderSummaryValue}>
+                    -{appliedCreditAmount.toFixed(2)} DZD
+                </Text>
+            </Text>
+        )}
+
+        <View style={styles.summarySection}>
+            <Text style={styles.summarySectionTitle}>{t('ordered_products_title')}</Text>
+            {renderOrderedProductsSummary()}
+        </View>
+
+        <Text style={[styles.orderSummaryModalText, styles.finalTotalSummary]}>
+            {t('finalTotal')} : <Text style={styles.finalTotalSummaryValue}>{finalTotalPrice.toFixed(2)} DZD</Text>
+        </Text>
+
+        <TouchableOpacity
+            style={[styles.button, styles.orderSummaryConfirmButton]}
+            onPress={handleConfirmOrderSummary}
+        >
+            <Text style={styles.textStyle}>{t('general.confirm')}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+            style={[styles.button, styles.orderSummaryCancelButton]}
+            onPress={() => setShowOrderSummary(false)}
+        >
+            <Text style={styles.textStyle}>{t('general.cancel')}</Text>
+        </TouchableOpacity>
+
+    </ScrollView>
+)}
+
+orderSummaryHeaderTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#007bff',
+    flex: 1,
+    textAlign: 'center',
+},
+orderSummaryValue: {
+    fontWeight: 'bold',
+    color: '#555',
+},
+fullScreenOrderSummaryContainer: {
+    flex: 1,
+    backgroundColor: 'white',
+},
+fullScreenOrderSummaryContent: {
+    flexGrow: 1,
+    padding: 20,
+    alignItems: 'center',
+},
+orderSummaryModalText: {
+    fontSize: 20,
+    marginBottom: 12,
+    color: '#333',
+    textAlign: 'left',
+    width: '90%',
+},
+finalTotalSummary: {
+    marginTop: 25,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    fontSize: 26,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    width: '100%',
+    color: '#d9534f',
+},
+finalTotalSummaryValue: {
+    color: '#d9534f',
+    fontSize: 30,
+},
+orderSummaryConfirmButton: {
+    backgroundColor: '#28a745',
+    marginTop: 30,
+    width: '90%',
+    paddingVertical: 15,
+},
+orderSummaryCancelButton: {
+    backgroundColor: '#6c757d',
+    marginTop: 15,
+    width: '90%',
+    paddingVertical: 15,
+},
+summarySection: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+},
+summarySectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#555',
+    textAlign: 'center',
+},
+summaryProductItem: {
+    backgroundColor: '#fff',
+    borderRadius: 6,
+    padding: 10,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+},
+summaryProductName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 2,
+},
+summaryProductDetails: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 2,
+},
+summaryProductPrice: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#007bff',
+    textAlign: 'right',
+    marginTop: -20,
+    marginBottom: 5,
+},
+summaryStoreName: {
+    fontSize: 12,
+    color: '#888',
+    fontStyle: 'italic',
+    marginTop: 5,
+},
+
+export default ModalOrderSummary;

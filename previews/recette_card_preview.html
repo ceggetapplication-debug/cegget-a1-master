@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recette Seller - Miroir Final</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #111;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone {
+            width: 375px;
+            background: #f0f0f0;
+            height: 780px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        }
+
+        /* HEADER */
+        .header {
+            padding: 40px 25px 10px;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000000;
+            border-bottom: 2px solid #78290f;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+
+        /* TABS */
+        .tabs-row {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            margin-top: 15px;
+        }
+
+        .tab-on {
+            font-size: 16px;
+            font-weight: bold;
+            color: #15616d;
+            border-bottom: 2px solid #ff7d00;
+            padding-bottom: 5px;
+        }
+
+        .tab-off {
+            font-size: 16px;
+            font-weight: bold;
+            color: #e8e9eb;
+            opacity: 0.5;
+        }
+
+        /* TABLEAU */
+        .main-content {
+            padding: 5px;
+        }
+
+        .table-bg {
+            background: #f1f1f1;
+            margin-top: 5px;
+        }
+
+        .table-head {
+            display: flex;
+            background: transparent;
+            padding: 12px 0;
+            border-bottom: 2px solid #78290f;
+        }
+
+        .head-cell {
+            flex: 1;
+            color: #ffecd1;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .row {
+            display: flex;
+            padding: 18px 0;
+            border-bottom: 1.2px solid #ffecd1;
+            align-items: center;
+        }
+
+        .data-cell {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #78290f;
+        }
+
+        .id-cell {
+            flex: 1.5;
+            color: #ffecd1;
+            font-size: 13px;
+            font-weight: bold;
+            padding-left: 5px;
+            text-align: left;
+        }
+
+        /* FOOTER / TOTALS */
+        .footer-totals {
+            border-top: 3px solid #e0dfdf;
+            padding: 10px 0;
+            margin-top: 15px;
+        }
+
+        .txt-total {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .txt-net {
+            font-size: 15px;
+            font-weight: bold;
+            color: #78290f; /* RUSSET */
+            margin-top: 8px;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #000;
+            font-style: italic;
+            margin-top: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="phone">
+        <div class="header">
+            <div class="title">Ma Recette</div>
+        </div>
+
+        <div class="tabs-row">
+            <div class="tab-on">Journalier</div>
+            <div class="tab-off">Hebdo</div>
+            <div class="tab-off">Vues</div>
+        </div>
+
+        <div class="main-content">
+            <div class="table-bg">
+                <div class="table-head">
+                    <div class="head-cell" style="flex:1.5; text-align:left; padding-left:5px;">CMD</div>
+                    <div class="head-cell">OBJETS</div>
+                    <div class="head-cell">BRUT</div>
+                    <div class="head-cell">NET</div>
+                </div>
+                
+                <div class="row">
+                    <div class="id-cell">#58291</div>
+                    <div class="data-cell" style="color:#333">2</div>
+                    <div class="data-cell">2,250.00</div>
+                    <div class="data-cell">1,800.00</div>
+                </div>
+
+                <div class="row">
+                    <div class="id-cell">#58304</div>
+                    <div class="data-cell" style="color:#333">1</div>
+                    <div class="data-cell">1,200.00</div>
+                    <div class="data-cell">960.00</div>
+                </div>
+            </div>
+
+            <div class="footer-totals">
+                <div class="txt-total">Total Journalier : 2,760.00 DZD</div>
+                <div class="txt-net">Total Net multiple de 5 : 2,760 DZD</div>
+            </div>
+
+            <div class="note">
+                Note : Les virements sont effectués sous 48h.
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

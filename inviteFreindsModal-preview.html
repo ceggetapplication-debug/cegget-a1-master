@@ -1,0 +1,176 @@
+
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert, ScrollView, Share } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { ReferralManager } from './calculLivraison';
+
+
+interface InviteFriendsModalProps {
+    visible: boolean;
+    onClose: () => void;
+    username: string;
+    t: (key: string, replacements?: { [key: string]: string | number }) => string;
+}
+
+
+export const InviteFriendsModal: React.FC<InviteFriendsModalProps> = ({ 
+    visible, 
+    onClose, 
+    username,
+    t 
+}) => {
+    const [referralManager] = useState(() => new ReferralManager());
+    const [userReferralLink, setUserReferralLink] = useState<string>('');
+
+    useEffect(() => {
+        if (username) {
+            const referralLink = referralManager.generateReferralLink(username);
+            setUserReferralLink(referralLink);
+        }
+    }, [username]);
+
+    const handleShareReferralLink = async () => {
+        const message = `${t('invite_friends_message')} ${userReferralLink}`;
+        
+        try {
+            const result = await Share.share({
+                title: t('invite_friends_title'),
+                message: message,
+            });
+
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    console.log('Partagé via:', result.activityType);
+                }
+            } else if (result.action === Share.dismissedAction) {
+                console.log('Partage annulé');
+            }
+        } catch (error: any) {
+            Alert.alert(t('general.error'), error.message);
+        }
+    };
+
+    return (
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={visible}
+            onRequestClose={onClose}
+        >
+            <View style={styles.centeredView}>
+                <View style={styles.inviteFriendsModalView}>
+                    <View style={styles.creditModalHeader}>
+                        <TouchableOpacity 
+                            onPress={onClose} 
+                            style={styles.creditModalBackButton}
+                        >
+                            <Ionicons name="close-circle-outline" size={30} color="#666" />
+                        </TouchableOpacity>
+                        <Text style={styles.creditModalTitle}>{t('invite_friends_title')}</Text>
+                    </View>
+
+                    <ScrollView style={styles.inviteScrollView} contentContainerStyle={styles.inviteScrollContent}>
+                        <Text style={styles.inviteDescriptionText}>
+                            {t('invite_friends_message')}
+                        </Text>
+
+                        <TouchableOpacity
+                            style={[styles.orderButton, styles.shareButton]}
+                            onPress={handleShareReferralLink}
+                        >
+                            <Ionicons name="share-social-outline" size={24} color="#fff" style={{ marginRight: 10 }} />
+                            <Text style={styles.orderButtonText}>{t('invite_friends')}</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.orderButton, styles.closeButton]}
+                            onPress={onClose}
+                        >
+                            <Text style={styles.orderButtonText}>{t('general.close')}</Text>
+                        </TouchableOpacity>
+                    </ScrollView>
+                </View>
+            </View>
+        </Modal>
+    );
+};
+
+
+const styles = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    inviteFriendsModalView: {
+        width: '90%',
+        maxHeight: '80%',
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    inviteScrollView: {
+        width: '100%',
+    },
+    inviteScrollContent: {
+        paddingBottom: 20,
+    },
+    creditModalHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: 20,
+        justifyContent: 'center',
+    },
+    creditModalBackButton: {
+        position: 'absolute',
+        left: 0,
+        padding: 5,
+    },
+    creditModalTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    inviteDescriptionText: {
+        fontSize: 16,
+        textAlign: 'center',
+        marginBottom: 25,
+        color: '#666',
+        lineHeight: 24,
+    },
+    orderButton: {
+        backgroundColor: '#007bff',
+        paddingVertical: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 10,
+        marginBottom: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        elevation: 5,
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    shareButton: {
+        backgroundColor: '#28a745',
+    },
+    closeButton: {
+        backgroundColor: '#6c757d',
+    },
+    orderButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+});
+
+export InviteFriendsModal

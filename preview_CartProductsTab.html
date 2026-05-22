@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview - CartProductsTab.tsx</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      font-family: 'Inter', sans-serif;
+    }
+    .phone {
+      width: 390px;
+      background: #fafafa;
+      border-radius: 48px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35), inset 0 0 0 2px #222;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .status-bar {
+      background: #fafafa;
+      padding: 12px 24px 4px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: #001524;
+      flex-shrink: 0;
+    }
+    /* === from CartProductsTab styles === */
+    .container {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .container::-webkit-scrollbar { display: none; }
+    .section { margin-bottom: 25px; }
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #001524;
+    }
+    /* CartItem styles from cart.tsx */
+    .cart-item {
+      background: #f7f7f7;
+      padding: 12px;
+      border-bottom: 1px solid #001524;
+      border-top: 1px solid #001524;
+      border-radius: 8px;
+      margin: 4px 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .cart-item.disabled { background: #f0f0f0; border-color: #eee; opacity: 0.7; }
+    .cart-item-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+    .item-qty { font-size: 13px; font-weight: 700; color: #000; min-width: 28px; }
+    .item-name { flex: 1; font-size: 13px; font-weight: 600; color: #000; margin: 0 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .item-price { font-size: 12px; font-weight: bold; color: #15616d; margin-right: 10px; }
+    .bag-icon { font-size: 20px; }
+    /* Delivery type */
+    .delivery-container { display: flex; flex-direction: row; justify-content: space-between; gap: 8px; }
+    .type-btn {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+      transition: background 0.2s, color 0.2s;
+    }
+    .type-btn.selected { background: #ff7d00; border-color: #ff7d00; color: #fff; font-weight: bold; }
+    /* Summary card */
+    .summary-card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    .summary-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+    .total-row {
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+      margin-top: 5px;
+    }
+    .total-label { font-size: 18px; font-weight: bold; color: #000; }
+    .total-value { font-size: 22px; font-weight: bold; color: #ff7d00; }
+    .order-btn {
+      background: #001524;
+      padding: 18px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 20px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="status-bar"><span>16:03</span><span>▌▌▌ ☁ 🔋</span></div>
+  <div class="container">
+
+    <!-- Section: Produits -->
+    <div class="section">
+      <div class="section-title">Votre panier</div>
+
+      <div class="cart-item" onclick="toggleItem(this, 0)">
+        <div class="cart-item-row">
+          <span class="item-qty">2 kg</span>
+          <span class="item-name">Pommes de terre</span>
+          <span class="item-price">500 DZD</span>
+          <span class="bag-icon" id="bag0">🛍️</span>
+        </div>
+      </div>
+
+      <div class="cart-item" onclick="toggleItem(this, 1)">
+        <div class="cart-item-row">
+          <span class="item-qty">3</span>
+          <span class="item-name">Lait entier Candia</span>
+          <span class="item-price">360 DZD</span>
+          <span class="bag-icon" id="bag1">🛍️</span>
+        </div>
+      </div>
+
+      <div class="cart-item disabled" onclick="toggleItem(this, 2)">
+        <div class="cart-item-row">
+          <span class="item-qty">500 g</span>
+          <span class="item-name">Tomates cerises</span>
+          <span class="item-price">250 DZD</span>
+          <span class="bag-icon" id="bag2">🛍</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: Livraison -->
+    <div class="section">
+      <div class="section-title">Choisir la livraison</div>
+      <div class="delivery-container">
+        <div class="type-btn selected" id="dt-normal" onclick="selectType('normal')">Normal</div>
+        <div class="type-btn" id="dt-rapid" onclick="selectType('rapid')">Rapide</div>
+        <div class="type-btn" id="dt-pickup" onclick="selectType('pickup')">Retrait</div>
+      </div>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="summary-card">
+      <div class="summary-row">
+        <span>Total articles</span>
+        <span id="total-cmd">860 DZD</span>
+      </div>
+      <div class="summary-row">
+        <span>Frais livraison</span>
+        <span id="frais-liv">200 DZD</span>
+      </div>
+      <div class="summary-row total-row">
+        <span class="total-label">TOTAL</span>
+        <span class="total-value" id="grand-total">1100 DZD</span>
+      </div>
+      <div class="order-btn">Confirmer la commande</div>
+    </div>
+
+  </div>
+</div>
+<script>
+  function toggleItem(el, idx) {
+    el.classList.toggle('disabled');
+    document.getElementById('bag'+idx).textContent = el.classList.contains('disabled') ? '🛍' : '🛍️';
+  }
+  function selectType(type) {
+    ['normal','rapid','pickup'].forEach(t => document.getElementById('dt-'+t).classList.remove('selected'));
+    document.getElementById('dt-'+type).classList.add('selected');
+    const costs = { normal: 200, rapid: 400, pickup: 0 };
+    document.getElementById('frais-liv').textContent = costs[type] + ' DZD';
+    document.getElementById('grand-total').textContent = (860 + costs[type] + 40) + ' DZD';
+  }
+</script>
+</body>
+</html>

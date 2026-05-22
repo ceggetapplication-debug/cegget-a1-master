@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Récapitulatif de commande</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        :root {
+            --deep: #001524;
+            --teal: #15616d;
+            --orange: #ff7d00;
+            --white: #ffffff;
+            --gray: #777;
+            --light-gray: #f8f8f8;
+            --red: #d9534f;
+        }
+
+        body {
+            font-family: 'Urbanist', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--white);
+            color: var(--deep);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .info-text {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #333;
+            text-align: left;
+            width: 100%;
+        }
+
+        .bold-val {
+            font-weight: 700;
+            color: #555;
+        }
+
+        .summary-section {
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            box-sizing: border-box;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #555;
+            text-align: center;
+        }
+
+        .product-item {
+            background-color: #fff;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: #333;
+        }
+
+        .product-details {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .product-price {
+            font-size: 15px;
+            font-weight: 800;
+            color: #007bff;
+            text-align: right;
+            margin-top: -20px;
+        }
+
+        .store-name {
+            font-size: 12px;
+            color: #888;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .final-total-row {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            width: 100%;
+            text-align: center;
+        }
+
+        .final-total-text {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--red);
+        }
+
+        .final-total-val {
+            font-size: 30px;
+            font-weight: 900;
+            color: var(--red);
+        }
+
+        .button {
+            width: 100%;
+            height: 60px;
+            border-radius: 12px;
+            border: none;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-btn {
+            background-color: #28a745;
+            margin-top: 30px;
+        }
+
+        .cancel-btn {
+            background-color: #6c757d;
+        }
+
+        /* Helpers for costs mapping */
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header-title">Récapitulatif de la commande</div>
+
+        <div class="info-text">Référence : <span class="bold-val">RHROS-17022026-1</span></div>
+
+        <div class="info-text">Nom complet : <span class="bold-val">Rosa H.</span></div>
+
+        <div class="info-text">Nom d'utilisateur : <span class="bold-val">Rosah</span></div>
+
+        <div class="info-text">Addresse : <span class="bold-val">Alger, Algérie</span></div>
+
+        <div class="info-text">Total articles : <span class="bold-val">710.00 DZD</span></div>
+
+        <div class="info-text">Frais de livraison : <span class="bold-val">300.00 DZD</span></div>
+
+        <div class="info-text">Frais application : <span class="bold-val">50.00 DZD</span></div>
+
+        <div class="info-text">Crédit appliqué : <span class="bold-val">-0.00 DZD</span></div>
+
+        <div class="summary-section">
+            <div class="section-title">Produits commandés</div>
+
+            <div class="product-item">
+                <span class="product-name">Lait Nutritif - Candia</span>
+                <span class="product-details">1 /@/ 1L /@/ 120.00 DZD</span>
+                <span class="product-price">120.00 DZD</span>
+                <span class="store-name">Magasin: Superette Central</span>
+            </div>
+
+            <div class="product-item">
+                <span class="product-name">Eau Minérale - Ifri</span>
+                <span class="product-details">6 /@/ 1.5L /@/ 40.00 DZD</span>
+                <span class="product-price">240.00 DZD</span>
+                <span class="store-name">Magasin: Superette Central</span>
+            </div>
+
+            <div class="product-item">
+                <span class="product-name">Fromage Fondu - La Vache Qui Rit</span>
+                <span class="product-details">1 /@/ 200g /@/ 350.00 DZD</span>
+                <span class="product-price">350.00 DZD</span>
+                <span class="store-name">Magasin: Fromagerie Pro</span>
+            </div>
+        </div>
+
+        <div class="final-total-row">
+            <span class="final-total-text">Total à payer : <span class="final-total-val">1060.00 DZD</span></span>
+        </div>
+
+        <button class="button confirm-btn">CONFIRMER</button>
+        <button class="button cancel-btn">ANNULER</button>
+    </div>
+
+</body>
+
+</html>

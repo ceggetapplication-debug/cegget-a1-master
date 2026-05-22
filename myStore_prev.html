@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStore Premium Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        
+        :root {
+            --teal: #15616d;
+            --orange: #ff7d00;
+            --bg: #f8fafb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            margin: 0; padding: 0;
+            color: #1a1a1a;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(21, 97, 109, 0.1);
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        .teal-brand { color: var(--teal); }
+        .orange-brand { color: var(--orange); }
+        .bg-teal { background-color: var(--teal); }
+        
+        .cat-pill {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        
+        .cat-pill.active {
+            background-color: var(--teal);
+            color: white;
+            opacity: 0.5; /* Comme demandé par l'utilisateur */
+            box-shadow: 0 4px 12px rgba(21, 97, 109, 0.2);
+        }
+
+        .product-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+
+        .product-card:active { transform: scale(0.96); }
+
+        .add-card-dashed {
+            border: 2px dashed var(--teal);
+            background: rgba(21, 97, 109, 0.03);
+            border-radius: 18px;
+            transition: all 0.2s;
+        }
+
+        .add-card-dashed:hover { background: rgba(21, 97, 109, 0.08); }
+
+        /* MODAL ANIMATION */
+        .modal-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 21, 36, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: flex-end; justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%; max-width: 450px;
+            border-top-left-radius: 30px; border-top-right-radius: 30px;
+            padding: 24px;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+        }
+
+        input, textarea, select {
+            width: 100%; padding: 12px 16px;
+            border-radius: 12px; border: 2px solid #edf2f7;
+            background: #f9fbff; transition: border-color 0.2s;
+            font-size: 14px; margin-top: 4px; outline: none;
+        }
+
+        input:focus { border-color: var(--teal); }
+        
+        label { font-size: 11px; font-weight: 700; color: #718096; text-transform: uppercase; margin-top: 16px; display: block; }
+
+        .btn-primary { background: var(--teal); color: white; border-radius: 14px; padding: 14px; font-weight: 700; text-align: center; cursor: pointer; transition: opacity 0.2s; }
+        .btn-primary:active { opacity: 0.8; }
+
+        .hide-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="p-0">
+
+    <!-- App Frame Mockup (Visual only) -->
+    <div class="max-w-md mx-auto min-h-screen bg-white shadow-2xl relative">
+        
+        <!-- Header -->
+        <header class="glass-header px-6 py-5 flex items-center justify-between mt-10">
+            <button class="teal-brand text-2xl" onclick="alert('Retour')"><i class="fa-solid fa-chevron-left font-black"></i></button>
+            <h1 class="text-xl font-extrabold teal-brand tracking-tight">Mon Magasin</h1>
+            <button class="orange-brand text-3xl" onclick="openModal('add', 'Général')"><i class="fa-solid fa-plus-circle"></i></button>
+        </header>
+
+        <!-- Category Pills -->
+        <nav class="flex overflow-x-auto hide-scroll gap-3 px-6 py-4 border-b border-gray-50">
+            <button id="cat-boucherie" onclick="switchCat('cat_boucherie')" class="cat-pill active px-5 py-2 rounded-full font-bold text-sm whitespace-nowrap">Boucherie</button>
+            <button id="cat-fruits" onclick="switchCat('cat_fruits')" class="cat-pill bg-gray-100 text-gray-400 px-5 py-2 rounded-full font-bold text-sm whitespace-nowrap">Fruits & Légumes</button>
+            <button id="cat-epicerie" onclick="switchCat('cat_epicerie')" class="cat-pill bg-gray-100 text-gray-400 px-5 py-2 rounded-full font-bold text-sm whitespace-nowrap">Épicerie</button>
+        </nav>
+
+        <!-- Content Area -->
+        <main id="main-content" class="px-6 py-6 space-y-10">
+            <!-- Sections injectées ici -->
+        </main>
+
+    </div>
+
+    <!-- REAL MODAL MIRROR -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModalOnBg(event)">
+        <div class="modal-content animate__animated animate__slideInUp">
+            
+            <!-- Switcher réel -->
+            <div class="flex p-1 bg-gray-100 rounded-xl mb-6">
+                <button id="m-btn-add" onclick="setModalMode('add')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white shadow-sm teal-brand transition-all">AJOUT</button>
+                <button id="m-btn-edit" onclick="setModalMode('edit')" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition-all">MODIF</button>
+                <button id="m-btn-promo" onclick="setModalMode('promo')" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition-all">PROMO</button>
+            </div>
+
+            <h2 id="modal-title" class="text-xl font-bold teal-brand text-center mb-6 tracking-tight">Ajouter un produit</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label>Nom du produit</label>
+                    <input type="text" id="p-name" placeholder="Ex: Boeuf Bourguignon">
+                </div>
+                
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label>Marque / Origine</label>
+                        <input type="text" id="p-brand" placeholder="Local, Import...">
+                    </div>
+                </div>
+
+                <div>
+                    <label>Descriptions (Précision Code)</label>
+                    <div class="bg-blue-50/30 p-4 rounded-2xl border border-blue-100/50">
+                        <span class="text-[10px] font-bold text-teal-800 opacity-60">FRANÇAIS</span>
+                        <textarea id="p-desc-fr" class="bg-white" style="height: 60px;"></textarea>
+                        <span class="text-[10px] font-bold text-teal-800 opacity-60 mt-2 block">KABYLE</span>
+                        <textarea id="p-desc-kab" class="bg-white" style="height: 60px;"></textarea>
+                    </div>
+                </div>
+
+                <div id="dynamic-fields" class="grid grid-cols-2 gap-4">
+                    <!-- Injecté selon mode -->
+                </div>
+            </div>
+
+            <div class="flex gap-4 mt-10">
+                <button onclick="closeModal()" class="flex-1 py-4 font-bold text-gray-400">Annuler</button>
+                <button id="btn-save" class="flex-1 btn-primary tracking-wide shadow-lg shadow-teal-900/10">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const storeData = [
+            { id: 'cat_boucherie', name: 'Boucherie', sections: [
+                { id: 'pt_boeuf', title: 'Boeuf', items: [{ n: 'Bifteck', p: 1950, b: 'Local' }, { n: 'Cuisse', p: 2100, b: 'Djezzy' }] },
+                { id: 'pt_mouton', title: 'Mouton', items: [{ n: 'Gigot', p: 2800, b: 'Agneau' }] }
+            ]},
+            { id: 'cat_fruits', name: 'Fruits & Légumes', sections: [
+                { id: 'cat_fruits', title: 'Fruits & Légumes', items: [{ n: 'Bananes', p: 550, b: 'Équateur' }, { n: 'Oranges', p: 250, b: 'Boufarik' }] }
+            ]}
+        ];
+
+        let activeCatId = 'cat_boucherie';
+
+        function switchCat(id) {
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                btn.className = 'cat-pill bg-gray-100 text-gray-400 px-5 py-2 rounded-full font-bold text-sm whitespace-nowrap';
+            });
+            document.getElementById('cat-' + id.split('_')[1]).className = 'cat-pill active px-5 py-2 rounded-full font-bold text-sm whitespace-nowrap';
+            activeCatId = id;
+            render();
+        }
+
+        function render() {
+            const data = storeData.find(d => d.id === activeCatId);
+            const container = document.getElementById('main-content');
+            container.innerHTML = '';
+
+            data.sections.forEach(sec => {
+                const secEl = document.createElement('section');
+                secEl.innerHTML = `
+                    <h3 class="text-xl font-bold teal-brand mb-4 tracking-tight px-1">${sec.title}</h3>
+                    <div class="flex overflow-x-auto gap-4 hide-scroll pb-2">
+                        ${sec.items.map(p => `
+                            <div class="product-card min-w-[170px] p-4 flex flex-col justify-between h-[240px]">
+                                <div class="w-full h-24 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-200"><i class="fa-solid fa-image text-3xl"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 truncate">${p.n}</h4>
+                                    <p class="text-[10px] text-gray-400 font-semibold">${p.b}</p>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="orange-brand font-extrabold text-lg">${p.p} <small class="text-[10px]">DZD</small></span>
+                                    <button class="text-gray-300 hover:text-teal-600 p-1" onclick="openModal('edit', '${sec.title}', '${p.n}')"><i class="fa-solid fa-ellipsis text-xl font-black"></i></button>
+                                </div>
+                            </div>
+                        `).join('')}
+                        <div onclick="openModal('add', '${sec.title}')" class="add-card-dashed min-w-[170px] h-[240px] flex flex-col items-center justify-center space-y-3 cursor-pointer">
+                            <i class="fa-solid fa-plus-circle text-teal-600 text-3xl"></i>
+                            <div class="text-center"><p class="text-[11px] font-bold teal-brand">Ajouter</p><p class="text-[9px] teal-brand opacity-60">(${sec.title})</p></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(secEl);
+            });
+        }
+
+        function openModal(mode, section, name = '') {
+            const overlay = document.getElementById('modal-overlay');
+            overlay.style.display = 'flex';
+            document.getElementById('p-name').value = name;
+            setModalMode(mode);
+        }
+
+        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+        function closeModalOnBg(e) { if(e.target.id === 'modal-overlay') closeModal(); }
+
+        function setModalMode(mode) {
+            const buttons = ['add', 'edit', 'promo'];
+            buttons.forEach(m => {
+                const btn = document.getElementById('m-btn-'+m);
+                btn.className = `flex-1 py-2 text-xs font-bold rounded-lg transition-all ${m === mode ? 'bg-white shadow-sm teal-brand' : 'text-gray-400'}`;
+            });
+
+            const title = document.getElementById('modal-title');
+            const dyn = document.getElementById('dynamic-fields');
+            const ok = document.getElementById('btn-save');
+
+            if(mode === 'add') {
+                title.innerText = "Ajouter un produit";
+                ok.innerText = "Enregistrer";
+                dyn.innerHTML = `<div><label>Prix</label><input type="number" placeholder="0.00"></div><div><label>Unité</label><select><option>kg</option><option>Unité</option></select></div>`;
+            } else if(mode === 'edit') {
+                title.innerText = "Modifier le produit";
+                ok.innerText = "Modifier";
+                dyn.innerHTML = `<div><label>Nouveau Prix</label><input type="number" placeholder="0.00"></div><div><label>Stock</label><input type="number" value="10"></div>`;
+            } else if(mode === 'promo') {
+                title.innerText = "Offre Promotionnelle";
+                ok.innerText = "Valider Promo";
+                dyn.innerHTML = `<div class="col-span-2"><label>Prix PROMO (DZD)</label><input type="number" class="border-orange-200"></div><div><label>Date Début</label><input type="date"></div><div><label>Date Fin</label><input type="date"></div>`;
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>

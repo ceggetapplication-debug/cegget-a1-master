@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Recette Card - Palette Équilibrée</title>
+    <style>
+        :root {
+            --orange-red: #f06543;
+            --platinum: #e8e9eb;
+            --timberwolf: #e0dfd5;
+            --onyx: #313638;
+            --sandy: #f09d51;
+            --white: #f9f9f9;
+        }
+
+        body { 
+            background-color: var(--platinum); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; 
+            justify-content: center; 
+            padding: 50px;
+            color: var(--onyx);
+        }
+
+        .card { 
+            width: 380px; 
+            background: var(--white); 
+            border: 1px solid var(--timberwolf);
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            background-color: var(--onyx);
+            padding: 20px;
+            color: var(--platinum);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        .list-container {
+            padding: 10px 20px;
+        }
+
+        .row { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 18px 0; 
+            border-bottom: 1px solid var(--timberwolf); 
+            font-size: 13px;
+        }
+
+        .row:last-child { border-bottom: none; }
+
+        .label { font-weight: 600; color: var(--onyx); }
+        
+        /* Utilisation de Sandy pour les IDs */
+        .id-text { color: var(--sandy); font-weight: 800; }
+        
+        /* Utilisation de OrangeRed pour les Gains */
+        .gain-text { color: var(--orange-red); font-weight: 900; }
+
+        .total-section { 
+            background-color: var(--platinum);
+            padding: 25px 20px;
+            border-top: 2px solid var(--timberwolf);
+        }
+
+        .total-label { 
+            font-size: 11px; 
+            font-weight: 900; 
+            color: var(--onyx);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.7;
+        }
+
+        .total-val { 
+            font-size: 26px; 
+            font-weight: 900; 
+            color: var(--onyx); 
+        }
+
+        .accent-bar {
+            height: 4px;
+            background-color: var(--orange-red);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="accent-bar"></div>
+        <div class="card-header">
+            <h2>Journal de bord</h2>
+        </div>
+        <div class="list-container">
+            <div class="row">
+                <span class="label">Commande <span class="id-text">#7782</span></span>
+                <span class="gain-text">+4,200 DZD</span>
+            </div>
+            <div class="row">
+                <span class="label">Commande <span class="id-text">#7783</span></span>
+                <span class="gain-text">+2,100 DZD</span>
+            </div>
+            <div class="row">
+                <span class="label">Commission Cegget</span>
+                <span style="font-weight: bold; opacity: 0.5;">-630 DZD</span>
+            </div>
+        </div>
+        <div class="total-section">
+            <div class="total-label">Versement Net Multiple de 5</div>
+            <div class="total-val">5,670 DZD</div>
+        </div>
+    </div>
+</body>
+</html>

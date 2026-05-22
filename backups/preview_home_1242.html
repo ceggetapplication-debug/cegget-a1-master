@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Céget - Accueil (Restauration Manuelle 12:42)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Outfit:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff7d00;
+            /* Orange */
+            --dark: #001524;
+            /* Bleu nuit */
+            --white: #ffffff;
+            --bg-texture: rgba(0, 21, 36, 0.15);
+            /* Stripes opacity approx 60% relative to orange? No, 0.15 is subtle */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .mobile-wrapper {
+            width: 100%;
+            max-width: 400px;
+            height: 90vh;
+            max-height: 850px;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--primary);
+            border-radius: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.5s ease;
+        }
+
+        /* Texture de fond rayée "Hand-Drawn" */
+        .background-texture {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(-45deg,
+                    var(--bg-texture) 0px,
+                    var(--bg-texture) 1px,
+                    transparent 1px,
+                    transparent 8px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #home-view {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            position: relative;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: 90%;
+            padding: 20px;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .organic-shape {
+            fill: var(--white);
+            stroke: var(--dark);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+
+        .organic-shape.active {
+            fill: var(--dark);
+            stroke: var(--primary);
+            transform: scale(1.03) translateY(-5px);
+            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.3));
+        }
+
+        .shape-label {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 26px;
+            fill: var(--dark);
+            text-anchor: middle;
+            dominant-baseline: middle;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .shape-group.active .shape-label {
+            opacity: 1;
+            fill: var(--white);
+            transform: translateY(-5px);
+        }
+
+        /* Detail View */
+        #detail-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--white);
+            display: none;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--white);
+            border-bottom: 1px solid #eee;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        .page-title {
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--dark);
+            font-family: 'Outfit';
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 24px;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            text-decoration: none;
+            color: var(--dark);
+            border: 1px solid #edf2f7;
+            transition: all 0.2s;
+        }
+
+        .card:active {
+            transform: scale(0.95);
+            background: #edf2f7;
+        }
+
+        .card img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .card span {
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-wrapper" id="wrapper">
+        <div class="background-texture"></div>
+
+        <div id="home-view">
+            <div class="svg-container">
+                <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid meet">
+                    <!-- Shape 1: COURSES (Top Left) -->
+                    <g class="shape-group" id="group-courses" onclick="handleShapeClick('courses')">
+                        <path
+                            d="M 60,150 C 60,110 90,80 140,90 C 190,100 200,140 190,180 C 180,220 140,230 100,220 C 70,210 60,190 60,150 Z"
+                            class="organic-shape" />
+                        <text x="130" y="160" class="shape-label">COURSES</text>
+                    </g>
+
+                    <!-- Shape 2: FRAIS (Top Right) -->
+                    <g class="shape-group" id="group-frais" onclick="handleShapeClick('frais')">
+                        <path
+                            d="M 260,120 C 260,80 300,50 340,60 C 380,70 390,110 380,150 C 370,190 330,200 290,190 C 260,180 260,150 260,120 Z"
+                            class="organic-shape" />
+                        <text x="320" y="130" class="shape-label">FRAIS</text>
+                    </g>
+
+                    <!-- Shape 3: RESTAU (Middle Right) -->
+                    <g class="shape-group" id="group-restau" onclick="handleShapeClick('restau')">
+                        <path
+                            d="M 220,320 C 220,270 260,250 310,260 C 360,270 370,310 360,360 C 350,410 310,420 270,410 C 230,400 220,360 220,320 Z"
+                            class="organic-shape" />
+                        <text x="290" y="340" class="shape-label">RESTAU</text>
+                    </g>
+
+                    <!-- Shape 4: COLLATION (Bottom Left) -->
+                    <g class="shape-group" id="group-collation" onclick="handleShapeClick('collation')">
+                        <path
+                            d="M 40,400 C 40,350 80,330 130,340 C 180,350 190,390 180,440 C 170,490 130,500 90,490 C 50,480 40,440 40,400 Z"
+                            class="organic-shape" />
+                        <text x="110" y="420" class="shape-label">COLLATION</text>
+                    </g>
+
+                    <!-- Shape 5: MAGASINS (Bottom Right) -->
+                    <g class="shape-group" id="group-magasins" onclick="handleShapeClick('magasins')">
+                        <path
+                            d="M 240,520 C 280,510 330,520 350,560 C 370,600 360,650 330,680 C 300,710 240,700 200,690 C 160,680 150,650 180,620 C 210,590 200,530 240,520 Z"
+                            class="organic-shape" />
+                        <text x="270" y="620" class="shape-label">MAGASINS</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div id="detail-view">
+            <div class="header">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <div class="page-title" id="page-title">Nos Boutiques</div>
+            </div>
+            <div class="content" id="main-content">
+                <div class="grid-container" id="grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            courses: {
+                name: "COURSES", items: [
+                    { name: "Superette", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081840.png" },
+                    { name: "Épicerie", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081840.png" }
+                ]
+            },
+            frais: {
+                name: "FRAIS", items: [
+                    { name: "Boucherie", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081840.png" },
+                    { name: "Primeur", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081840.png" }
+                ]
+            },
+            restau: {
+                name: "RESTAURATION", items: [
+                    { name: "Pizzeria", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081840.png" },
+                    { name: "Crémerie", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081840.png" }
+                ]
+            },
+            collation: { name: "COLLATION", items: [] },
+            magasins: { name: "MAGASINS", items: [] }
+        };
+
+        let activeId = null;
+        let history = [];
+
+        function handleShapeClick(id) {
+            const group = document.getElementById('group-' + id);
+            const shape = group.querySelector('.organic-shape');
+
+            if (activeId === id) {
+                // Second click: Navigate
+                navigateTo(id);
+            } else {
+                // First click: Activate
+                document.querySelectorAll('.shape-group').forEach(g => g.classList.remove('active'));
+                document.querySelectorAll('.organic-shape').forEach(s => s.classList.remove('active'));
+
+                group.classList.add('active');
+                shape.classList.add('active');
+                activeId = id;
+            }
+        }
+
+        function navigateTo(id) {
+            const groupData = data[id];
+            if (!groupData) return;
+
+            history.push('home');
+            renderGrid(groupData.items, groupData.name);
+
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('detail-view').style.display = 'flex';
+            document.getElementById('wrapper').style.backgroundColor = 'white';
+        }
+
+        function renderGrid(items, title) {
+            const grid = document.getElementById('grid');
+            document.getElementById('page-title').textContent = title;
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                grid.innerHTML = '<p style="grid-column: span 2; text-align: center; color: #999; margin-top: 50px;">Bientôt disponible...</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<img src="${item.icon}"><span>${item.name}</span>`;
+                card.onclick = () => alert("Ouverture de " + item.name);
+                grid.appendChild(card);
+            });
+        }
+
+        function goBack() {
+            if (history.length > 0) {
+                history.pop();
+                document.getElementById('home-view').style.display = 'flex';
+                document.getElementById('detail-view').style.display = 'none';
+                document.getElementById('wrapper').style.backgroundColor = 'var(--primary)';
+                activeId = null;
+                document.querySelectorAll('.shape-group').forEach(g => g.classList.remove('active'));
+                document.querySelectorAll('.organic-shape').forEach(s => s.classList.remove('active'));
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoris - Mirror Full</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        :root {
+            --primary: #15616d;
+            --secondary: #ff7d00;
+            --bg: #f8f9fa;
+            --text-dark: #001524;
+            --text-gray: #555;
+            --heart-story: #FF5733;
+            --white: #ffffff;
+            --blue-overlay: rgba(0, 0, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg);
+            height: 100%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .screen-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        /* Horizontal Scrolls */
+        .horizontal-scroll {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            scrollbar-width: none;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stories-scroll-container {
+            padding: 0 10px;
+            align-items: center;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+
+        .item-wrapper {
+            position: relative;
+            margin-right: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .external-heart {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            z-index: 10;
+            background: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .story-button {
+            width: 70px;
+            height: 70px;
+            border-radius: 35px;
+            overflow: hidden;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid var(--heart-story);
+            cursor: pointer;
+        }
+
+        .story-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            margin-left: 15px;
+            color: #333;
+        }
+
+        .products-scroll-container {
+            padding: 5px 10px;
+        }
+
+        .product-button {
+            width: 140px;
+            height: 140px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .favorite-stores-scroll-container {
+            padding: 5px 10px;
+        }
+
+        .favorite-store-item-wrapper {
+            width: 160px;
+            margin-right: 16px;
+            align-items: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .favorite-store-button {
+            width: 100%;
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .favorite-store-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .favorite-store-name {
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: center;
+            color: var(--text-gray);
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .disabled-item {
+            opacity: 0.5;
+            border-color: #ccc !important;
+        }
+
+        .disabled-image {
+            filter: grayscale(100%);
+        }
+
+        /* Full Screen Story Modal */
+        .full-screen-story {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: black;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+        }
+
+        .full-screen-story.visible {
+            display: flex;
+        }
+
+        .modal-header {
+            height: 70px;
+            background: var(--blue-overlay);
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 10px 15px 0;
+            z-index: 10;
+        }
+
+        .header-icon-container {
+            padding: 8px;
+            border: 2px solid #755;
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .header-three-dots-button {
+            width: 50px;
+            height: 50px;
+            justify-content: center;
+            align-items: center;
+            border: 0.5px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .image-story-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: black;
+        }
+
+        .modal-story-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .modal-floating-like {
+            position: absolute;
+            bottom: 25%;
+            left: 5px;
+            z-index: 10;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .modal-bottom-bar {
+            height: 90px;
+            background: var(--blue-overlay);
+            display: flex;
+            align-items: center;
+            padding: 0 15px 10px;
+        }
+
+        .store-name-text {
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        /* Modals Generic Styling */
+        .report-menu,
+        .report-reasons-menu {
+            position: absolute;
+            top: 70px;
+            right: 15px;
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 3.84px rgba(0, 0, 0, 0.25);
+            z-index: 10000;
+            display: none;
+            min-width: 180px;
+        }
+
+        .report-menu.visible,
+        .report-reasons-menu.visible {
+            display: block;
+        }
+
+        .report-menu-item,
+        .report-reasons-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+
+        .report-menu-text,
+        .report-reasons-text {
+            margin-left: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-end;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal-content-container {
+            background: white;
+            border-top-left-radius: 45px;
+            border-top-right-radius: 45px;
+            width: 100%;
+            max-height: 90%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .top-bar-product {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 10px 25px;
+            align-items: center;
+            margin-top: -60px;
+            z-index: 1010;
+        }
+
+        .float-btn {
+            width: 54px;
+            height: 54px;
+            border-radius: 27px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 35px 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .main-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-product-img {
+            width: 100%;
+            height: 200px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .info-row {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .label {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-right: 8px;
+        }
+
+        .value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .price-value {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--secondary);
+        }
+
+        .commander-btn {
+            background: var(--secondary);
+            height: 50px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 30px 40px;
+            box-shadow: 0 6px 12px rgba(255, 125, 0, 0.3);
+            cursor: pointer;
+        }
+
+        .commander-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Order Modal Specific */
+        .order-modal-header {
+            font-size: 30px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .quantity-control {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .quantity-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 30px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .quantity-display {
+            font-size: 40px;
+            font-weight: 900;
+            color: var(--text-dark);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .price-summary {
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .summary-total {
+            font-weight: 900;
+            color: var(--secondary);
+            font-size: 22px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app-container">
+        <!-- Main Screen -->
+        <div id="main-screen" class="scroll-container">
+            <h1 class="screen-title" id="tab-favorite">Wid i teṭṭafareḍ</h1>
+            <div class="horizontal-scroll stories-scroll-container" id="stories-list"></div>
+            <h2 class="section-title" id="prodFav">Ayen i tḥemmleḍ</h2>
+            <div class="horizontal-scroll products-scroll-container" id="products-list"></div>
+            <h2 class="section-title" id="magFav">Tiḥuna i tḥemmleḍ</h2>
+            <div class="horizontal-scroll favorite-stores-scroll-container" id="stores-list"></div>
+        </div>
+
+        <!-- Full Screen Story Modal -->
+        <div id="story-modal" class="full-screen-story">
+            <div class="modal-header">
+                <div class="header-icon-container header-three-dots-button" onclick="handleReportMenuToggle()">
+                    <ion-icon name="ellipsis-vertical" style="color: white; font-size: 24px;"></ion-icon>
+                </div>
+                <div class="header-icon-container" onclick="closeStoryModal()">
+                    <ion-icon name="close" style="color: white; font-size: 24px;"></ion-icon>
+                </div>
+            </div>
+
+            <div class="image-story-container">
+                <img id="modal-story-img" class="modal-story-image" src="">
+            </div>
+
+            <div class="modal-bottom-bar">
+                <span id="modal-story-store-name" class="store-name-text"></span>
+            </div>
+
+            <div id="report-menu" class="report-menu">
+                <div class="report-menu-item" onclick="handleShowReportReasons()">
+                    <ion-icon name="alert-circle" style="color: var(--text-dark); font-size: 28px;"></ion-icon>
+                    <span class="report-menu-text">Signaler la photo</span>
+                </div>
+            </div>
+            <div id="report-reasons-menu" class="report-reasons-menu">
+                <div class="report-reasons-item" onclick="confirmReport('scam')">
+                    <span class="report-reasons-text">Fraude ou Arnaque</span>
+                </div>
+                <div class="report-reasons-item" onclick="confirmReport('adult')">
+                    <span class="report-reasons-text">Contenu pour adultes</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Info Modal -->
+        <div id="product-modal" class="modal-overlay">
+            <div class="top-bar-product">
+                <div class="float-btn" onclick="closeProductModal()">
+                    <ion-icon name="chevron-down" style="font-size: 32px; color: var(--text-dark)"></ion-icon>
+                </div>
+                <div class="float-btn" onclick="toggleModalFavorite()">
+                    <ion-icon id="modal-heart-icon" name="heart"
+                        style="font-size: 32px; color: var(--secondary)"></ion-icon>
+                </div>
+            </div>
+            <div class="modal-content-container">
+                <div class="modal-body">
+                    <h2 class="main-title" id="surLeProd">Sur le produit</h2>
+                    <img id="modal-img" class="modal-product-img" src="">
+                    <div class="info-row"><span class="label">Issem:</span><span class="value" id="modal-name"></span>
+                    </div>
+                    <div class="info-row"><span class="label">Lmarka:</span><span class="value" id="modal-brand"></span>
+                    </div>
+                    <div class="info-row"><span class="label">Lqis:</span><span class="value" id="modal-weight"></span>
+                    </div>
+                    <div class="info-row"><span class="label">Ssuma:</span><span class="price-value"><span
+                                id="modal-price"></span> DZD</span></div>
+                </div>
+                <div class="commander-btn" onclick="openOrderModal()">
+                    <span class="commander-text">Commander</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Quantity Modal -->
+        <div id="order-modal" class="modal-overlay">
+            <div class="top-bar-product">
+                <div class="float-btn" onclick="closeOrderModal()">
+                    <ion-icon name="chevron-down" style="font-size: 32px; color: var(--text-dark)"></ion-icon>
+                </div>
+                <div></div>
+            </div>
+            <div class="modal-content-container">
+                <div class="modal-body">
+                    <h2 class="order-modal-header">Qantité</h2>
+                    <div class="quantity-control">
+                        <div class="quantity-btn" onclick="changeQuantity(-1)">-</div>
+                        <div id="quantity-count" class="quantity-display">1</div>
+                        <div class="quantity-btn" onclick="changeQuantity(1)">+</div>
+                    </div>
+                    <div class="price-summary">
+                        <div class="summary-row"><span>Prix unitaire</span><span><span id="summary-price">0</span>
+                                DZD</span></div>
+                        <div class="summary-row"><span>Total</span><span class="summary-total"><span
+                                    id="summary-total">0</span> DZD</span></div>
+                    </div>
+                </div>
+                <div class="commander-btn" onclick="confirmOrder()">
+                    <span class="commander-text">Ajouter au panier</span>
+                </div>
+            </div>
+            <!-- Store Info Modal (Mirroring ModalMagasinInfos.tsx) -->
+            <div id="store-modal" class="modal-overlay">
+                <div class="top-bar-product">
+                    <div class="float-btn" onclick="closeStoreModal()">
+                        <ion-icon name="chevron-down" style="font-size: 32px; color: var(--text-dark)"></ion-icon>
+                    </div>
+                    <div class="float-btn">
+                        <ion-icon name="heart-outline" style="font-size: 32px; color: var(--text-dark)"></ion-icon>
+                    </div>
+                </div>
+                <div class="modal-content-container">
+                    <div class="modal-body" style="padding-top: 20px;">
+                        <h2 id="preview-store-name"
+                            style="color: var(--primary); font-style: italic; margin-bottom: 20px;">Nom du Magasin</h2>
+                        <img id="preview-store-img"
+                            style="width: 100%; height: 150px; border-radius: 16px; object-fit: cover; margin-bottom: 15px;"
+                            src="">
+
+                        <div class="info-row" style="justify-content: space-between;">
+                            <span class="label">Ajouter aux favoris</span>
+                            <ion-icon name="heart-outline" style="font-size: 28px; color: var(--text-dark)"></ion-icon>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Adresse:</span>
+                            <span class="value" id="preview-store-address">Adresse non disponible</span>
+                        </div>
+
+                        <div id="preview-shared-photos-section" style="margin-top: 20px;">
+                            <span class="label">Photos partagées:</span>
+                            <div class="horizontal-scroll" id="preview-shared-photos-list"
+                                style="margin-top: 10px; gap: 10px;">
+                                <!-- Les photos SharedPhotoUrls viendront ici -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            kab: {
+                'tab.favorite': "Wid i teṭṭafareḍ",
+                'prodFav': "Ayen i tḥemmleḍ",
+                'magFav': "Tiḥuna i tḥemmleḍ",
+                'surLeProd': "Sur le produit"
+            }
+        };
+
+        const t = (key) => translations['kab'][key] || key;
+
+        const favorites = [
+            { $id: 's1', storeId: 'st1', type: 'story', fileId: 's1_img', image: 'https://picsum.photos/400/800?random=1' },
+            { $id: 's2', storeId: 'st2', type: 'story', fileId: 's2_img', image: 'https://picsum.photos/400/800?random=2' },
+            { $id: 'p1', type: 'product', productName: 'Pain Complet', productPrice: 120, productPhoto: 'https://picsum.photos/300/300?random=10', brand: 'Boulangerie du Coin', weight: '500g' },
+            { $id: 'p2', type: 'product', productName: 'Lait Frais', productPrice: 100, productPhoto: 'https://picsum.photos/300/300?random=11', brand: 'Laiterie du Bonheur', weight: '1L' },
+            { $id: 'st1', type: 'store', name: 'Boulangerie du Coin', image: 'https://picsum.photos/400/300?random=20' },
+            { $id: 'st2', type: 'store', name: 'Librairie Mots', image: 'https://picsum.photos/400/300?random=21' }
+        ];
+
+        let unfavoritedItems = {};
+        let selectedProduct = null;
+        let selectedStory = null;
+        let isStoryLiked = false;
+        let currentQuantity = 1;
+
+        function render() {
+            document.getElementById('tab-favorite').innerText = t('tab.favorite');
+            document.getElementById('prodFav').innerText = t('prodFav');
+            document.getElementById('magFav').innerText = t('magFav');
+
+            const storiesList = document.getElementById('stories-list');
+            const productsList = document.getElementById('products-list');
+            const storesList = document.getElementById('stores-list');
+
+            storiesList.innerHTML = '';
+            productsList.innerHTML = '';
+            storesList.innerHTML = '';
+
+            favorites.forEach(item => {
+                const isHidden = unfavoritedItems[item.$id];
+                const wrapper = document.createElement('div');
+
+                if (item.type === 'story') {
+                    wrapper.className = 'item-wrapper';
+                    wrapper.innerHTML = `
+                        <div class="story-button" onclick="onStoryPress('${item.$id}')">
+                            <img src="${item.image}" class="story-image">
+                        </div>
+                    `;
+                    storiesList.appendChild(wrapper);
+                }
+                else if (item.type === 'product') {
+                    wrapper.className = 'item-wrapper';
+                    wrapper.innerHTML = `
+                        <div class="external-heart" onclick="toggleHeart('${item.$id}')">
+                            <ion-icon name="${isHidden ? 'heart-outline' : 'heart'}" style="color: ${isHidden ? 'gray' : 'var(--secondary)'}; font-size: 20px;"></ion-icon>
+                        </div>
+                        <div class="product-button ${isHidden ? 'disabled-item' : ''}" onclick="openProductModal('${item.$id}')">
+                            <img src="${item.productPhoto}" class="product-image ${isHidden ? 'disabled-image' : ''}">
+                        </div>
+                    `;
+                    productsList.appendChild(wrapper);
+                }
+                else if (item.type === 'store') {
+                    wrapper.className = 'favorite-store-item-wrapper';
+                    wrapper.innerHTML = `
+                        <div class="external-heart" onclick="toggleHeart('${item.$id}')">
+                            <ion-icon name="${isHidden ? 'heart-outline' : 'heart'}" style="color: ${isHidden ? 'gray' : 'var(--secondary)'}; font-size: 20px;"></ion-icon>
+                        </div>
+                        <div class="favorite-store-button ${isHidden ? 'disabled-item' : ''}" onclick="openStoreModal('${item.$id}')">
+                            <img src="${item.image}" class="favorite-store-image ${isHidden ? 'disabled-image' : ''}">
+                        </div>
+                        <div class="favorite-store-name" style="color: ${isHidden ? '#ccc' : '#555'}">${item.name}</div>
+                    `;
+                    storesList.appendChild(wrapper);
+                }
+            });
+        }
+
+        function toggleHeart(id) {
+            if (unfavoritedItems[id]) { delete unfavoritedItems[id]; }
+            else { unfavoritedItems[id] = Date.now(); }
+            render();
+            if (selectedProduct && selectedProduct.$id === id) { updateProductModalHeart(); }
+        }
+
+        // --- Story Modal ---
+        function onStoryPress(id) {
+            const story = favorites.find(f => f.$id === id);
+            const store = favorites.find(f => f.$id === story.storeId);
+            if (store) { handleStoryPress(story, store); }
+        }
+        function handleStoryPress(story, store) {
+            selectedStory = { story, store };
+            isStoryLiked = false;
+            document.getElementById('modal-story-img').src = story.image;
+            document.getElementById('modal-story-store-name').innerText = store.name;
+            document.getElementById('story-heart-icon').name = 'heart-outline';
+            document.getElementById('story-modal').classList.add('visible');
+            hideMenus();
+        }
+        function closeStoryModal() {
+            document.getElementById('story-modal').classList.remove('visible');
+            selectedStory = null;
+        }
+        function handleCloseModal() {
+            closeStoryModal();
+        }
+        function toggleStoryLike() {
+            isStoryLiked = !isStoryLiked;
+            document.getElementById('story-heart-icon').name = isStoryLiked ? 'heart' : 'heart-outline';
+        }
+        function handleReportMenuToggle() {
+            const menu = document.getElementById('report-menu');
+            const isVisible = menu.classList.contains('visible');
+            hideMenus();
+            if (!isVisible) menu.classList.add('visible');
+        }
+        function handleShowReportReasons() {
+            hideMenus();
+            document.getElementById('report-reasons-menu').classList.add('visible');
+        }
+        function hideMenus() {
+            document.getElementById('report-menu').classList.remove('visible');
+            document.getElementById('report-reasons-menu').classList.remove('visible');
+        }
+        function confirmReport(reason) {
+            alert('Signalement envoyé: ' + reason);
+            handleCloseModal();
+        }
+
+        // --- Product Modal ---
+        function openProductModal(id) {
+            const product = favorites.find(f => f.$id === id);
+            if (unfavoritedItems[id]) return;
+            selectedProduct = product;
+            document.getElementById('modal-img').src = product.productPhoto;
+            document.getElementById('modal-name').innerText = product.productName;
+            document.getElementById('modal-brand').innerText = product.brand || '-';
+            document.getElementById('modal-weight').innerText = product.weight || '-';
+            document.getElementById('modal-price').innerText = product.productPrice;
+            updateProductModalHeart();
+            document.getElementById('product-modal').classList.add('visible');
+        }
+        function closeProductModal() { document.getElementById('product-modal').classList.remove('visible'); selectedProduct = null; }
+        function toggleModalFavorite() { if (selectedProduct) toggleHeart(selectedProduct.$id); }
+        function updateProductModalHeart() {
+            const isFav = !unfavoritedItems[selectedProduct.$id];
+            const icon = document.getElementById('modal-heart-icon');
+            icon.name = isFav ? 'heart' : 'heart-outline';
+            icon.style.color = isFav ? 'var(--secondary)' : 'var(--text-dark)';
+        }
+
+        // --- Order Modal ---
+        function openOrderModal() {
+            if (!selectedProduct) return;
+            currentQuantity = 1;
+            document.getElementById('quantity-count').innerText = currentQuantity;
+            document.getElementById('summary-price').innerText = selectedProduct.productPrice;
+            updateSummary();
+            document.getElementById('order-modal').classList.add('visible');
+        }
+        function closeOrderModal() { document.getElementById('order-modal').classList.remove('visible'); }
+        function changeQuantity(val) {
+            currentQuantity = Math.max(1, currentQuantity + val);
+            document.getElementById('quantity-count').innerText = currentQuantity;
+            updateSummary();
+        }
+        function updateSummary() {
+            const total = currentQuantity * selectedProduct.productPrice;
+            document.getElementById('summary-total').innerText = total;
+        }
+        function confirmOrder() {
+            alert(`Ajouté au panier: ${currentQuantity} x ${selectedProduct.productName}`);
+            closeOrderModal();
+            closeProductModal();
+        }
+
+        // --- Store Modal ---
+        function openStoreModal(id) {
+            const store = favorites.find(f => f.$id === id);
+            if (unfavoritedItems[id]) return;
+
+            document.getElementById('preview-store-name').innerText = store.name;
+            document.getElementById('preview-store-img').src = store.image;
+
+            // Simulation des photos partagées (SharedPhotoUrls)
+            const sharedList = document.getElementById('preview-shared-photos-list');
+            sharedList.innerHTML = '';
+            const mocks = [
+                'https://picsum.photos/300/300?random=50',
+                'https://picsum.photos/300/300?random=51'
+            ];
+            mocks.forEach(url => {
+                sharedList.innerHTML += `<img src="${url}" style="width: 280px; height: 280px; border-radius: 12px; object-fit: cover; margin-right: 10px;">`;
+            });
+
+            document.getElementById('store-modal').classList.add('visible');
+        }
+
+        function closeStoreModal() {
+            document.getElementById('store-modal').classList.remove('visible');
+        }
+
+        render();
+    </script>
+</body>
+
+</html>

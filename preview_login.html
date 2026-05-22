@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Screen Preview</title>
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #2b2b2b;
+        }
+
+        /* Phone frame simulator */
+        .mobile-container {
+            position: relative;
+            width: 390px;
+            height: 844px;
+            /* Typical modern phone aspect ratio */
+            max-height: 98vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: #fff;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            border-radius: 40px;
+            border: 12px solid #000;
+        }
+
+        .mobile-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff7d00;
+            opacity: 0.8;
+            z-index: -1;
+        }
+
+        .topBar {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 20px 0 20px;
+        }
+
+        .logoContainer {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .logoBox {
+            width: 40px;
+            height: 40px;
+            background-color: #2d6a4f;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logoText {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .langButton {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .langButtonText {
+            color: #001524;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: underline;
+            text-decoration-color: #15616d;
+        }
+
+        .content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+            align-self: center;
+            color: #15616d;
+            margin-bottom: 15px;
+        }
+
+        .label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 6px;
+            margin-top: 10px;
+        }
+
+        .input {
+            background-color: #fafafa;
+            border: 2px solid #15616d;
+            border-radius: 5px;
+            padding: 12px 14px;
+            font-size: 15px;
+            color: #000;
+            outline: none;
+            width: 100%;
+        }
+
+        .input::placeholder {
+            color: #aaa;
+        }
+
+        .passwordContainer {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            background-color: #fafafa;
+            border: 2px solid #15616d;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .passwordInput {
+            flex: 1;
+            padding: 12px 14px;
+            font-size: 15px;
+            color: #000;
+            border: none;
+            outline: none;
+            background: transparent;
+        }
+
+        .passwordInput::placeholder {
+            color: #aaa;
+        }
+
+        .eyeButton {
+            padding: 12px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .errorText {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            align-self: center;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .footerLinkContaineroub {
+            display: flex;
+            flex-direction: row;
+            align-self: center;
+            gap: 6px;
+            border-bottom: 2px solid #15616d;
+            max-width: fit-content;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            background: transparent;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .footerLink {
+            font-size: 15px;
+            color: #001524;
+            font-weight: 600;
+        }
+
+        .loginButton {
+            background-color: #15616d;
+            border-radius: 5px;
+            padding: 12px 0;
+            align-self: center;
+            margin-top: 15px;
+            width: 40%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+        }
+
+        .loginButtonText {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .registerButton {
+            background-color: #ffecd1;
+            border-radius: 5px;
+            padding: 12px 0;
+            align-self: center;
+            margin-top: 10px;
+            width: 60%;
+            border: 2px solid #15616d;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+        }
+
+        .registerButtonText {
+            color: #000;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .notFoundText {
+            color: #000;
+            font-size: 18px;
+            font-weight: 600;
+            align-self: center;
+            margin-bottom: 30px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 45px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .footerLinkContainer {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 2px solid #15616d;
+            cursor: pointer;
+        }
+
+        /* Utility classes for React State mocking */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Simple Modal implementation for Forgot Password */
+        .modalOverlay {
+            position: absolute;
+            /* Changed to absolute to fit inside the mobile container */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 28px;
+            /* match container inner border roughly */
+        }
+
+        .modalContainer {
+            width: 85%;
+            background-color: #fafafa;
+            border-radius: 10px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modalHeader {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .modalTitle {
+            font-size: 18px;
+            font-weight: 600;
+            color: #15616d;
+            align-self: center;
+            margin-bottom: 8px;
+        }
+
+        .modalButton {
+            background-color: #15616d;
+            border-radius: 5px;
+            padding: 12px 0;
+            align-self: center;
+            margin-top: 15px;
+            width: 50%;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-container">
+
+        <div class="background"></div>
+
+        <div class="topBar">
+            <div class="logoContainer">
+                <div class="logoBox">
+                    <span class="logoText">M</span>
+                </div>
+            </div>
+            <button class="langButton" id="langButton" onclick="toggleLang()">
+                <span class="langButtonText" id="langButtonText">Taqvaylit</span>
+            </button>
+        </div>
+
+        <div class="content" id="mainContent">
+            <span class="title" id="t-welcome">Ansuf yis-wen</span>
+
+            <div id="normalForm">
+                <span class="label" id="t-email">L'mail</span>
+                <input type="email" class="input" id="emailInput" placeholder="Aru-d l'email-ik">
+
+                <span class="errorText hidden" id="invalidEmailError">Ur iwulem ara l'email-agi.</span>
+
+                <span class="label" id="t-password">Awal uffir</span>
+                <div class="passwordContainer">
+                    <input type="password" class="passwordInput" id="passwordInput" placeholder="**********">
+                    <button class="eyeButton" onclick="togglePasswordVisibility()">
+                        <ion-icon name="eye-outline" id="eyeIcon" style="font-size: 22px; color: #001524;"></ion-icon>
+                    </button>
+                </div>
+
+                <div id="wrongPasswordSection" class="hidden" style="display: flex; flex-direction: column;">
+                    <span class="errorText" id="t-wrongPassword">Ur iwulem ara wawal uffir-agi.</span>
+                    <button class="footerLinkContaineroub" onclick="showResetModal()">
+                        <span class="footerLink" id="t-forgotPassword">Teţţuḍ awal uffir?</span>
+                    </button>
+                </div>
+
+                <span class="errorText hidden" id="userDisabledError">Yeţwakkes useqdac-agi.</span>
+
+                <button class="loginButton" onclick="handleLogin()">
+                    <span class="loginButtonText" id="t-login">Anekcum</span>
+                </button>
+                <button class="registerButton" onclick="navigateToRegister()">
+                    <span class="registerButtonText" id="t-registerMySelf">Ad jerdeɣ iman-iw</span>
+                </button>
+            </div>
+
+            <div id="accountNotFoundSection" class="hidden" style="display: flex; flex-direction: column;">
+                <span class="notFoundText" id="t-userNotFoundText">Ulac aseqdac i yesxdamen l'email-agi.</span>
+                <button class="loginButton" onclick="navigateToRegister()">
+                    <span class="loginButtonText" id="t-registerMySelfNotFound">Ad jerdeɣ iman-iw</span>
+                </button>
+            </div>
+
+            <div class="footer">
+                <div class="footerLinkContainer" onclick="openPlayStore('magasin')">
+                    <ion-icon name="storefront" style="font-size: 22px; color: #15616d;"></ion-icon>
+                    <span class="footerLink" id="t-titleMgz">Ad jerdeɣ taḥanuţ-iw</span>
+                </div>
+                <div class="footerLinkContainer" onclick="openPlayStore('livreur')">
+                    <ion-icon name="bicycle" style="font-size: 22px; color: #15616d;"></ion-icon>
+                    <span class="footerLink" id="t-titleLvr">Ad sawaḍeɣ lqeḍyan</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password Reset Modal -->
+        <div class="modalOverlay hidden" id="resetModal">
+            <div class="modalContainer">
+                <div class="modalHeader">
+                    <div style="cursor: pointer" onclick="hideResetModal()">
+                        <ion-icon name="chevron-back" style="font-size: 24px; color: #15616d;"></ion-icon>
+                    </div>
+                    <span class="modalTitle" id="t-resetPasswordTitle">Teţţuḍ awal uffir?</span>
+                </div>
+
+                <div id="resetEmailForm">
+                    <span class="label" id="t-modalEmail">L'mail</span>
+                    <input type="email" class="input" style="background-color: #f0f0f0;" id="resetEmailInput"
+                        placeholder="Aru-d l'email-ik"
+                        oninput="document.getElementById('resetInvalidEmailError').classList.add('hidden')">
+                    <span class="errorText hidden" style="color: #ff7d00; font-size: 14px; margin-top: 4px;"
+                        id="resetInvalidEmailError">Ur iwulem ara l'email-agi.</span>
+
+                    <button class="modalButton" onclick="handleSendReset()">
+                        <span id="t-send">Ceggeɛ</span>
+                    </button>
+                </div>
+
+                <div id="resetSentMessage" class="hidden">
+                    <span style="color: #000; font-size: 16px; text-align: center; display: block; margin: 20px 0;"
+                        id="t-resetEmailSent">Yeţwaceggeɛen l'email i uveddel n wawal uffir.</span>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- Emd mobile container -->
+
+    <script>
+        // --- Translations ---
+        const translations = {
+            fr: {
+                welcome: "Bienvenue",
+                email: "Adresse email",
+                emailPlaceholder: "votre.email@exemple.com",
+                password: "Mot de passe",
+                login: "Se connecter",
+                registerMySelf: "Je m'inscris",
+                titleMgz: "Inscrire mon magasin",
+                titleLvr: "Devenir livreur",
+                wrongPassword: "Mot de passe incorrect.",
+                forgotPassword: "Mot de passe oublié ?",
+                userDisabled: "Cet utilisateur a été désactivé.",
+                userNotFound: "Aucun utilisateur trouvé avec cette adresse email.",
+                invalidEmail: "Adresse email invalide.",
+                send: "Envoyer",
+                resetEmailSent: "L'email de réinitialisation a été envoyé."
+            },
+            kab: {
+                welcome: "Ansuf yis-wen",
+                email: "L'mail",
+                emailPlaceholder: "Aru-d l'email-ik",
+                password: "Awal uffir",
+                login: "Anekcum",
+                registerMySelf: "Ad jerdeɣ iman-iw",
+                titleMgz: "Ad jerdeɣ taḥanuţ-iw",
+                titleLvr: "Ad sawaḍeɣ lqeḍyan",
+                wrongPassword: "Ur iwulem ara wawal uffir-agi.",
+                forgotPassword: "Teţţuḍ awal uffir?",
+                userDisabled: "Yeţwakkes useqdac-agi.",
+                userNotFound: "Ulac aseqdac i yesxdamen l'email-agi.",
+                invalidEmail: "Ur iwulem ara l'email-agi.",
+                send: "Ceggeɛ",
+                resetEmailSent: "Yeţwaceggeɛen l'email i uveddel n wawal uffir."
+            }
+        };
+
+        // --- State ---
+        let currentLang = 'kab';
+        let showPassword = false;
+
+        // --- functions ---
+        function toggleLang() {
+            currentLang = currentLang === 'kab' ? 'fr' : 'kab';
+            document.getElementById('langButtonText').textContent = currentLang === 'kab' ? 'Taqvaylit' : 'Français';
+            updateTranslations();
+
+            // Re-apply placeholders
+            document.getElementById('emailInput').placeholder = t('emailPlaceholder');
+            document.getElementById('resetEmailInput').placeholder = t('emailPlaceholder');
+        }
+
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        function updateTranslations() {
+            document.getElementById('t-welcome').textContent = t('welcome');
+            document.getElementById('t-email').textContent = t('email');
+            document.getElementById('t-password').textContent = t('password');
+            document.getElementById('t-login').textContent = t('login');
+            document.getElementById('t-registerMySelf').textContent = t('registerMySelf');
+            document.getElementById('t-registerMySelfNotFound').textContent = t('registerMySelf');
+            document.getElementById('t-titleMgz').textContent = t('titleMgz');
+            document.getElementById('t-titleLvr').textContent = t('titleLvr');
+
+            document.getElementById('invalidEmailError').textContent = t('invalidEmail');
+            document.getElementById('t-wrongPassword').textContent = t('wrongPassword');
+            document.getElementById('t-forgotPassword').textContent = t('forgotPassword');
+            document.getElementById('userDisabledError').textContent = t('userDisabled');
+            document.getElementById('t-userNotFoundText').textContent = t('userNotFound');
+
+            // Modal
+            document.getElementById('t-resetPasswordTitle').textContent = t('forgotPassword');
+            document.getElementById('t-modalEmail').textContent = t('email');
+            document.getElementById('resetInvalidEmailError').textContent = t('invalidEmail');
+            document.getElementById('t-send').textContent = t('send');
+            document.getElementById('t-resetEmailSent').textContent = t('resetEmailSent');
+        }
+
+        function togglePasswordVisibility() {
+            showPassword = !showPassword;
+            const input = document.getElementById('passwordInput');
+            const icon = document.getElementById('eyeIcon');
+
+            if (showPassword) {
+                input.type = "text";
+                icon.name = "eye-off-outline";
+            } else {
+                input.type = "password";
+                icon.name = "eye-outline";
+            }
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            // Reset all errors
+            document.getElementById('invalidEmailError').classList.add('hidden');
+            document.getElementById('wrongPasswordSection').classList.add('hidden');
+            document.getElementById('userDisabledError').classList.add('hidden');
+            document.getElementById('accountNotFoundSection').classList.add('hidden');
+            document.getElementById('normalForm').classList.remove('hidden');
+
+            if (email === '' || password === '') return;
+
+            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (!emailValid) {
+                document.getElementById('invalidEmailError').classList.remove('hidden');
+                return;
+            }
+
+            // SIMULATION Logic based on specific email inputs for preview tests
+            if (email === "wrong@test.com") {
+                document.getElementById('wrongPasswordSection').classList.remove('hidden');
+            } else if (email === "notfound@test.com") {
+                document.getElementById('normalForm').classList.add('hidden');
+                document.getElementById('accountNotFoundSection').classList.remove('hidden');
+            } else if (email === "disabled@test.com") {
+                document.getElementById('userDisabledError').classList.remove('hidden');
+            } else {
+                alert("Login Success (Simulation)");
+            }
+        }
+
+        function navigateToRegister() {
+            alert("Router push: /(main)/modals-others/registrationForm");
+        }
+
+        function openPlayStore(type) {
+            let url = 'https://play.google.com/store/apps/details?id=com.cegget.';
+            if (type === 'magasin') url += 'magasin';
+            if (type === 'livreur') url += 'livreur';
+
+            // alert(`Opening URL: ${url}`);
+            window.open(url, '_blank');
+        }
+
+        // --- Modal ---
+        function showResetModal() {
+            document.getElementById('resetModal').classList.remove('hidden');
+            document.getElementById('resetEmailInput').value = document.getElementById('emailInput').value;
+            document.getElementById('resetSentMessage').classList.add('hidden');
+            document.getElementById('resetEmailForm').classList.remove('hidden');
+            document.getElementById('resetInvalidEmailError').classList.add('hidden');
+        }
+
+        function hideResetModal() {
+            document.getElementById('resetModal').classList.add('hidden');
+        }
+
+        function handleSendReset() {
+            const email = document.getElementById('resetEmailInput').value;
+            if (email === '') return;
+
+            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (!emailValid) {
+                document.getElementById('resetInvalidEmailError').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('resetEmailForm').classList.add('hidden');
+            document.getElementById('resetSentMessage').classList.remove('hidden');
+        }
+
+        // Initialize placeholders correctly
+        document.getElementById('emailInput').placeholder = t('emailPlaceholder');
+        document.getElementById('resetEmailInput').placeholder = t('emailPlaceholder');
+
+    </script>
+</body>
+
+</html>

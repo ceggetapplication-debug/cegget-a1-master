@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Profil - Cegget</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #15616d;
+            --accent: #ff7d00;
+            --bg-light: #ffecd1;
+            --text-dark: #001524;
+            --white: #ffffff;
+            --gray: #767577;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #222;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        /* PHONE FRAME */
+        .phone {
+            width: 375px;
+            min-height: 812px;
+            background: var(--primary);
+            border: 12px solid #333;
+            border-radius: 45px;
+            padding: 20px 12px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        /* HIDDEN */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== MENU VIEW ===== */
+        .profile-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .photo-container {
+            position: relative;
+            margin-right: 12px;
+        }
+
+        .profile-photo {
+            width: 140px;
+            height: 140px;
+            border-radius: 8px;
+            border: 1.5px solid var(--accent);
+            object-fit: cover;
+            background: #ccc;
+        }
+
+        .edit-photo-icon {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 5px;
+            color: #fff;
+            display: flex;
+        }
+
+        .pseudo-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--bg-light);
+        }
+
+        .zone-text {
+            font-size: 12px;
+            color: var(--accent);
+            margin-top: 4px;
+        }
+
+        .menu-container {
+            background: #fff;
+            border: 1.5px solid var(--accent);
+            border-radius: 10px;
+            padding: 8px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 10px;
+            border-bottom: 1px solid var(--bg-light);
+            cursor: pointer;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 8px;
+        }
+
+        .menu-item-text {
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        /* ===== SUB VIEWS ===== */
+        .sub-view {
+            background: #fff;
+            border: 1.5px solid var(--accent);
+            border-radius: 10px;
+            padding: 15px 18px;
+            margin-top: 100px;
+            min-height: 350px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            cursor: pointer;
+            display: flex;
+        }
+
+        .view-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .detail-item {
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--bg-light);
+            padding-bottom: 10px;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .detail-value-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            color: #000;
+        }
+
+        .edit-icon {
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+        }
+
+        /* NOTIFICATION ROWS */
+        .notif-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--bg-light);
+        }
+
+        .notif-text {
+            font-size: 15px;
+            color: #000;
+        }
+
+        /* SWITCH */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gray);
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background: var(--accent);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+            background: var(--text-dark);
+        }
+
+        /* ===== BIG RED TEST BUTTON ===== */
+        .test-notif-btn {
+            background-color: red;
+            color: white;
+            border: 3px solid darkred;
+            border-radius: 12px;
+            padding: 16px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* LANGUAGE ITEMS */
+        .lang-item {
+            padding: 15px 5px;
+            border-bottom: 1px solid var(--bg-light);
+            cursor: pointer;
+            font-size: 15px;
+            color: #000;
+        }
+
+        /* ===== MODALS ===== */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 35px;
+        }
+
+        .modal-box {
+            background: #fff;
+            width: 88%;
+            border-radius: 20px;
+            padding: 25px;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: var(--text-dark);
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .modal-label {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            margin-top: 8px;
+        }
+
+        .modal-val {
+            font-size: 15px;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .modal-input {
+            border: 1.5px solid var(--accent);
+            border-radius: 6px;
+            width: 100%;
+            padding: 10px;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .modal-btn {
+            background: var(--primary);
+            color: white;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .modal-btn-cancel {
+            background: var(--accent);
+            color: white;
+            border: 2px solid var(--text-dark);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .contact-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--accent);
+            cursor: pointer;
+            font-size: 14px;
+            color: #000;
+        }
+
+        .modal-msg {
+            font-size: 14px;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone" id="phone">
+
+        <!-- ======================== MENU ======================== -->
+        <div id="view-menu">
+            <div class="profile-header">
+                <div class="photo-container">
+                    <img class="profile-photo" src="https://via.placeholder.com/140.png?text=Profil" id="pfp">
+                    <div class="edit-photo-icon" onclick="alert('Galerie...')"><ion-icon
+                            name="camera-outline"></ion-icon></div>
+                </div>
+                <div>
+                    <div class="pseudo-text" id="main-pseudo">VotrePseudoIci</div>
+                    <div class="zone-text" id="main-address">Votre adresse</div>
+                </div>
+            </div>
+
+            <div class="menu-container">
+                <div class="menu-item" onclick="go('accountDetails')">
+                    <div class="menu-item-left"><ion-icon name="person-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon><span class="menu-item-text">Mon
+                            Compte</span></div>
+                    <ion-icon name="chevron-forward-outline" style="color:var(--text-dark)"></ion-icon>
+                </div>
+                <div class="menu-item" onclick="go('languages')">
+                    <div class="menu-item-left"><ion-icon name="language-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon><span
+                            class="menu-item-text">Langues</span></div>
+                    <ion-icon name="chevron-forward-outline" style="color:var(--text-dark)"></ion-icon>
+                </div>
+                <div class="menu-item" onclick="go('notifications')">
+                    <div class="menu-item-left"><ion-icon name="notifications-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon><span
+                            class="menu-item-text">Notifications</span></div>
+                    <ion-icon name="chevron-forward-outline" style="color:var(--text-dark)"></ion-icon>
+                </div>
+                <div class="menu-item" onclick="openModal('avantages')">
+                    <div class="menu-item-left"><ion-icon name="gift-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon><span class="menu-item-text">Mes
+                            Avantages</span></div>
+                    <ion-icon name="chevron-forward-outline" style="color:var(--text-dark)"></ion-icon>
+                </div>
+                <div class="menu-item" onclick="openModal('contact')">
+                    <div class="menu-item-left"><ion-icon name="call-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon><span class="menu-item-text">Nous
+                            contacter</span></div>
+                    <ion-icon name="chevron-forward-outline" style="color:var(--text-dark)"></ion-icon>
+                </div>
+                <div class="menu-item" onclick="handleLogout()">
+                    <div class="menu-item-left"><ion-icon name="log-out-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon><span
+                            class="menu-item-text">Déconnexion</span></div>
+                    <ion-icon name="chevron-forward-outline" style="color:var(--text-dark)"></ion-icon>
+                </div>
+                <div class="menu-item" onclick="openModal('delete')">
+                    <div class="menu-item-left"><ion-icon name="trash-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon><span
+                            class="menu-item-text">Supprimer le compte</span></div>
+                    <ion-icon name="chevron-forward-outline" style="color:var(--text-dark)"></ion-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================== ACCOUNT DETAILS ======================== -->
+        <div id="view-accountDetails" class="sub-view hidden">
+            <div class="header-row">
+                <div class="back-btn" onclick="go('menu')"><ion-icon name="chevron-back-outline"
+                        style="font-size:24px;color:var(--text-dark)"></ion-icon></div>
+                <span class="view-title">Détails du compte</span>
+            </div>
+            <!-- Pseudo -->
+            <div class="detail-item">
+                <div class="detail-label">Pseudo</div>
+                <div class="detail-value-row">
+                    <span class="detail-value" id="det-pseudo">VotrePseudoIci</span>
+                    <div class="edit-icon" onclick="editPseudo()"><ion-icon name="create-outline"
+                            style="font-size:20px"></ion-icon></div>
+                </div>
+            </div>
+            <!-- Email -->
+            <div class="detail-item">
+                <div class="detail-label">Email</div>
+                <div class="detail-value-row">
+                    <span class="detail-value" id="det-email">votre.email@example.com</span>
+                    <div class="edit-icon" onclick="openModal('email')"><ion-icon name="create-outline"
+                            style="font-size:20px"></ion-icon></div>
+                </div>
+            </div>
+            <!-- Password -->
+            <div class="detail-item">
+                <div class="detail-label">Mot de passe</div>
+                <div class="detail-value-row">
+                    <span class="detail-value">********</span>
+                    <div class="edit-icon" onclick="openModal('password')"><ion-icon name="create-outline"
+                            style="font-size:20px"></ion-icon></div>
+                </div>
+            </div>
+            <!-- Phone -->
+            <div class="detail-item">
+                <div class="detail-label">Téléphone</div>
+                <div class="detail-value-row">
+                    <span class="detail-value" id="det-phone">+33 1 23 45 67 89</span>
+                    <div class="edit-icon" onclick="openModal('phone')"><ion-icon name="create-outline"
+                            style="font-size:20px"></ion-icon></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================== LANGUAGES ======================== -->
+        <div id="view-languages" class="sub-view hidden">
+            <div class="header-row">
+                <div class="back-btn" onclick="go('menu')"><ion-icon name="chevron-back-outline"
+                        style="font-size:24px;color:var(--text-dark)"></ion-icon></div>
+                <span class="view-title">Langues</span>
+            </div>
+            <div class="lang-item" onclick="alert('Taqvaylit sélectionné'); go('menu')">Taqvaylit (kab)</div>
+            <div class="lang-item" onclick="alert('Français sélectionné'); go('menu')">Français (fr)</div>
+        </div>
+
+        <!-- ======================== NOTIFICATIONS ======================== -->
+        <div id="view-notifications" class="sub-view hidden">
+            <div class="header-row">
+                <div class="back-btn" onclick="go('menu')"><ion-icon name="chevron-back-outline"
+                        style="font-size:24px;color:var(--text-dark)"></ion-icon></div>
+                <span class="view-title">Notifications</span>
+            </div>
+
+            <!-- LE BOUTON PLEIN ÉCRAN ROUGE -->
+            <div class="test-notif-btn" onclick="testNotif()">
+                🔔 Tester le vibreur et le son
+            </div>
+
+            <!-- Switch 1 : Notifications -->
+            <div class="notif-row">
+                <span class="notif-text">Notifications</span>
+                <label class="switch">
+                    <input type="checkbox" id="sw-push" onchange="togglePush(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <!-- Switch 2 : Arrivée livreur -->
+            <div class="notif-row">
+                <span class="notif-text">Arrivée livreur</span>
+                <label class="switch">
+                    <input type="checkbox" id="sw-arrival" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- ======================== MODALS ======================== -->
+        <div id="overlay" class="modal-overlay hidden">
+
+            <!-- EMAIL -->
+            <div id="modal-email" class="modal-box hidden">
+                <div class="modal-header">
+                    <div class="back-btn" onclick="closeModal()"><ion-icon name="chevron-back-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon></div>
+                    <span class="modal-title">Changer l'email</span>
+                </div>
+                <div class="modal-label">Email actuel</div>
+                <div class="modal-val" id="mod-email-curr">votre.email@example.com</div>
+                <div class="modal-label">Nouvel email</div>
+                <input class="modal-input" type="email" placeholder="nouveau@email.com" id="new-email-input">
+                <div class="modal-btn" onclick="openModal('code')">Enregistrer</div>
+            </div>
+
+            <!-- PASSWORD -->
+            <div id="modal-password" class="modal-box hidden">
+                <div class="modal-header">
+                    <div class="back-btn" onclick="closeModal()"><ion-icon name="chevron-back-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon></div>
+                    <span class="modal-title">Changer le mot de passe</span>
+                </div>
+                <div class="modal-label">Mot de passe actuel</div>
+                <input class="modal-input" type="password" placeholder="Ancien mot de passe">
+                <div class="modal-label">Nouveau mot de passe</div>
+                <input class="modal-input" type="password" placeholder="Nouveau mot de passe">
+                <p style="font-size:11px;color:var(--gray);margin-bottom:8px">8 carac. min, Maj/Min/Chiffre/Spécial</p>
+                <div class="modal-btn" onclick="openModal('code')">Changer le mot de passe</div>
+            </div>
+
+            <!-- PHONE -->
+            <div id="modal-phone" class="modal-box hidden">
+                <div class="modal-header">
+                    <div class="back-btn" onclick="closeModal()"><ion-icon name="chevron-back-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon></div>
+                    <span class="modal-title">Changer le téléphone</span>
+                </div>
+                <div class="modal-label">Numéro actuel</div>
+                <div class="modal-val" id="mod-phone-curr">+33 1 23 45 67 89</div>
+                <div class="modal-label">Nouveau numéro</div>
+                <input class="modal-input" type="tel" placeholder="0XXXXXXXXX">
+                <div class="modal-btn" onclick="openModal('code')">Enregistrer</div>
+            </div>
+
+            <!-- CODE VERIF -->
+            <div id="modal-code" class="modal-box hidden">
+                <div class="modal-header">
+                    <span class="modal-title">Vérification</span>
+                </div>
+                <div class="modal-msg">Un code a été envoyé à votre email.</div>
+                <input class="modal-input" type="text" id="code-input" placeholder="Code à 6 chiffres">
+                <div class="modal-btn" onclick="confirmCode()">Vérifier le code</div>
+            </div>
+
+            <!-- AVANTAGES -->
+            <div id="modal-avantages" class="modal-box hidden">
+                <div class="modal-header">
+                    <div class="back-btn" onclick="closeModal()"><ion-icon name="chevron-back-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon></div>
+                    <span class="modal-title">Mes Avantages</span>
+                </div>
+                <div class="detail-item" style="width:100%">
+                    <div class="detail-label">Solde Crédit</div>
+                    <div style="font-size:20px;font-weight:bold;color:var(--accent)">0.00 DZD</div>
+                </div>
+                <div class="detail-item" style="width:100%">
+                    <div class="detail-label">Livraisons gratuites</div>
+                    <div>0 livraison(s) disponible(s)</div>
+                </div>
+                <div class="modal-btn" onclick="alert('Offres Premium...')">Premium</div>
+                <div class="modal-btn" style="margin-top:8px" onclick="alert('Inviter...')">Inviter des amis</div>
+            </div>
+
+            <!-- CONTACT -->
+            <div id="modal-contact" class="modal-box hidden">
+                <div class="modal-header">
+                    <div class="back-btn" onclick="closeModal()"><ion-icon name="chevron-back-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon></div>
+                    <span class="modal-title">Nous contacter</span>
+                </div>
+                <div class="contact-option" onclick="alert('Ouverture mail...')"><ion-icon name="mail-outline"
+                        style="font-size:22px"></ion-icon> Par Email</div>
+                <div class="contact-option" onclick="alert('Appel...')"><ion-icon name="call-outline"
+                        style="font-size:22px"></ion-icon> Par Téléphone</div>
+            </div>
+
+            <!-- DELETE -->
+            <div id="modal-delete" class="modal-box hidden">
+                <div class="modal-header">
+                    <div class="back-btn" onclick="closeModal()"><ion-icon name="chevron-back-outline"
+                            style="font-size:22px;color:var(--text-dark)"></ion-icon></div>
+                    <span class="modal-title">Supprimer le compte</span>
+                </div>
+                <p style="color:var(--primary);font-weight:bold;text-align:center;margin-bottom:10px">Voulez-vous
+                    supprimer votre compte ?</p>
+                <textarea class="modal-input" style="height:80px" id="delete-reason"
+                    placeholder="Pourquoi nous quittez-vous ?" oninput="updateDeleteBtn()"></textarea>
+                <div id="delete-btn" class="modal-btn" style="opacity:0.4;cursor:not-allowed" onclick="doDelete()">
+                    Supprimer</div>
+                <div class="modal-btn-cancel" onclick="closeModal()">Annuler</div>
+            </div>
+
+        </div><!-- /overlay -->
+
+    </div><!-- /phone -->
+
+    <script>
+        const userData = {
+            pseudo: "VotrePseudoIci",
+            address: "Votre adresse",
+            email: "votre.email@example.com",
+            phone: "+33 1 23 45 67 89"
+        };
+
+        function go(id) {
+            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + id).classList.remove('hidden');
+        }
+
+        function openModal(id) {
+            document.getElementById('overlay').classList.remove('hidden');
+            document.querySelectorAll('.modal-box').forEach(m => m.classList.add('hidden'));
+            document.getElementById('modal-' + id).classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('overlay').classList.add('hidden');
+        }
+
+        function editPseudo() {
+            const p = prompt("Nouveau pseudo :", userData.pseudo);
+            if (p && confirm("Confirmer le changement vers : " + p + " ?")) {
+                userData.pseudo = p;
+                document.getElementById('main-pseudo').innerText = p;
+                document.getElementById('det-pseudo').innerText = p;
+            }
+        }
+
+        function confirmCode() {
+            const c = document.getElementById('code-input').value;
+            if (c) { alert("Succès ! Action confirmée."); closeModal(); }
+            else { alert("Entrez le code."); }
+        }
+
+        function togglePush(el) {
+            if (el.checked) {
+                if (!confirm("Permission refusée\nTu dois autoriser les notifications dans les réglages de l'appareil.")) {
+                    el.checked = false;
+                }
+            }
+        }
+
+        function testNotif() {
+            if (window.navigator.vibrate) window.navigator.vibrate(300);
+            alert("🔔 BRR BRR ! 🍔\nTest vibreur et son déclenché !\n(Livreur arrivé !)");
+        }
+
+        function handleLogout() {
+            if (confirm("Déconnexion\nVoulez-vous vraiment vous déconnecter ?")) {
+                alert("Déconnexion réussie.");
+            }
+        }
+
+        function updateDeleteBtn() {
+            const r = document.getElementById('delete-reason').value.trim();
+            const btn = document.getElementById('delete-btn');
+            btn.style.opacity = r ? '1' : '0.4';
+            btn.style.cursor = r ? 'pointer' : 'not-allowed';
+            btn.dataset.ready = r ? '1' : '';
+        }
+
+        function doDelete() {
+            const btn = document.getElementById('delete-btn');
+            if (btn.dataset.ready) { alert("Compte supprimé."); closeModal(); }
+        }
+    </script>
+</body>
+
+</html>

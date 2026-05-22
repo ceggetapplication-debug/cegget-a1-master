@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview - DeliveryStatusTab.tsx</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #e0e0e0; display: flex; justify-content: center; padding: 40px 20px; font-family: 'Inter', sans-serif; }
+    .phone {
+      width: 390px;
+      background: #fafafa;
+      border-radius: 48px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35), inset 0 0 0 2px #222;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .status-bar { background: #fafafa; padding: 12px 24px 4px; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #001524; flex-shrink: 0; }
+    .container { padding: 20px; overflow-y: auto; flex: 1; scrollbar-width: none; }
+    .container::-webkit-scrollbar { display: none; }
+
+    /* === Exact styles from DeliveryStatusTab.tsx === */
+    .delivery-status-message {
+      font-size: 16px;
+      font-weight: bold;
+      color: #001524;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .delivery-info-labels {
+      background: #fbfbfb;
+      border-radius: 5px;
+      padding: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    .delivery-info-text {
+      font-size: 15px;
+      color: #001524;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .delivery-info-value { font-weight: bold; color: #ff7d00; }
+    .delivery-label { font-size: 15px; font-weight: bold; color: #001524; margin-top: 16px; margin-bottom: 8px; }
+    .heart-rating-container { display: flex; flex-direction: row; justify-content: center; margin-top: 8px; gap: 4px; }
+    .heart { font-size: 32px; cursor: pointer; color: #ccc; transition: color 0.15s, transform 0.1s; }
+    .heart.filled { color: #ff7d00; }
+    .heart:hover { transform: scale(1.15); }
+    .final-total-container {
+      border-top: 2px solid #ff7d00;
+      border-bottom: 2px solid #ff7d00;
+      padding: 10px 0;
+      margin-top: 12px;
+    }
+    .total-text { font-size: 16px; color: #001524; }
+    .final-total-value { font-weight: bold; color: #ff7d00; font-size: 18px; }
+    .cancel-order-btn { align-self: center; margin-top: 20px; text-align: center; color: #001524; text-decoration: underline; font-size: 14px; cursor: pointer; padding: 10px; }
+
+    /* State controls */
+    .state-panel { display: none; }
+    .state-panel.active { display: block; }
+    .state-controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      padding: 12px;
+      background: #ececec;
+      border-top: 1px solid #ccc;
+    }
+    .state-btn {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #001524;
+      background: #fff;
+    }
+    .state-btn.active { background: #001524; color: #fff; }
+
+    /* Waiting animation */
+    .pulse-container { text-align: center; padding: 20px 0; }
+    .pulse {
+      width: 50px; height: 50px; background: #ff7d00;
+      border-radius: 50%; margin: 0 auto 10px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .waiting-text { color: #15616d; font-size: 14px; font-style: italic; }
+
+    /* QR mini */
+    .qr-box { background: #fff; border-radius: 5px; padding: 15px; text-align: center; border: 1px solid #eee; margin-top: 12px; }
+    .qr-grid {
+      width: 100px; height: 100px; margin: 0 auto 8px;
+      background:
+        repeating-linear-gradient(0deg, #001524 0px, #001524 3px, transparent 3px, transparent 7px),
+        repeating-linear-gradient(90deg, #001524 0px, #001524 3px, transparent 3px, transparent 7px);
+      border: 3px solid #001524; border-radius: 4px;
+    }
+    .qr-label { font-size: 11px; color: #555; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="status-bar"><span>16:03</span><span>▌▌▌ ☁ 🔋</span></div>
+
+  <!-- State: waiting -->
+  <div class="container state-panel active" id="state-waiting">
+    <div class="delivery-status-message">Votre commande est en cours de traitement...</div>
+    <div class="pulse-container">
+      <div class="pulse"></div>
+      <div class="waiting-text">Recherche d'un livreur en cours...</div>
+    </div>
+    <div class="delivery-info-labels">
+      <div class="delivery-info-text">ID livreur : <span class="delivery-info-value">/</span></div>
+      <div class="delivery-info-text">Nom livreur : <span class="delivery-info-value">/</span></div>
+      <div class="delivery-info-text">Distance livreur : <span class="delivery-info-value">/</span></div>
+      <div class="delivery-info-text">Temps de livraison : <span class="delivery-info-value">/</span></div>
+    </div>
+    <div class="cancel-order-btn">Annuler ma commande</div>
+  </div>
+
+  <!-- State: accepted (en route) -->
+  <div class="container state-panel" id="state-accepted">
+    <div class="delivery-status-message">Votre livreur est en route !</div>
+    <div class="delivery-info-labels">
+      <div class="delivery-info-text">ID livreur : <span class="delivery-info-value">LIV-2847</span></div>
+      <div class="delivery-info-text">Nom livreur : <span class="delivery-info-value">Ahmed B.</span></div>
+      <div class="delivery-info-text">Distance livreur : <span class="delivery-info-value">1.248 km</span></div>
+      <div class="delivery-info-text">Temps de livraison : <span class="delivery-info-value">/</span></div>
+    </div>
+    <div class="cancel-order-btn">Annuler ma commande</div>
+  </div>
+
+  <!-- State: arrived -->
+  <div class="container state-panel" id="state-arrived">
+    <div class="delivery-status-message">Votre livreur est arrivé !</div>
+    <div class="delivery-info-labels">
+      <div class="delivery-info-text">ID livreur : <span class="delivery-info-value">LIV-2847</span></div>
+      <div class="delivery-info-text">Nom livreur : <span class="delivery-info-value">Ahmed B.</span></div>
+      <div class="delivery-info-text">Distance livreur : <span class="delivery-info-value">0.001 km</span></div>
+      <div class="delivery-info-text">Temps de livraison : <span class="delivery-info-value">38 minutes</span></div>
+      <div class="delivery-info-text">Coût livraison final : <span class="delivery-info-value">200 DZD</span></div>
+      <div class="delivery-info-text">Frais d'application : <span class="delivery-info-value">40 DZD</span></div>
+      <div class="delivery-info-text">Crédit appliqué : <span class="delivery-info-value">-50 DZD</span></div>
+      <div class="final-total-container">
+        <div class="total-text">Total FINAL : <span class="final-total-value">1050 DZD</span></div>
+      </div>
+      <div class="qr-box">
+        <div style="font-size:13px;font-weight:600;color:#001524;margin-bottom:8px">Signature QR</div>
+        <div class="qr-grid"></div>
+        <div class="qr-label">CMD-20240312-001</div>
+      </div>
+      <div class="delivery-label">Notez votre livreur</div>
+      <div class="heart-rating-container">
+        <span class="heart" id="h1" onclick="setRating(1)">♥</span>
+        <span class="heart" id="h2" onclick="setRating(2)">♥</span>
+        <span class="heart" id="h3" onclick="setRating(3)">♥</span>
+        <span class="heart" id="h4" onclick="setRating(4)">♥</span>
+        <span class="heart" id="h5" onclick="setRating(5)">♥</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- State controls -->
+  <div class="state-controls">
+    <button class="state-btn active" id="ctrl-waiting" onclick="showState('waiting')">⏳ En attente</button>
+    <button class="state-btn" id="ctrl-accepted" onclick="showState('accepted')">🚴 En route</button>
+    <button class="state-btn" id="ctrl-arrived" onclick="showState('arrived')">✅ Arrivé</button>
+  </div>
+</div>
+
+<script>
+  function showState(s) {
+    ['waiting','accepted','arrived'].forEach(x => {
+      document.getElementById('state-'+x).classList.remove('active');
+      document.getElementById('ctrl-'+x).classList.remove('active');
+    });
+    document.getElementById('state-'+s).classList.add('active');
+    document.getElementById('ctrl-'+s).classList.add('active');
+  }
+  let rating = 0;
+  function setRating(v) {
+    rating = v;
+    for (let i=1;i<=5;i++) {
+      document.getElementById('h'+i).classList.toggle('filled', i<=v);
+    }
+  }
+</script>
+</body>
+</html>

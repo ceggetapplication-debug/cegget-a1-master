@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Interactive Modal - Test</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #1a1a1a; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .switcher { background: #333; padding: 8px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 10px; }
+        .btn-s { padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; background: #444; color: #aaa; font-size: 12px; }
+        .btn-s.active { background: #15616d; color: white; }
+        .modal-view { width: 375px; background-color: #fafafa; border-radius: 12px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; position: relative; }
+        .title { font-size: 18px; font-weight: 700; color: #15616d; text-align: center; margin-bottom: 20px; }
+        .label { font-size: 13px; font-weight: 600; color: #001524; margin-top: 15px; margin-bottom: 5px; display: block; }
+        .input { box-sizing: border-box; padding: 12px; border: 2px solid #15616d; border-radius: 8px; font-size: 14px; background: #f0f0f0; width: 100%; margin-bottom: 5px; }
+        .unit-selector { position: relative; flex: 0.40; }
+        .unit-display { background: #f0f0f0; border: 2px solid #15616d; border-radius: 8px; padding: 12px; font-size: 14px; color: #000; cursor: pointer; text-align: center; font-weight: 500; }
+        .unit-list { position: absolute; top: 50px; left: 0; right: 0; background: white; border: 2px solid #15616d; border-radius: 8px; z-index: 2000; max-height: 200px; overflow-y: auto; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .unit-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; text-align: center; }
+        .unit-item:hover { background: #f0f0f0; color: #15616d; font-weight: bold; }
+        .qty-row { display: flex; flex-direction: row; width: 100%; justify-content: space-between; margin-bottom: 15px; margin-top: 5px; gap: 10px; }
+        .input-val { flex: 0.55; }
+        .details-box { margin-top: 10px; padding: 10px; border: 1px dashed #ccc; border-radius: 10px; }
+        .text-area { min-height: 80px; resize: none; font-family: inherit; width: 100%; box-sizing: border-box; border: 2px solid #15616d; border-radius: 8px; background: #f0f0f0; padding: 10px; margin-bottom: 5px; }
+        .btn-confirm { width: 100%; background: #15616d; color: white; border: none; padding: 10px; border-radius: 5px; margin-top: 10px; cursor: pointer; display: none; font-weight: bold; }
+        .image-picker-btn { background-color: #15616d; padding: 12px 0; border-radius: 5px; margin-top: 15px; align-self: center; width: 50%; color: white; font-weight: 600; font-size: 16px; border: none; cursor: pointer; }
+        .footer { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-f { flex: 1; padding: 12px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="switcher">
+    <button class="btn-s active" id="s1" onclick="switchCase('add', this)">AJOUT</button>
+    <button class="btn-s" onclick="switchCase('edit', this)">MODIF</button>
+    <button class="btn-s" onclick="switchCase('promo', this)">PROMO</button>
+</div>
+
+<div class="modal-view">
+    <div id="m-tit" class="title">Ajouter un produit</div>
+    
+    <span class="label">Nom du produit</span>
+    <input type="text" class="input" placeholder="Que cherchez-vous ?">
+
+    <span class="label">Détails du produit</span>
+    <div class="details-box">
+        <textarea id="f" class="text-area" placeholder="Français..." oninput="checkD()"></textarea>
+        <textarea id="k" class="text-area" placeholder="Taqbaylit..." oninput="checkD()"></textarea>
+        <button id="cf" class="btn-confirm" onclick="this.style.display='none'">Enregistrer les détails</button>
+    </div>
+
+    <span class="label" id="qty-lbl" style="display:none; color:#15616d;">Volume / Poids :</span>
+    
+    <div class="qty-row">
+        <input type="number" class="input input-val" placeholder="Valeur">
+        <div class="unit-selector">
+            <div id="u-display" class="unit-display" onclick="toggleU()">Unité ▼</div>
+            <div id="u-list" class="unit-list">
+                <div class="unit-item" onclick="pickU('L')">L</div>
+                <div class="unit-item" onclick="pickU('CL')">CL</div>
+                <div class="unit-item" onclick="pickU('ML')">ML</div>
+                <div class="unit-item" onclick="pickU('KG')">KG</div>
+                <div class="unit-item" onclick="pickU('G')">G</div>
+                <div class="unit-item" onclick="pickU('DA/KG')">DA/KG</div>
+                <div class="unit-item" onclick="pickU('DZD/KG')">DZD/KG</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dynamic-content"></div>
+
+    <button id="photo-btn" class="image-picker-btn">Importer photo</button>
+    
+    <div class="footer">
+        <button class="btn-f" style="background:#ff7d00;">Annuler</button>
+        <button id="ok-btn" class="btn-f" style="background:#001524; color:white;">Enregistrer</button>
+    </div>
+</div>
+
+<script>
+    function switchCase(m, b) {
+        document.querySelectorAll('.btn-s').forEach(x => x.classList.remove('active'));
+        if(b) b.classList.add('active');
+        const tit = document.getElementById('m-tit');
+        const dyn = document.getElementById('dynamic-content');
+        const ok = document.getElementById('ok-btn');
+
+        if(m === 'add') {
+            tit.innerText = "Ajouter un produit";
+            ok.innerText = "Enregistrer";
+            dyn.innerHTML = '<span class="label">Prix unitaire</span><input type="number" class="input" placeholder="0.00">';
+        } else if(m === 'edit') {
+            tit.innerText = "Modifier le produit";
+            ok.innerText = "Modifier";
+            dyn.innerHTML = '<span class="label">Modifier le prix</span><input type="number" class="input" placeholder="0.00">';
+        } else if(m === 'promo') {
+            tit.innerText = "Offre Promotionnelle";
+            ok.innerText = "Enregistrer";
+            dyn.innerHTML = `
+                <span class="label">Ancien prix</span>
+                <input type="text" class="input" value="1200.00 DZD" disabled style="opacity:0.6">
+                <span class="label">Nouveau prix</span>
+                <input type="number" class="input" placeholder="0.00">
+            `;
+        }
+    }
+    function toggleU() { const list = document.getElementById('u-list'); list.style.display = list.style.display === 'block' ? 'none' : 'block'; }
+    function pickU(unit) {
+        document.getElementById('u-display').innerText = unit;
+        document.getElementById('u-list').style.display = 'none';
+        const lbl = document.getElementById('qty-lbl');
+        const v = unit.toLowerCase();
+        if(['l', 'cl', 'ml'].includes(v)) { lbl.innerText = "Volume :"; lbl.style.display = "block"; }
+        else if(['kg', 'g'].includes(v)) { lbl.innerText = "Poids :"; lbl.style.display = "block"; }
+        else if(['dzd/kg', 'da/kg'].includes(v)) { lbl.innerText = "Vrac :"; lbl.style.display = "block"; }
+        else lbl.style.display = "none";
+    }
+    function checkD() {
+        const v1 = document.getElementById('f').value.trim();
+        const v2 = document.getElementById('k').value.trim();
+        document.getElementById('cf').style.display = (v1 && v2) ? 'block' : 'none';
+    }
+    switchCase('add', document.getElementById('s1'));
+</script>
+
+</body>
+</html>

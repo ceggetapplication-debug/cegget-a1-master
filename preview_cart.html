@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview - Cart Screen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .phone {
+            width: 390px;
+            background: #fafafa;
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+            overflow: hidden;
+            min-height: 800px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* TOP NAV BAR */
+        .top-nav {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            background: #fff;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+            border-right: 1px solid #e0e0e0;
+            background: none;
+            line-height: 1.3;
+        }
+
+        .tab-btn:last-child {
+            border-right: none;
+        }
+
+        .tab-btn.active {
+            color: #15616d;
+            border-bottom-color: #15616d;
+        }
+
+        .tab-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* CONTENT AREA */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* PRODUCT ITEM (CartItem) */
+        .cart-item {
+            background: #fdfdfd;
+            border-bottom: 2px solid #001524;
+            padding: 8px 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            border-radius: 0;
+        }
+
+        .cart-item.disabled {
+            background: #f0f0f0;
+            opacity: 0.7;
+        }
+
+        .item-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .item-qty {
+            font-size: 13px;
+            font-weight: 600;
+            color: #15616d;
+            min-width: 30px;
+        }
+
+        .item-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: #001524;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-price {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ff7d00;
+        }
+
+        .item-bag-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 20px;
+        }
+
+        .item-brand-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            padding-left: 38px;
+        }
+
+        .item-brand {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .item-volume {
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* TOTAL */
+        .total-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 8px;
+        }
+
+        .total-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #001524;
+        }
+
+        .total-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ff7d00;
+        }
+
+        /* DELIVERY OPTIONS */
+        .section-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #001524;
+            margin: 14px 0 8px;
+        }
+
+        .delivery-btn-row-center {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .delivery-btn-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .delivery-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 2px solid #001524;
+            background: #ffecd1;
+            font-size: 13px;
+            font-weight: 700;
+            color: #001524;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delivery-btn.selected {
+            background: #15616d;
+            color: #fff;
+            border-color: #15616d;
+        }
+
+        .delivery-cost-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: #ff7d00;
+        }
+
+        /* PAYMENT BUTTONS */
+        .payment-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 18px;
+            border-radius: 10px;
+            border: 2px solid #001524;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            color: #001524;
+            cursor: pointer;
+            margin-bottom: 8px;
+            align-self: center;
+        }
+
+        .payment-btn.selected {
+            background: #15616d;
+            border-color: #ff7d00;
+            color: #fff;
+        }
+
+        .payment-btn .icon {
+            font-size: 18px;
+        }
+
+        .credit-info {
+            font-size: 13px;
+            color: #001524;
+            margin: 6px 0;
+        }
+
+        /* FINAL TOTAL + ORDER BUTTON */
+        .final-total-container {
+            border-top: 2px solid #ff7d00;
+            margin: 12px 0;
+            padding-top: 10px;
+        }
+
+        .final-total-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .final-total-value {
+            color: #15616d;
+        }
+
+        .order-btn {
+            display: block;
+            background: #15616d;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 12px 30px;
+            border-radius: 100px;
+            border: 2px solid #ff7d00;
+            margin: 16px auto 24px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .order-btn:disabled {
+            background: #888;
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: #888;
+        }
+
+        /* DELIVERY STATUS TAB */
+        .status-message {
+            font-size: 17px;
+            font-weight: 700;
+            color: #001524;
+            text-align: center;
+            margin: 14px 0;
+        }
+
+        .delivery-info-block {
+            border-top: 2px solid #001524;
+            padding-top: 12px;
+            margin-top: 8px;
+        }
+
+        .info-row {
+            font-size: 15px;
+            font-weight: 500;
+            color: #001524;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #15616d;
+        }
+
+        .heart-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .heart-btn {
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        /* QR CODE SECTION */
+        .qr-card {
+            background: #fbfbfb;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .qr-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #001524;
+            text-decoration: underline;
+            text-decoration-color: #ff7d00;
+        }
+
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            padding: 10px 0 12px;
+        }
+
+        .qr-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            padding: 6px 15px;
+            border-radius: 6px;
+            align-self: center;
+            margin: 0 auto 12px;
+            width: fit-content;
+        }
+
+        .qr-status.valid {
+            background: #001524;
+            color: #fff;
+        }
+
+        .qr-status.invalid {
+            background: #ffecd1;
+            color: #000;
+        }
+
+        .regen-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #15616d;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 8px auto 0;
+        }
+
+        .qr-signed-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #ff7d00;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 12px auto 0;
+        }
+
+        /* COURSES LIST TAB */
+        .add-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fdfdfd;
+            border: 2px solid #15616d;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        .add-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .add-btn {
+            background: none;
+            border: none;
+            font-size: 26px;
+            cursor: pointer;
+            color: #ff7d00;
+        }
+
+        .courses-list {
+            border: 2px solid #15616d;
+            border-radius: 4px;
+            background: #fdfdfd;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .course-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .course-item:last-child {
+            border-bottom: none;
+        }
+
+        .course-check {
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .course-text {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 500;
+            color: #001524;
+        }
+
+        .course-text.done {
+            text-decoration: line-through;
+            color: #dbdbdb;
+        }
+
+        .trash-btn {
+            background: none;
+            border: none;
+            color: red;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* MODAL OVERLAY */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px 22px;
+            width: 340px;
+            max-width: 95vw;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f8f8f8;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 900;
+            color: #15616d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .modal-product-name {
+            font-size: 14px;
+            color: #001524;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+
+        .qty-side-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: #001524;
+            color: #fff;
+            border: none;
+            font-size: 24px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .qty-input {
+            width: 90px;
+            height: 48px;
+            border: 1.5px solid #eee;
+            border-radius: 14px;
+            background: #f8f8f8;
+            font-size: 18px;
+            font-weight: 900;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .qty-unit {
+            font-size: 13px;
+            text-align: center;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .price-display {
+            font-size: 22px;
+            font-weight: 900;
+            color: #15616d;
+            text-align: center;
+            margin: 8px 0 20px;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            background: #15616d;
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            display: block;
+            background: #15616d;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 100px;
+            border: 2px solid #ff7d00;
+            margin: 16px auto 0;
+            cursor: pointer;
+        }
+
+        /* Alert Modal */
+        .alert-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .alert-overlay.open {
+            display: flex;
+        }
+
+        .alert-box {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px 20px;
+            width: 280px;
+            text-align: center;
+        }
+
+        .alert-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #001524;
+            margin-bottom: 8px;
+        }
+
+        .alert-msg {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 18px;
+        }
+
+        .alert-ok {
+            background: #15616d;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .delivery-cost-summary {
+            margin: 8px 0;
+        }
+
+        .driver-sim {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+
+        .sim-btn {
+            font-size: 11px;
+            background: #001524;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .sim-label {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        /* NEW MODAL STYLES FROM CART.TSX */
+        .centered-view {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 300;
+        }
+
+        .reward-modal-view {
+            margin: 20px;
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 85%;
+        }
+
+        .reward-modal-header {
+            flex-direction: row;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .reward-modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: left;
+            flex: 1;
+            margin-left: 10px;
+            color: #001524;
+        }
+
+        .reward-account-detail-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ffecd1;
+            padding-bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .reward-account-detail-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff7d00;
+            margin-bottom: 5px;
+        }
+
+        .reward-modal-message {
+            font-size: 22px;
+            font-weight: bold;
+            color: #15616d;
+            margin: 10px 0;
+        }
+
+        .reward-modal-button {
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 10px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            color: #fff;
+        }
+
+        .reward-modal-button-save {
+            background-color: #15616d;
+            border: 2px solid #ff7d00;
+        }
+
+        .reward-modal-button-confirm {
+            background-color: #ff7d00;
+        }
+
+        .reward-credit-input {
+            border: none;
+            border-bottom: 2px solid #15616d;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #001524;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .reward-credit-info-text {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .close-icon {
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            color: #001524;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <!-- TOP NAV BAR -->
+        <div class="top-nav">
+            <button class="tab-btn active" id="tab-products" onclick="switchTab('products')">Produits / Panier</button>
+            <button class="tab-btn" id="tab-deliveryStatus" onclick="switchTab('deliveryStatus')">État de Liv.</button>
+            <button class="tab-btn" id="tab-courses" onclick="switchTab('courses')">Liste Courses</button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content" id="main-content"></div>
+    </div>
+
+    <!-- QUANTITY MODAL -->
+    <div class="modal-overlay" id="qty-modal">
+        <div class="modal-box">
+            <button class="modal-back-btn" onclick="closeQtyModal()">&#8592;</button>
+            <div class="modal-title">Ajouter au panier</div>
+            <div class="modal-product-name" id="modal-product-name">Produit</div>
+            <div class="qty-selector">
+                <button class="qty-side-btn" onclick="changeQty(-1)">-</button>
+                <input class="qty-input" type="number" id="qty-input" value="1" min="1" oninput="updatePrice()" />
+                <button class="qty-side-btn" onclick="changeQty(1)">+</button>
+            </div>
+            <div class="qty-unit" id="qty-unit">unité(s)</div>
+            <div class="price-display" id="modal-price">0 DZD</div>
+            <button class="confirm-btn" onclick="confirmQty()">Confirmer la commande</button>
+        </div>
+    </div>
+
+    <!-- ALERT MODAL -->
+    <div class="alert-overlay" id="alert-overlay">
+        <div class="alert-box">
+            <div class="alert-title" id="alert-title">Info</div>
+            <div class="alert-msg" id="alert-msg"></div>
+            <button class="alert-ok" onclick="closeAlert()">OK</button>
+        </div>
+    </div>
+
+    <!-- NEW REWARD MODALS -->
+    <!-- Modal Infos CC -->
+    <div id="modal-cc-info" class="centered-view" style="display: none;">
+        <div class="reward-modal-view">
+            <div class="reward-modal-header">
+                <span class="reward-modal-title">Crédits CC</span>
+                <span class="close-icon" onclick="toggleCCModal(false)">✕</span>
+            </div>
+            <div class="reward-account-detail-item">
+                <p class="reward-account-detail-label">Tu as :</p>
+                <p class="reward-modal-message" id="modal-cc-balance">0.00 DZD</p>
+                <p>de crédits.</p>
+                <button id="premium-button" class="reward-modal-button reward-modal-button-save" onclick="openPremiumOffers()">Premium</button>
+            </div>
+            <p class="reward-credit-info-text">Combien souhaitez-vous utiliser ?</p>
+            <input type="number" id="cc-use-input" class="reward-credit-input" placeholder="Montant en DZD" />
+            <button class="reward-modal-button reward-modal-button-confirm" onclick="confirmCreditFromModal()">Utiliser</button>
+        </div>
+    </div>
+
+    <!-- Modal Infos Livraison Gratuite -->
+    <div id="modal-free-delivery-info" class="centered-view" style="display: none;">
+        <div class="reward-modal-view">
+            <div class="reward-modal-header">
+                <span class="reward-modal-title">Livraison offerte</span>
+                <span class="close-icon" onclick="toggleFreeDeliveryModal(false)">✕</span>
+            </div>
+            <div class="reward-account-detail-item">
+                <p class="reward-account-detail-label">Livraisons offertes disponibles :</p>
+                <p class="reward-modal-message"><span id="modal-free-delivery-count">0</span> livraisons gratuites</p>
+                <button class="reward-modal-button reward-modal-button-save" onclick="openInviteFriends()">Inviter des amis</button>
+            </div>
+            <button class="reward-modal-button reward-modal-button-confirm" onclick="applyFreeDeliveryFromModal()">Utiliser</button>
+        </div>
+    </div>
+
+    <!-- Dummy Premium Offers Modal -->
+    <div id="modal-premium-offers" class="centered-view" style="display: none;">
+        <div class="reward-modal-view" style="background-color: #15616d; color: #fff;">
+            <div class="reward-modal-header">
+                <span class="reward-modal-title" style="color: #fff;">Offres Premium</span>
+                <span class="close-icon" style="color: #fff;" onclick="togglePremiumOffers(false)">✕</span>
+            </div>
+            <p style="margin-bottom: 20px;">Profitez de réductions exclusives et de livraisons prioritaires !</p>
+            <button class="reward-modal-button reward-modal-button-confirm" onclick="togglePremiumOffers(false)">Fermer</button>
+        </div>
+    </div>
+
+    <!-- Dummy Invite Friends Modal -->
+    <div id="modal-invite-friends" class="centered-view" style="display: none;">
+        <div class="reward-modal-view">
+            <div class="reward-modal-header">
+                <span class="reward-modal-title">Inviter des amis</span>
+                <span class="close-icon" onclick="toggleInviteFriends(false)">✕</span>
+            </div>
+            <p style="margin-bottom: 10px;">Partagez votre code et gagnez des livraisons gratuites !</p>
+            <p style="font-weight: bold; font-size: 18px; color: #15616d; margin-bottom: 20px;">CODE: USER123</p>
+            <button class="reward-modal-button reward-modal-button-confirm" onclick="toggleInviteFriends(false)">Copier le code</button>
+        </div>
+    </div>
+
+    <script>
+        // === STATE (mirrors cart.tsx useState) ===
+        const state = {
+            activeSection: 'products',
+            selectedProductIds: [],
+            selectedDeliveryType: null,  // 'pickup' | 'rapid' | 'normal'
+            deliveryCost: 0,
+            selectedPaymentOption: 'delivery',
+            useAccumulatedCredit: false,
+            useFreeDelivery: false,
+            appliedCreditAmount: 0,
+            creditEarned: 0,
+            userCreditBalance: 150,
+            numberOfFreeDeliveries: 2,
+            userOrderCount: 1,
+            currentMonthDeliveries: 0,
+            isOrderConfirmed: false,
+            isDriverAcceptedOrder: false,
+            isOrderCancelled: false,
+            confirmedDeliveryType: null,
+            confirmedTotalCommand: 0,
+            confirmedAppliedCreditAmount: 0,
+            externalDriverDistance: null,
+            confirmedTReel: 0,
+            hasDeliveryArrived: false,
+            deliveryStatusMessage: 'Votre commande n\'a pas encore été confirmée.',
+            selectedRating: 0,
+            coursesListItems: [],
+            newCoursesListItemText: '',
+            currentDriver: null,
+            finalBilledDeliveryCost: 0,
+            finalOrderTotalForDisplay: null,
+            finalCalculatedAppFees: 0,
+            confirmedAppliedCreditAmountDisplay: 0,
+            orderReference: '',
+            qrSignature: null,
+            selectedProductForQuantity: null,
+            isQuantityModalVisible: false,
+            isQRCompleted: false, // NEW STATE tracked here
+            isPremium: false, // Added for condition logic
+        };
+
+        // === SAMPLE DATA ===
+        const products = [
+            { id: '1', nom: 'Huile d\'olive', marque: 'Olia', prix: 450, valeurQuantite: 1, uniteQuantite: 'L', storeId: 's1' },
+            { id: '2', nom: 'Farine', marque: null, prix: 85, valeurQuantite: 5, uniteQuantite: 'kg', storeId: 's1', quantity_unit_dzd_per_kg: 85 },
+            { id: '3', nom: 'Yaourt Nature', marque: 'Soummam', prix: 60, valeurQuantite: 4, uniteQuantite: null, storeId: 's2' },
+            { id: '4', nom: 'Sucre', marque: null, prix: 110, valeurQuantite: 2, uniteQuantite: 'kg', storeId: 's2', quantity_unit_dzd_per_kg: 110 },
+        ];
+        state.selectedProductIds = products.map(p => p.id);
+
+        // === HELPERS ===
+        function totalCommand() {
+            return products
+                .filter(p => state.selectedProductIds.includes(p.id))
+                .reduce((sum, p) => sum + (p.valeurQuantite || 0) * p.prix, 0);
+        }
+
+        function finalTotalPrice() {
+            const total = totalCommand() + state.deliveryCost - state.appliedCreditAmount;
+            return Math.max(0, total);
+        }
+
+        function showAlert(title, msg) {
+            document.getElementById('alert-title').textContent = title;
+            document.getElementById('alert-msg').textContent = msg;
+            document.getElementById('alert-overlay').classList.add('open');
+        }
+        function closeAlert() {
+            document.getElementById('alert-overlay').classList.remove('open');
+        }
+
+        // === TAB SWITCHING ===
+        function switchTab(section) {
+            if (section === 'products' && state.isOrderConfirmed) return;
+            state.activeSection = section;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + section).classList.add('active');
+            if (state.isOrderConfirmed) {
+                document.getElementById('tab-products').classList.add('disabled');
+                document.getElementById('tab-products').disabled = true;
+            }
+            render();
+        }
+
+        // === RENDER ===
+        function render() {
+            const c = document.getElementById('main-content');
+            if (state.activeSection === 'products') c.innerHTML = renderProducts();
+            else if (state.activeSection === 'deliveryStatus') c.innerHTML = renderDeliveryStatus();
+            else if (state.activeSection === 'courses') c.innerHTML = renderCourses();
+            attachEvents();
+            if (state.activeSection === 'deliveryStatus' && state.isDriverAcceptedOrder && state.qrSignature && !state.isQRCompleted && state.externalDriverDistance !== null && state.externalDriverDistance <= 0.005) {
+                renderQRCode();
+            }
+        }
+
+        // === PRODUCTS TAB ===
+        function renderProducts() {
+            let html = '';
+
+            // Product list
+            if (products.length === 0) {
+                html += `<p style="text-align:center;color:#888;margin-top:40px;">Panier vide</p>`;
+            } else {
+                products.forEach(p => {
+                    const checked = state.selectedProductIds.includes(p.id);
+                    const price = ((p.valeurQuantite || 0) * p.prix);
+                    const qtyLabel = (p.uniteQuantite === 'g' || p.uniteQuantite === 'kg') ? `${p.valeurQuantite} ${p.uniteQuantite}` : p.valeurQuantite;
+                    const bagIcon = checked ? '🛍️' : '🛒';
+                    html += `
+        <div class="cart-item ${checked ? '' : 'disabled'}" onclick="openQtyModal('${p.id}')">
+          <div class="item-row">
+            <span class="item-qty">${qtyLabel}</span>
+            <span class="item-name">${p.nom}</span>
+            <span class="item-price">${price} DZD</span>
+            <button class="item-bag-btn" onclick="event.stopPropagation(); toggleProduct('${p.id}')">${bagIcon}</button>
+          </div>
+          ${p.marque ? `<div class="item-brand-row"><span class="item-brand">${p.marque}</span><span class="item-volume">${p.valeurQuantite} ${p.uniteQuantite || ''}</span></div>` : ''}
+        </div>`;
+                });
+            }
+
+            // Total
+            html += `<div class="total-container"><span class="total-label">Total produits</span><span class="total-value">${totalCommand()} DZD</span></div>`;
+
+            // Delivery type
+            html += `<p class="section-label">Type de livraison</p>`;
+            html += `<div class="delivery-btn-row-center">
+    <button class="delivery-btn ${state.selectedDeliveryType === 'pickup' ? 'selected' : ''}" onclick="selectDelivery('pickup')">
+      🚶 Retrait  ${state.selectedDeliveryType === 'pickup' ? '<span class="delivery-cost-badge">Gratuit</span>' : ''}
+    </button>
+  </div>`;
+            html += `<div class="delivery-btn-row">
+    <button class="delivery-btn ${state.selectedDeliveryType === 'rapid' ? 'selected' : ''}" onclick="selectDelivery('rapid')">
+      🚗 Rapide ${state.selectedDeliveryType === 'rapid' && state.deliveryCost > 0 ? `<span class="delivery-cost-badge">${state.deliveryCost} DZD</span>` : ''}
+    </button>
+    <button class="delivery-btn ${state.selectedDeliveryType === 'normal' ? 'selected' : ''}" onclick="selectDelivery('normal')">
+      🚲 Normal ${state.selectedDeliveryType === 'normal' && state.deliveryCost > 0 ? `<span class="delivery-cost-badge">${state.deliveryCost} DZD</span>` : ''}
+    </button>
+  </div>`;
+
+            // Payment options (only for rapid/normal)
+            if (state.selectedDeliveryType === 'rapid' || state.selectedDeliveryType === 'normal') {
+                html += `<p class="section-label">Mode de paiement</p>`;
+                html += `<button class="payment-btn ${state.selectedPaymentOption === 'delivery' ? 'selected' : ''}" onclick="selectPayment('delivery')">
+      <span class="icon">💵</span> Paiement à la livraison
+    </button>`;
+                html += `<p class="credit-info">Crédit disponible : ${state.userCreditBalance} DZD${state.appliedCreditAmount > 0 ? ` (-${state.appliedCreditAmount} DZD appliqué)` : ''}</p>`;
+                html += `<button class="payment-btn ${state.useAccumulatedCredit || state.appliedCreditAmount > 0 ? 'selected' : ''}" onclick="toggleCCInfoModal()">
+      <span class="icon">🏆</span> C-Cumulatus
+    </button>`;
+                if (state.selectedDeliveryType === 'normal') {
+                    html += `<p class="credit-info">Livraisons gratuites : ${state.numberOfFreeDeliveries}</p>`;
+                    html += `<button class="payment-btn ${state.useFreeDelivery ? 'selected' : ''}" onclick="toggleFreeDeliveryInfoModal()">
+        ✨ Livraison offerte
+      </button>`;
+                }
+            }
+
+            // Delivery cost summary
+            if (state.selectedDeliveryType && state.selectedDeliveryType !== 'pickup') {
+                html += `<div class="delivery-cost-summary">
+      <p class="final-total-text">Frais de livraison : <span class="total-value">${state.deliveryCost} DZD</span></p>
+    </div>`;
+            }
+
+            // Final total
+            html += `<div class="final-total-container">
+    <p class="final-total-text">Total final : <span class="final-total-value">${finalTotalPrice()} DZD</span></p>
+  </div>`;
+
+            // Order button
+            const disabled = (!state.selectedDeliveryType || state.selectedProductIds.length === 0) ? 'disabled' : '';
+            html += `<button class="order-btn" ${disabled} onclick="placeOrder()">Commander</button>`;
+
+            return html;
+        }
+
+        // === DELIVERY STATUS TAB ===
+        function renderDeliveryStatus() {
+            let msg = '';
+            if (state.isOrderCancelled) msg = 'Commande annulée.';
+            else if (!state.isOrderConfirmed) msg = 'Votre commande n\'a pas encore été confirmée.';
+            else if (state.confirmedDeliveryType === 'pickup') msg = 'Bonne route !';
+            else if (state.confirmedDeliveryType === 'rapid' || state.confirmedDeliveryType === 'normal') {
+                if (state.isQRCompleted) msg = 'Livraison terminée. Merci !';
+                else if (state.hasDeliveryArrived) msg = 'Votre livreur est arrivé !';
+                else if (state.isDriverAcceptedOrder) msg = 'Votre commande est en route.';
+                else msg = 'Votre commande est en cours de traitement.';
+            }
+
+            let html = `<p class="status-message">${msg}</p>`;
+            html += `<div class="delivery-info-block">`;
+            html += `<p class="info-row">ID Livreur : <span class="info-value">${(state.confirmedDeliveryType === 'rapid' || state.confirmedDeliveryType === 'normal') && state.currentDriver ? state.currentDriver.id : '/'}</span></p>`;
+            html += `<p class="info-row">Nom Livreur : <span class="info-value">${(state.confirmedDeliveryType === 'rapid' || state.confirmedDeliveryType === 'normal') && state.currentDriver ? state.currentDriver.nom : '/'}</span></p>`;
+            html += `<p class="info-row">Distance : <span class="info-value">${(state.confirmedDeliveryType === 'rapid' || state.confirmedDeliveryType === 'normal') && state.externalDriverDistance !== null ? state.externalDriverDistance.toFixed(3) + ' km' : '/'}</span></p>`;
+            html += `<p class="info-row">Temps réel : <span class="info-value">${(state.confirmedDeliveryType === 'rapid' || state.confirmedDeliveryType === 'normal') && state.hasDeliveryArrived && state.confirmedTReel > 0 ? state.confirmedTReel + ' min' : '/'}</span></p>`;
+
+            if (state.hasDeliveryArrived || state.confirmedDeliveryType === 'pickup') {
+                if (state.confirmedDeliveryType !== 'pickup') {
+                    html += `<p class="info-row">Coût livraison final : <span class="info-value">${state.finalBilledDeliveryCost} DZD</span></p>`;
+                } else {
+                    html += `<p class="info-row">Coût livraison : <span class="info-value">Gratuit</span></p>`;
+                }
+                if (state.finalCalculatedAppFees > 0) {
+                    html += `<p class="info-row">Frais application : <span class="info-value">${state.finalCalculatedAppFees} DZD</span></p>`;
+                }
+                if (state.confirmedAppliedCreditAmount > 0) {
+                    html += `<p class="info-row">Crédit appliqué : <span class="info-value">-${state.confirmedAppliedCreditAmount} DZD</span></p>`;
+                }
+                html += `<div class="final-total-container"><p class="final-total-text">TOTAL FINAL : <span class="final-total-value">${state.finalOrderTotalForDisplay !== null ? state.finalOrderTotalForDisplay + ' DZD' : (state.confirmedTotalCommand - state.confirmedAppliedCreditAmount) + ' DZD (provisoire)'}</span></p></div>`;
+
+                // Rating (ONLY AFTER QR COMPLETED)
+                if ((state.confirmedDeliveryType === 'rapid' || state.confirmedDeliveryType === 'normal') && state.isQRCompleted) {
+                    html += `<p class="section-label">Note le livreur</p>`;
+                    html += `<p style="font-size:13px;color:#444;margin-bottom:8px;">Êtes-vous satisfait de la prestation ?</p>`;
+                    html += `<div class="heart-row">`;
+                    const colors = ['#001524', '#315baa', '#ffdc4a', '#fe9e4c', 'red'];
+                    for (let i = 1; i <= 5; i++) {
+                        const filled = state.selectedRating >= i;
+                        html += `<button class="heart-btn" onclick="rateDelivery(${i})">${filled ? '❤️' : '🤍'}</button>`;
+                    }
+                    html += `</div>`;
+                }
+            }
+            html += `</div>`;
+
+            // QR Code section (shown when driver < 500m AND not completed)
+            if ((state.confirmedDeliveryType === 'rapid' || state.confirmedDeliveryType === 'normal') && state.isDriverAcceptedOrder && !state.isQRCompleted) {
+                if (state.externalDriverDistance !== null && state.externalDriverDistance <= 0.005) {
+                    html += `<div class="qr-card" id="qr-section">
+        <div class="qr-card-header"><span style="font-size:22px;color:#ff7d00">📱</span><span class="qr-card-title">Code QR Signature</span></div>
+        <div class="qr-container" id="qr-container"></div>
+        <div class="qr-status ${state.qrSignature ? 'valid' : 'invalid'}" id="qr-status-badge">
+          ${state.qrSignature ? '✅ Code Valide' : '❌ Code invalide'}
+        </div>
+        <button class="regen-btn" onclick="generateQR()">🔄 Régénérer QR</button>
+        <button class="qr-signed-btn" onclick="completeQR()"><span style="font-size:18px;">✍️</span> Signature effectuée</button>
+      </div>`;
+                }
+            }
+
+            // Simulation buttons (preview only)
+            if (state.isOrderConfirmed && !state.isOrderCancelled && (state.confirmedDeliveryType === 'rapid' || state.confirmedDeliveryType === 'normal') && !state.isQRCompleted) {
+                html += `<p class="sim-label">⚙️ Simulateur (preview uniquement)</p>`;
+                html += `<div class="driver-sim">
+      <button class="sim-btn" onclick="simulateDriver()">Livreur accepte</button>
+      <button class="sim-btn" onclick="simulateClose()">< 500m</button>
+      <button class="sim-btn" onclick="simulateArrived()">Arrivé (200m)</button>
+    </div>`;
+            }
+
+            // Cancel button
+            if (!state.isOrderCancelled && state.isOrderConfirmed && !state.isDriverAcceptedOrder) {
+                html += `<button class="cancel-btn" onclick="cancelOrder()">Annuler la commande</button>`;
+            }
+
+            return html;
+        }
+
+        // === COURSES TAB ===
+        function renderCourses() {
+            let html = `<p class="section-label">Liste de courses</p>`;
+            html += `<div class="add-input-wrapper">
+    <input class="add-input" id="courses-input" type="text" placeholder="Ajouter un produit..." value="${state.newCoursesListItemText}" oninput="state.newCoursesListItemText=this.value" onkeydown="if(event.key==='Enter')addCourseItem()"/>
+    <button class="add-btn" onclick="addCourseItem()">${state.newCoursesListItemText.trim().length > 0 ? '✅' : '➕'}</button>
+  </div>`;
+            html += `<div class="courses-list">`;
+            if (state.coursesListItems.length === 0) {
+                html += `<p style="text-align:center;color:#aaa;padding:20px;font-size:14px;">Liste vide</p>`;
+            } else {
+                state.coursesListItems.forEach(item => {
+                    html += `<div class="course-item">
+        <span class="course-check" onclick="toggleCourseItem('${item.id}')">${item.checked ? '☑️' : '⬜'}</span>
+        <span class="course-text ${item.checked ? 'done' : ''}">${item.text}</span>
+        <button class="trash-btn" onclick="deleteCourseItem('${item.id}')">🗑️</button>
+      </div>`;
+                });
+            }
+            html += `</div>`;
+            return html;
+        }
+
+        // === QR CODE RENDERING ===
+        function renderQRCode() {
+            const container = document.getElementById('qr-container');
+            if (!container) return;
+            if (!state.qrSignature) { generateQR(); return; }
+            container.innerHTML = '';
+            new QRCode(container, {
+                text: state.qrSignature.token,
+                width: 200, height: 200,
+                colorDark: state.qrSignature.isValid ? "#001524" : "#15616d",
+                colorLight: "#ffffff",
+            });
+        }
+
+        function generateQR() {
+            const qrId = `QR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const token = btoa(JSON.stringify({ qrId, orderId: state.orderReference, timestamp: Date.now() }));
+            state.qrSignature = { qrId, orderId: state.orderReference, token, isValid: true, createdAt: Date.now() };
+            render();
+            setTimeout(() => renderQRCode(), 50);
+        }
+
+        function completeQR() {
+            state.isQRCompleted = true;
+            render();
+            showAlert('Succès', 'Signature effectuée. Vous pouvez maintenant noter le livreur.');
+        }
+
+        // === ACTIONS ===
+        function toggleProduct(id) {
+            if (state.selectedProductIds.includes(id)) {
+                state.selectedProductIds = state.selectedProductIds.filter(x => x !== id);
+            } else {
+                state.selectedProductIds.push(id);
+            }
+            render();
+        }
+
+        function selectDelivery(type) {
+            state.selectedDeliveryType = type;
+            state.useFreeDelivery = false;
+            state.selectedPaymentOption = null;
+            state.useAccumulatedCredit = false;
+            state.appliedCreditAmount = 0;
+            // Simulate cost
+            if (type === 'rapid') state.deliveryCost = 200;
+            else if (type === 'normal') state.deliveryCost = 120;
+            else state.deliveryCost = 0;
+            render();
+        }
+
+        function selectPayment(type) {
+            state.selectedPaymentOption = type;
+            if (type === 'delivery') {
+                state.useAccumulatedCredit = false;
+                state.appliedCreditAmount = 0;
+            } else if (type === 'credit') {
+                state.useAccumulatedCredit = !state.useAccumulatedCredit;
+                if (state.useAccumulatedCredit && state.userCreditBalance > 0) {
+                    const maxCredit = Math.min(state.userCreditBalance, totalCommand() + state.deliveryCost);
+                    state.appliedCreditAmount = maxCredit;
+                } else {
+                    state.appliedCreditAmount = 0;
+                }
+            }
+            render();
+        }
+
+        function toggleFreeDelivery() {
+            if (state.useFreeDelivery) {
+                state.useFreeDelivery = false;
+                state.deliveryCost = 120;
+            } else if (state.numberOfFreeDeliveries > 0) {
+                state.useFreeDelivery = true;
+                state.deliveryCost = 0;
+            } else {
+                showAlert('Attention', 'Plus de livraisons gratuites disponibles.');
+            }
+            render();
+        }
+
+        // NEW MODAL LOGIC (MIRRORS CART.TSX)
+        function toggleCCInfoModal() {
+            if (state.appliedCreditAmount > 0) {
+                state.appliedCreditAmount = 0;
+                state.useAccumulatedCredit = false;
+                render();
+            } else {
+                toggleCCModal(true);
+            }
+        }
+
+        function toggleCCModal(visible) {
+            const modal = document.getElementById('modal-cc-info');
+            modal.style.display = visible ? 'flex' : 'none';
+            if (visible) {
+                document.getElementById('modal-cc-balance').textContent = state.userCreditBalance.toFixed(2) + ' DZD';
+                document.getElementById('cc-use-input').value = '';
+                // Cache le bouton si déjà Premium OU si le solde est > 0
+                document.getElementById('premium-button').style.display = 
+                    (state.isPremium || state.userCreditBalance > 0) ? 'none' : 'block';
+            }
+        }
+
+        function confirmCreditFromModal() {
+            const val = parseFloat(document.getElementById('cc-use-input').value);
+            if (isNaN(val) || val <= 0) {
+                showAlert('Erreur', 'Veuillez entrer un montant valide.');
+                return;
+            }
+            if (val > state.userCreditBalance) {
+                showAlert('Erreur', 'Solde insuffisant.');
+                return;
+            }
+            state.appliedCreditAmount = val;
+            state.useAccumulatedCredit = true;
+            toggleCCModal(false);
+            render();
+        }
+
+        function openCreditInput() {
+            toggleCCModal(false);
+            selectPayment('credit');
+        }
+
+        function openPremiumOffers() {
+            toggleCCModal(false);
+            togglePremiumOffers(true);
+        }
+
+        function togglePremiumOffers(visible) {
+            document.getElementById('modal-premium-offers').style.display = visible ? 'flex' : 'none';
+        }
+
+        function toggleFreeDeliveryInfoModal() {
+            if (state.useFreeDelivery) {
+                state.useFreeDelivery = false;
+                state.deliveryCost = 120;
+                render();
+            } else {
+                toggleFreeDeliveryModal(true);
+            }
+        }
+
+        function toggleFreeDeliveryModal(visible) {
+            const modal = document.getElementById('modal-free-delivery-info');
+            modal.style.display = visible ? 'flex' : 'none';
+            if (visible) {
+                document.getElementById('modal-free-delivery-count').textContent = state.numberOfFreeDeliveries;
+            }
+        }
+
+        function applyFreeDeliveryFromModal() {
+            toggleFreeDeliveryModal(false);
+            toggleFreeDelivery();
+        }
+
+        function openInviteFriends() {
+            toggleFreeDeliveryModal(false);
+            toggleInviteFriends(true);
+        }
+
+        function toggleInviteFriends(visible) {
+            document.getElementById('modal-invite-friends').style.display = visible ? 'flex' : 'none';
+        }
+
+        function placeOrder() {
+            if (!state.selectedDeliveryType || state.selectedProductIds.length === 0) return;
+            const today = new Date();
+            state.orderReference = `USER-${today.getDate()}${today.getMonth() + 1}${today.getFullYear()}-${state.userOrderCount}`;
+            state.confirmedTotalCommand = totalCommand();
+            state.confirmedAppliedCreditAmount = state.appliedCreditAmount;
+            state.confirmedDeliveryType = state.selectedDeliveryType;
+            state.isOrderConfirmed = true;
+            state.isOrderCancelled = false;
+            state.isDriverAcceptedOrder = false;
+            state.hasDeliveryArrived = false;
+            state.isQRCompleted = false;
+            state.selectedRating = 0;
+            state.selectedProductIds = [];
+            state.appliedCreditAmount = 0;
+            state.deliveryCost = 0;
+            state.activeSection = 'deliveryStatus';
+            if (state.confirmedDeliveryType === 'pickup') {
+                state.isDriverAcceptedOrder = true;
+                state.hasDeliveryArrived = true;
+                state.isQRCompleted = true; // Auto complete for pickup
+                state.finalBilledDeliveryCost = 0;
+                state.finalOrderTotalForDisplay = state.confirmedTotalCommand - state.confirmedAppliedCreditAmount;
+            }
+            document.getElementById('tab-products').classList.add('disabled');
+            document.getElementById('tab-products').disabled = true;
+            document.getElementById('tab-deliveryStatus').classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-deliveryStatus').classList.add('active');
+            render();
+        }
+
+        function cancelOrder() {
+            if (!confirm('Annuler la commande ?')) return;
+            state.isOrderCancelled = true;
+            state.isOrderConfirmed = false;
+            state.currentDriver = null;
+            state.externalDriverDistance = null;
+            state.isDriverAcceptedOrder = false;
+            state.confirmedDeliveryType = null;
+            state.isQRCompleted = false;
+            state.selectedRating = 0;
+            document.getElementById('tab-products').disabled = false;
+            render();
+        }
+
+        function rateDelivery(val) {
+            state.selectedRating = val;
+            showAlert('Merci !', `Vous avez noté le livreur ${val}/5 ⭐`);
+            render();
+        }
+
+        // === SIMULATION BUTTONS (preview only) ===
+        function simulateDriver() {
+            state.currentDriver = { id: 'LIV-042', nom: 'Karim B.' };
+            state.isDriverAcceptedOrder = true;
+            state.externalDriverDistance = 1.2;
+            render();
+        }
+        function simulateClose() {
+            if (!state.currentDriver) simulateDriver();
+            state.externalDriverDistance = 0.004;
+            if (!state.qrSignature) generateQR();
+            render();
+            setTimeout(() => renderQRCode(), 80);
+        }
+        function simulateArrived() {
+            if (!state.currentDriver) simulateDriver();
+            state.externalDriverDistance = 0.002;
+            state.hasDeliveryArrived = true;
+            state.confirmedTReel = 23;
+            state.finalBilledDeliveryCost = state.confirmedDeliveryType === 'rapid' ? 200 : 120;
+            state.finalCalculatedAppFees = 30;
+            state.finalOrderTotalForDisplay = state.confirmedTotalCommand + state.finalBilledDeliveryCost + state.finalCalculatedAppFees - state.confirmedAppliedCreditAmount;
+            if (!state.qrSignature) generateQR();
+            render();
+            setTimeout(() => renderQRCode(), 80);
+        }
+
+        // === QUANTITY MODAL ===
+        let currentModalProduct = null;
+        function openQtyModal(productId) {
+            currentModalProduct = products.find(p => p.id === productId);
+            if (!currentModalProduct) return;
+            document.getElementById('modal-product-name').textContent = currentModalProduct.nom;
+            document.getElementById('qty-input').value = 1;
+            const isWeight = currentModalProduct.uniteQuantite === 'g' || currentModalProduct.uniteQuantite === 'kg';
+            document.getElementById('qty-unit').textContent = isWeight ? currentModalProduct.uniteQuantite : 'unité(s)';
+            updatePrice();
+            document.getElementById('qty-modal').classList.add('open');
+        }
+        function closeQtyModal() {
+            document.getElementById('qty-modal').classList.remove('open');
+            currentModalProduct = null;
+        }
+        function changeQty(delta) {
+            const input = document.getElementById('qty-input');
+            const val = parseInt(input.value) + delta;
+            input.value = Math.max(1, val);
+            updatePrice();
+        }
+        function updatePrice() {
+            if (!currentModalProduct) return;
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const price = qty * currentModalProduct.prix;
+            document.getElementById('modal-price').textContent = price.toFixed(2) + ' DZD';
+        }
+        function confirmQty() {
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const p = products.find(x => x.id === currentModalProduct.id);
+            if (p) {
+                p.valeurQuantite = qty;
+                p.orderQuantity = qty;
+            }
+            closeQtyModal();
+            render();
+        }
+
+        // === COURSES LIST ===
+        function addCourseItem() {
+            const text = state.newCoursesListItemText.trim();
+            if (!text) return;
+            if (state.coursesListItems.length >= 20) {
+                showAlert('Attention', 'Limite de 20 articles atteinte.');
+                return;
+            }
+            state.coursesListItems.push({ id: Date.now().toString(), text, checked: false });
+            state.newCoursesListItemText = '';
+            render();
+        }
+        function toggleCourseItem(id) {
+            state.coursesListItems = state.coursesListItems.map(item => item.id === id ? { ...item, checked: !item.checked } : item);
+            render();
+        }
+        function deleteCourseItem(id) {
+            state.coursesListItems = state.coursesListItems.filter(item => item.id !== id);
+            render();
+        }
+
+        function attachEvents() {
+            // Attach input event for courses tab
+            const input = document.getElementById('courses-input');
+            if (input) {
+                input.addEventListener('input', e => { state.newCoursesListItemText = e.target.value; });
+            }
+        }
+
+        // === INITIAL RENDER ===
+        render();
+    </script>
+</body>
+
+</html>

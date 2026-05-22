@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aperçu Inscription Vendeur - Cegget</title>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+  <!-- Ionicons for modern icons styling -->
+  <script src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  <!-- Leaflet CSS & JS for fully interactive map simulation -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    /* Design Tokens matching appSellerColors.ts */
+    :root {
+      /* Palette */
+      --orangeRed: #78290f;
+      --platinum: #e8e9eb;
+      --timberwolf: #e0dfd5;
+      --onyx: #001524;
+      --sandy: #ffecd1;
+      --punk: rgba(221, 30, 59, 1);
+      --white: #f9f9f9;
+      --green: #15616d;
+      --grey: #313630;
+      --nwar: #000000;
+      --acvhan: #fff;
+      --rouge: red;
+
+      /* Active theme variables (Light Mode default) */
+      --background: var(--white);
+      --text: var(--onyx);
+      --textNormal: var(--nwar);
+      --tint: var(--orangeRed);
+      --surface: var(--platinum);
+      --accent: var(--sandy);
+      --greenColor: var(--green);
+      --greyDes: var(--grey);
+      --errorText: var(--rouge);
+      --cardBg: #ffffff;
+      --border: var(--textNormal);
+    }
+
+    [data-theme="dark"] {
+      --background: var(--onyx);
+      --text: var(--timberwolf);
+      --textNormal: var(--acvhan);
+      --tint: var(--orangeRed);
+      --surface: #3d4244;
+      --accent: var(--sandy);
+      --greenColor: var(--green);
+      --greyDes: #aaa;
+      --errorText: var(--punk);
+      --cardBg: #0c1c28;
+      --border: var(--text);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    /* Device frame simulation for ultra premium look */
+    .device-container {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--background);
+      border: 8px solid var(--greyDes);
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      height: 900px;
+      position: relative;
+    }
+
+    /* Top bar & switchers container */
+    .top-header {
+      background-color: var(--background);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--surface);
+      z-index: 100;
+      gap: 8px;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .theme-toggle, .lang-toggle {
+      background-color: var(--surface);
+      color: var(--textNormal);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .theme-toggle:hover, .lang-toggle:hover {
+      opacity: 0.9;
+    }
+
+    /* Scrollable form content matching ScrollView */
+    .scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      padding-bottom: 80px;
+    }
+
+    .title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 24px;
+      text-align: center;
+      color: var(--text);
+    }
+
+    .sidetitle {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      color: var(--tint);
+      font-weight: 700;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      text-decoration: underline;
+    }
+
+    .label {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      margin-top: 12px;
+      color: var(--text);
+      display: block;
+    }
+
+    .input-field {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      margin-bottom: 12px;
+      background-color: var(--surface);
+      color: var(--textNormal);
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--tint);
+      box-shadow: 0 0 0 3px rgba(120, 41, 15, 0.2);
+    }
+
+    .error-text {
+      color: var(--errorText);
+      font-size: 11px;
+      margin-top: -8px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      display: none;
+    }
+
+    /* Password container styling */
+    .password-container {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .password-container .input-field {
+      margin-bottom: 0;
+      padding-right: 50px;
+    }
+
+    .password-toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--textNormal);
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Buttons styling */
+    .custom-button {
+      background-color: var(--greenColor);
+      color: var(--accent);
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+    }
+
+    .custom-button:hover {
+      opacity: 0.95;
+    }
+
+    .id-photo-preview {
+      width: 150px;
+      height: 100px;
+      border-radius: 8px;
+      margin: 10px auto 15px auto;
+      display: none;
+      background-size: cover;
+      background-position: center;
+      border: 1.5px dashed var(--tint);
+    }
+
+    /* Map container styling */
+    .map-instruction {
+      font-size: 12px;
+      color: var(--textNormal);
+      margin-bottom: 8px;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .map-container {
+      height: 200px;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      border: 1.5px solid var(--tint);
+      z-index: 1;
+    }
+
+    .confirm-location-btn {
+      background-color: var(--tint);
+      color: var(--accent);
+      display: none;
+    }
+
+    .location-selected-text {
+      font-size: 12px;
+      color: var(--textNormal);
+      text-align: center;
+      margin-bottom: 12px;
+      font-weight: 600;
+      display: none;
+    }
+
+    /* Weekdays selection grid */
+    .workdays-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .day-button {
+      padding: 6px 12px;
+      border: 1.5px solid var(--tint);
+      border-radius: 20px;
+      background: none;
+      color: var(--tint);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .day-button.selected {
+      background-color: var(--greenColor);
+      color: var(--accent);
+      border-color: var(--greenColor);
+    }
+
+    /* Time inputs grid matching style={styles.timeInput} exactly */
+    .time-input-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .time-input {
+      width: 50px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+      background-color: var(--surface);
+      color: var(--textNormal);
+      outline: none;
+    }
+
+    .time-input:focus {
+      border-color: var(--tint);
+    }
+
+    .time-separator {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--textNormal);
+    }
+
+    .time-range-text {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--textNormal);
+      margin: 0 4px;
+    }
+
+    /* Footer Suivant button */
+    .next-btn {
+      background-color: var(--greenColor);
+      margin-top: 16px;
+    }
+
+    .next-btn:disabled {
+      background-color: var(--greyDes) !important;
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .info-text {
+      font-size: 11px;
+      color: var(--greyDes);
+      margin-top: 8px;
+      margin-bottom: 12px;
+      font-style: italic;
+      text-align: center;
+    }
+
+    /* Spinner style inside buttons */
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top: 3px solid var(--accent);
+      width: 18px;
+      height: 18px;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="device-container">
+    <!-- Header top bar -->
+    <div class="top-header">
+      <div style="font-weight: 800; font-family: 'Outfit'; font-size: 15px; color: var(--tint);">Cegget Seller</div>
+      <div class="header-buttons">
+        <button class="lang-toggle" onclick="toggleLanguage()">
+          <ion-icon name="globe-outline"></ion-icon>
+          <span id="lang-text">Taqbaylit</span>
+        </button>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <ion-icon id="theme-icon" name="moon-outline"></ion-icon>
+          <span id="theme-text">Sombre</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="scroll-content">
+      <h1 class="title" id="t-titleMgz">Inscrire mon magasin</h1>
+
+      <!-- Section: À propos de vous -->
+      <h2 class="sidetitle" id="t-aboutYou">À propos de vous:</h2>
+      
+      <label class="label" id="t-nameLabel">Nom et Prénom *</label>
+      <input type="text" class="input-field" id="name" placeholder="" oninput="validateForm()">
+
+      <label class="label" id="t-dobLabel">Date de naissance *</label>
+      <input type="text" class="input-field" id="dob" placeholder="" maxlength="10" oninput="handleDobInput(this)">
+      <div class="error-text" id="dob-error">Date de naissance invalide ou moins de 19 ans.</div>
+
+      <label class="label" id="t-phoneLabel">Numéro de téléphone *</label>
+      <input type="text" class="input-field" id="phone" placeholder="0XXXXXXXXX" maxlength="14" oninput="handlePhoneInput(this)">
+      <div class="error-text" id="phone-error">Numéro de téléphone invalide.</div>
+
+      <label class="label" id="t-idPhotoLabel">Photo de la CDI</label>
+      <button class="custom-button" onclick="triggerPhotoUpload()">
+        <span class="spinner" id="photo-spinner"></span>
+        <span id="t-importPhotoBtn">Importer une Photo</span>
+      </button>
+      <input type="file" id="photo-file" style="display: none;" accept="image/*" onchange="handlePhotoFile(this)">
+      <div class="id-photo-preview" id="photo-preview"></div>
+
+      <!-- Section: Connexion -->
+      <h2 class="sidetitle" id="t-connectionInfo">Informations de connexion:</h2>
+
+      <label class="label" id="t-emailLabel">Adresse email *</label>
+      <input type="email" class="input-field" id="email" placeholder="" oninput="validateForm()">
+
+      <label class="label" id="t-passwordLabel">Mot de passe *</label>
+      <div class="password-container">
+        <input type="password" class="input-field" id="password" placeholder="" oninput="validateForm()">
+        <button class="password-toggle-btn" onclick="togglePasswordVisibility()">
+          <ion-icon id="password-eye" name="eye-outline"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Section: Activité -->
+      <h2 class="sidetitle" id="t-activityInfo">Sur votre activité:</h2>
+
+      <label class="label" id="t-storeNameLabel">Nom du magasin</label>
+      <input type="text" class="input-field" id="storeName" placeholder="" oninput="validateForm()">
+
+      <label class="label" id="t-storeTypes">Type de magasin</label>
+      <select class="input-field" id="storeType" onchange="validateForm()">
+        <!-- Populated dynamically via JS translations -->
+      </select>
+
+      <label class="label" id="t-commercialRegLabel">Numéro du registre de commerce *</label>
+      <input type="text" class="input-field" id="rcNumber" placeholder="" oninput="validateForm()">
+
+      <!-- Section: Adresse -->
+      <label class="label" id="t-communeLabel">Commune</label>
+      <input type="text" class="input-field" id="commune" placeholder="" oninput="validateForm()">
+
+      <label class="label" id="t-villageLabel">Chef-lieu / Village</label>
+      <input type="text" class="input-field" id="village" placeholder="" oninput="validateForm()">
+
+      <!-- Section: GPS -->
+      <label class="label" id="t-tab.gps">Localisation GPS</label>
+      <div class="map-instruction" id="t-simulateMapText">Cliquez sur la carte pour sélectionner</div>
+      <div class="map-container" id="map"></div>
+      
+      <button class="custom-button confirm-location-btn" id="confirm-gps" onclick="confirmLocation()">
+        <span id="t-confirmLocationBtn">Confirmer la Position sur la carte</span>
+      </button>
+      <div class="location-selected-text" id="gps-text">Position sélectionnée !</div>
+
+      <!-- Section: Jours d'ouverture -->
+      <h2 class="sidetitle" id="t-workDaysLabel">Journées de travail</h2>
+      <div class="workdays-container" id="days-container">
+        <!-- Populated dynamically to match translation -->
+      </div>
+
+      <!-- Section: Horaires -->
+      <h2 class="sidetitle" id="t-workHoursLabel">Horaire de travail</h2>
+
+      <label class="label" id="t-weekdaysText">Jours de semaine</label>
+      <div class="time-input-container">
+        <input type="text" class="time-input" id="wd-oh" placeholder="HH" maxlength="2" oninput="handleTimeInput(this, 'weekday')">
+        <span class="time-separator">:</span>
+        <input type="text" class="time-input" id="wd-om" placeholder="MM" maxlength="2" oninput="handleTimeInput(this, 'weekday')">
+        <span class="time-range-text">-</span>
+        <input type="text" class="time-input" id="wd-ch" placeholder="HH" maxlength="2" oninput="handleTimeInput(this, 'weekday')">
+        <span class="time-separator">:</span>
+        <input type="text" class="time-input" id="wd-cm" placeholder="MM" maxlength="2" oninput="handleTimeInput(this, 'weekday')">
+      </div>
+      <div class="error-text" id="weekday-time-error">Format ou ordre des heures invalide.</div>
+
+      <label class="label" id="t-weekendText">Weekend</label>
+      <div class="time-input-container">
+        <input type="text" class="time-input" id="we-oh" placeholder="HH" maxlength="2" oninput="handleTimeInput(this, 'weekend')">
+        <span class="time-separator">:</span>
+        <input type="text" class="time-input" id="we-om" placeholder="MM" maxlength="2" oninput="handleTimeInput(this, 'weekend')">
+        <span class="time-range-text">-</span>
+        <input type="text" class="time-input" id="we-ch" placeholder="HH" maxlength="2" oninput="handleTimeInput(this, 'weekend')">
+        <span class="time-separator">:</span>
+        <input type="text" class="time-input" id="we-cm" placeholder="MM" maxlength="2" oninput="handleTimeInput(this, 'weekend')">
+      </div>
+      <div class="error-text" id="weekend-time-error">Format ou ordre des heures invalide.</div>
+
+      <!-- Action Button -->
+      <button class="custom-button next-btn" id="next-submit-btn" disabled onclick="submitRegistration()">
+        <span class="spinner" id="submit-spinner"></span>
+        <span id="t-nextButton">Suivant</span>
+      </button>
+
+      <div class="info-text" id="t-noteVerification">Les informations comportant une * ne seront pas rendues publiques, elles serviront pour la vérification de votre identité.</div>
+    </div>
+  </div>
+
+  <script>
+    // Exact translation dictionary matching fr.json and kab.json
+    const translations = {
+      fr: {
+        "titleMgz": "Inscrire mon magasin",
+        "aboutYou": "À propos de vous:",
+        "nameLabel": "Nom et Prénom *",
+        "placeholderFullName": "Votre nom et prénom",
+        "dobLabel": "Date de naissance *",
+        "dobPlaceholder": "JJ/MM/AAAA",
+        "phoneLabel": "Numéro de téléphone *",
+        "idPhotoLabel": "Photo de la CDI",
+        "importPhotoBtn": "Importer une Photo",
+        "connectionInfo": "Informations de connexion:",
+        "emailLabel": "Adresse email *",
+        "emailPlaceholder": "Entrez votre email",
+        "passwordLabel": "Mot de passe *",
+        "passwordPlaceholder": "Créez votre mot de passe",
+        "activityInfo": "Sur votre activité:",
+        "storeNameLabel": "Nom du magasin",
+        "storeNamePlaceholder": "Nom de votre magasin",
+        "storeTypes": "Type de magasin",
+        "storeTypePlaceholder": "-- Sélectionner un type --",
+        "commercialRegLabel": "Numéro du registre de commerce *",
+        "commercialRegPlaceholder": "Entrez le numéro",
+        "communeLabel": "Commune",
+        "communePlaceholder": "Entrez la commune",
+        "villageLabel": "Chef-lieu / Village",
+        "villagePlaceholder": "Entrez le chef-lieu ou village",
+        "tab.gps": "Localisation GPS",
+        "simulateMapText": "Cliquez sur la carte pour sélectionner",
+        "confirmLocationBtn": "Confirmer la Position sur la carte",
+        "workDaysLabel": "Journées de travail",
+        "workHoursLabel": "Horaire de travail",
+        "weekdaysText": "Jours de semaine",
+        "weekendText": "Weekend",
+        "nextButton": "Suivant",
+        "noteVerification": "Les informations comportant une * ne seront pas rendues publiques, elles serviront pour la vérification de votre identité.",
+        "dobError": "Date de naissance invalide.",
+        "errorBirthDateAgeTooYoung": "Vous devez avoir au moins 19 ans.",
+        "phoneError": "Numéro de téléphone invalide.",
+        "errorPhoneStart": "Le numéro doit commencer par 05, 06 ou 07.",
+        "timeOrderError": "L'heure de fermeture doit être après l'heure d'ouverture.",
+        "locationSelected": "Position sélectionnée !",
+        "uploading": "Téléchargement...",
+        "registering": "Inscription en cours...",
+        "successMsg": "🎉 Compte Magasin créé avec succès ! Vos données ont été enregistrées sur le serveur Appwrite et l'image d'identité a été hébergée sur Cloudflare R2.",
+        "days": {
+          "Sunday": "Dimanche",
+          "Monday": "Lundi",
+          "Tuesday": "Mardi",
+          "Wednesday": "Mercredi",
+          "Thursday": "Jeudi",
+          "Friday": "Vendredi",
+          "Saturday": "Samedi"
+        },
+        "types": {
+          "fast": "Fast-food",
+          "rest": "Restaurant",
+          "sup": "Superette",
+          "alim": "Alimentation générale",
+          "frleg": "Fruits et légumes",
+          "pzpat": "Pizzeria et pâtisserie",
+          "blnj": "Boulangerie",
+          "pss": "Poissonnerie",
+          "cremerie": "Crèmerie"
+        }
+      },
+      kab: {
+        "titleMgz": "Ad jerdeɣ taḥanuţ-iw",
+        "aboutYou": "Ɣef yiman-iw:",
+        "nameLabel": "Tafamilt d yisem *",
+        "placeholderFullName": "Tafamilt d yisem",
+        "dobLabel": "Ass n tlalit *",
+        "dobPlaceholder": "ASS/AGGUR/ASEGGAS",
+        "phoneLabel": "Uṭṭun n tilifun*",
+        "idPhotoLabel": "Tugna n nnekwa",
+        "importPhotoBtn": "Aggʷay n tugna",
+        "connectionInfo": "I unekcum:",
+        "emailLabel": "L'email *",
+        "emailPlaceholder": "Aru-d l'email-ik/im",
+        "passwordLabel": "Awal uffir *",
+        "passwordPlaceholder": "Snulfu-d awal uffir",
+        "activityInfo": "Ɣef ixeddim-ik/im:",
+        "storeNameLabel": "Isem n tḥanuţ",
+        "storeNamePlaceholder": "Aru-d isem n tḥanuţ-ik/im",
+        "storeTypes": "Ṣṣifa n tḥanuţ",
+        "storeTypePlaceholder": "-- Xtaṛed yiwet --",
+        "commercialRegLabel": "Uṭṭun n Registre de commerce *",
+        "commercialRegPlaceholder": "Ssekcem uṭṭun",
+        "communeLabel": "Taɣiwant",
+        "communePlaceholder": "Ssekcem taɣiwant",
+        "villageLabel": "Chef-lieu / Taddart",
+        "villagePlaceholder": "Ssekcem Chef-lieu neɣ taddart",
+        "tab.gps": "Imukan s GPS",
+        "simulateMapText": "Nnal lkaṛta i wakken ad xtiṛeḍ",
+        "confirmLocationBtn": "D wagi i d amekkan ɣef lkaṛta",
+        "workDaysLabel": "Ussan n lxedma",
+        "workHoursLabel": "Sswayeɛ n lxedma",
+        "weekdaysText": "Ussan n smana",
+        "weekendText": "Tagara n dduṛt",
+        "nextButton": "Ɣer zdat",
+        "noteVerification": "Ayen akk i yesɛan * ad yeţwasexdam kan i wakken ad nẓer ma tzemreḍ ad tiliḍ di CEGGET, ad yeqqim kan gar-aneɣ ur tnezuzzur ara.",
+        "dobError": "Ass n tlalit ur iwulem ara.",
+        "errorBirthDateAgeTooYoung": "Ilaq ad tesɛuḍ 19 n yiseggasen neɣ uger.",
+        "phoneError": "Uṭṭun n tilifun ur iwulem ara.",
+        "errorPhoneStart": "Uṭṭun ilaq ad yebdu s 05, 06 neɣ 07.",
+        "timeOrderError": "Ssaɛar n umdal, ilaq ad tili umbaɛd tin n ulday.",
+        "locationSelected": "Amekkan yeţwaxtar !",
+        "uploading": "Aceggaɛ...",
+        "registering": "Ad jerdeɣ...",
+        "successMsg": "🎉 Dayen! Taḥnuţ-ik/im teţwajered s tewlelyt deg Appwrite u tugna teţwaceggeɛ ɣer Cloudflare R2.",
+        "days": {
+          "Sunday": "Lḥed",
+          "Monday": "Letniyen",
+          "Tuesday": "Ţlata",
+          "Wednesday": "Laṛevɛa",
+          "Thursday": "Lexmis",
+          "Friday": "Lǧemɛa",
+          "Saturday": "Ssebt"
+        },
+        "types": {
+          "fast": "Fast-food",
+          "rest": "Asečči",
+          "sup": "Superette",
+          "alim": "Alimentation générale",
+          "frleg": "Tidelt d ugama",
+          "pzpat": "Pizzeria d pâtisserie",
+          "blnj": "Lkuca",
+          "pss": "Lḥut",
+          "cremerie": "Asečči d uyefki"
+        }
+      }
+    };
+
+    let currentLang = 'fr';
+    let selectedLocation = null;
+    let selectedDays = [];
+    let idPhotoImported = false;
+
+    // Load active language translations
+    function applyTranslations() {
+      const data = translations[currentLang];
+
+      // Update basic text contents
+      document.getElementById('t-titleMgz').innerText = data.titleMgz;
+      document.getElementById('t-aboutYou').innerText = data.aboutYou;
+      document.getElementById('t-nameLabel').innerText = data.nameLabel;
+      document.getElementById('name').placeholder = data.placeholderFullName;
+      document.getElementById('t-dobLabel').innerText = data.dobLabel;
+      document.getElementById('dob').placeholder = data.dobPlaceholder;
+      document.getElementById('t-phoneLabel').innerText = data.phoneLabel;
+      document.getElementById('t-idPhotoLabel').innerText = data.idPhotoLabel;
+      document.getElementById('t-importPhotoBtn').innerText = idPhotoImported ? (currentLang === 'fr' ? 'Modifier la Photo' : 'Veddel tugna') : data.importPhotoBtn;
+      document.getElementById('t-connectionInfo').innerText = data.connectionInfo;
+      document.getElementById('t-emailLabel').innerText = data.emailLabel;
+      document.getElementById('email').placeholder = data.emailPlaceholder || "email@cegget.com";
+      document.getElementById('t-passwordLabel').innerText = data.passwordLabel;
+      document.getElementById('password').placeholder = data.passwordPlaceholder;
+      document.getElementById('t-activityInfo').innerText = data.activityInfo;
+      document.getElementById('t-storeNameLabel').innerText = data.storeNameLabel;
+      document.getElementById('storeName').placeholder = data.storeNamePlaceholder;
+      document.getElementById('t-storeTypes').innerText = data.storeTypes;
+      document.getElementById('t-commercialRegLabel').innerText = data.commercialRegLabel;
+      document.getElementById('rcNumber').placeholder = data.commercialRegPlaceholder;
+      document.getElementById('t-communeLabel').innerText = data.communeLabel;
+      document.getElementById('commune').placeholder = data.communePlaceholder;
+      document.getElementById('t-villageLabel').innerText = data.villageLabel;
+      document.getElementById('village').placeholder = data.villagePlaceholder;
+      document.getElementById('t-tab.gps').innerText = data["tab.gps"];
+      document.getElementById('t-simulateMapText').innerText = data.simulateMapText;
+      document.getElementById('t-confirmLocationBtn').innerText = data.confirmLocationBtn;
+      document.getElementById('t-workDaysLabel').innerText = data.workDaysLabel;
+      document.getElementById('t-workHoursLabel').innerText = data.workHoursLabel;
+      document.getElementById('t-weekdaysText').innerText = data.weekdaysText;
+      document.getElementById('t-weekendText').innerText = data.weekendText;
+      document.getElementById('t-nextButton').innerText = data.nextButton;
+      document.getElementById('t-noteVerification').innerText = data.noteVerification;
+
+      // Populate store type options
+      const storeSelect = document.getElementById('storeType');
+      const currentVal = storeSelect.value;
+      storeSelect.innerHTML = `<option value="" disabled selected>${data.storeTypePlaceholder}</option>`;
+      for (const [key, label] of Object.entries(data.types)) {
+        storeSelect.innerHTML += `<option value="${key}">${label}</option>`;
+      }
+      if (currentVal) storeSelect.value = currentVal;
+
+      // Populate opening days buttons
+      const daysContainer = document.getElementById('days-container');
+      daysContainer.innerHTML = '';
+      for (const [key, label] of Object.entries(data.days)) {
+        const isSelected = selectedDays.includes(key);
+        daysContainer.innerHTML += `
+          <button class="day-button ${isSelected ? 'selected' : ''}" onclick="toggleDay(this, '${key}')">
+            ${label}
+          </button>
+        `;
+      }
+
+      // Re-trigger active validation check in active lang
+      validateForm();
+    }
+
+    // Toggle between French and Kabyle
+    function toggleLanguage() {
+      const btnText = document.getElementById('lang-text');
+      if (currentLang === 'fr') {
+        currentLang = 'kab';
+        btnText.innerText = 'Français';
+      } else {
+        currentLang = 'fr';
+        btnText.innerText = 'Taqbaylit';
+      }
+      applyTranslations();
+    }
+
+    // Theme toggle
+    function toggleTheme() {
+      const body = document.body;
+      const currentTheme = body.getAttribute('data-theme');
+      const icon = document.getElementById('theme-icon');
+      const text = document.getElementById('theme-text');
+
+      if (currentTheme === 'dark') {
+        body.removeAttribute('data-theme');
+        icon.setAttribute('name', 'moon-outline');
+        text.innerText = 'Sombre';
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        icon.setAttribute('name', 'sunny-outline');
+        text.innerText = 'Clair';
+      }
+    }
+
+    // Initialize Mapbox/Leaflet Map
+    const map = L.map('map').setView([36.72, 4.05], 13); // Default centered on Tizi Ouzou area
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = null;
+
+    map.on('click', function(e) {
+      const lat = e.latlng.lat.toFixed(6);
+      const lng = e.latlng.lng.toFixed(6);
+      
+      if (marker) {
+        marker.setLatLng(e.latlng);
+      } else {
+        // Red marker matching theme.errorText
+        const redIcon = L.icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+        });
+        marker = L.marker(e.latlng, { icon: redIcon }).addTo(map);
+      }
+
+      selectedLocation = { lat, lng };
+      document.getElementById('confirm-gps').style.display = 'flex';
+      validateForm();
+    });
+
+    function confirmLocation() {
+      if (selectedLocation) {
+        const text = translations[currentLang].locationSelected;
+        document.getElementById('gps-text').innerText = `${text} Lat: ${selectedLocation.lat}, Lng: ${selectedLocation.lng}`;
+        document.getElementById('gps-text').style.display = 'block';
+        validateForm();
+      }
+    }
+
+    // Input masks & validations
+    function handleDobInput(el) {
+      let value = el.value.replace(/\D/g, '');
+      if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2);
+      if (value.length > 5) value = value.slice(0, 5) + '/' + value.slice(5);
+      el.value = value.slice(0, 10);
+
+      const errorDiv = document.getElementById('dob-error');
+      if (el.value.length === 10) {
+        const parts = el.value.split('/');
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10);
+        const year = parseInt(parts[2], 10);
+
+        const birthDate = new Date(year, month - 1, day);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+
+        if (month < 1 || month > 12 || day < 1 || day > 31 || isNaN(age) || age < 19 || age > 100) {
+          errorDiv.innerText = translations[currentLang].dobError;
+          errorDiv.style.display = 'block';
+        } else {
+          errorDiv.style.display = 'none';
+        }
+      } else {
+        errorDiv.style.display = 'none';
+      }
+      validateForm();
+    }
+
+    function handlePhoneInput(el) {
+      let value = el.value.replace(/\D/g, '');
+      if (value.length > 10) value = value.slice(0, 10);
+
+      let formatted = '';
+      if (value.length > 0) formatted += value.slice(0, 2);
+      if (value.length > 2) formatted += ' ' + value.slice(2, 4);
+      if (value.length > 4) formatted += ' ' + value.slice(4, 6);
+      if (value.length > 6) formatted += ' ' + value.slice(6, 8);
+      if (value.length > 8) formatted += ' ' + value.slice(8, 10);
+
+      el.value = formatted;
+
+      const errorDiv = document.getElementById('phone-error');
+      const cleaned = value;
+      if (cleaned.length === 10) {
+        if (!/^(05|06|07)\d{8}$/.test(cleaned)) {
+          errorDiv.innerText = translations[currentLang].errorPhoneStart;
+          errorDiv.style.display = 'block';
+        } else {
+          errorDiv.style.display = 'none';
+        }
+      } else {
+        errorDiv.style.display = 'none';
+      }
+      validateForm();
+    }
+
+    function triggerPhotoUpload() {
+      document.getElementById('photo-file').click();
+    }
+
+    function handlePhotoFile(input) {
+      if (input.files && input.files[0]) {
+        const spinner = document.getElementById('photo-spinner');
+        const btnText = document.getElementById('t-importPhotoBtn');
+        
+        spinner.style.display = 'inline-block';
+        btnText.innerText = translations[currentLang].uploading;
+
+        setTimeout(() => {
+          spinner.style.display = 'none';
+          idPhotoImported = true;
+          btnText.innerText = currentLang === 'fr' ? 'Modifier la Photo' : 'Veddel tugna';
+
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const preview = document.getElementById('photo-preview');
+            preview.style.backgroundImage = `url(${e.target.result})`;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(input.files[0]);
+          validateForm();
+        }, 1200);
+      }
+    }
+
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('password-eye');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.setAttribute('name', 'eye-off-outline');
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.setAttribute('name', 'eye-outline');
+      }
+    }
+
+    function toggleDay(button, day) {
+      button.classList.toggle('selected');
+      if (selectedDays.includes(day)) {
+        selectedDays = selectedDays.filter(d => d !== day);
+      } else {
+        selectedDays.push(day);
+      }
+      validateForm();
+    }
+
+    function handleTimeInput(el, type) {
+      el.value = el.value.replace(/\D/g, '').slice(0, 2);
+      
+      const errorDiv = document.getElementById(`${type}-time-error`);
+      const oh = document.getElementById(`${type === 'weekday' ? 'wd' : 'we'}-oh`).value;
+      const om = document.getElementById(`${type === 'weekday' ? 'wd' : 'we'}-om`).value;
+      const ch = document.getElementById(`${type === 'weekday' ? 'wd' : 'we'}-ch`).value;
+      const cm = document.getElementById(`${type === 'weekday' ? 'wd' : 'we'}-cm`).value;
+
+      if (oh && om && ch && cm) {
+        const openH = parseInt(oh, 10);
+        const openM = parseInt(om, 10);
+        const closeH = parseInt(ch, 10);
+        const closeM = parseInt(cm, 10);
+
+        if (openH > 23 || closeH > 23 || openM > 59 || closeM > 59) {
+          errorDiv.innerText = currentLang === 'fr' ? 'Heure invalide.' : 'Ur twulem ara ssaɛa-agi.';
+          errorDiv.style.display = 'block';
+        } else if ((openH * 60 + openM) >= (closeH * 60 + closeM)) {
+          errorDiv.innerText = translations[currentLang].timeOrderError;
+          errorDiv.style.display = 'block';
+        } else {
+          errorDiv.style.display = 'none';
+        }
+      } else {
+        errorDiv.style.display = 'none';
+      }
+      validateForm();
+    }
+
+    function validateForm() {
+      const name = document.getElementById('name').value.trim();
+      const dob = document.getElementById('dob').value.trim();
+      const phone = document.getElementById('phone').value.replace(/\s/g, '').trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const storeName = document.getElementById('storeName').value.trim();
+      const storeType = document.getElementById('storeType').value;
+      const rcNumber = document.getElementById('rcNumber').value.trim();
+      const commune = document.getElementById('commune').value.trim();
+      const village = document.getElementById('village').value.trim();
+
+      const wdOh = document.getElementById('wd-oh').value;
+      const wdOm = document.getElementById('wd-om').value;
+      const wdCh = document.getElementById('wd-ch').value;
+      const wdCm = document.getElementById('wd-cm').value;
+
+      const weOh = document.getElementById('we-oh').value;
+      const weOm = document.getElementById('we-om').value;
+      const weCh = document.getElementById('we-ch').value;
+      const weCm = document.getElementById('we-cm').value;
+
+      const dobErr = document.getElementById('dob-error').style.display === 'block';
+      const phoneErr = document.getElementById('phone-error').style.display === 'block';
+      const wdErr = document.getElementById('weekday-time-error').style.display === 'block';
+      const weErr = document.getElementById('weekend-time-error').style.display === 'block';
+
+      const fieldsFilled = 
+        name !== '' &&
+        dob !== '' &&
+        phone !== '' &&
+        email !== '' &&
+        password !== '' &&
+        storeName !== '' &&
+        storeType !== '' &&
+        rcNumber !== '' &&
+        commune !== '' &&
+        village !== '' &&
+        idPhotoImported &&
+        selectedLocation !== null &&
+        selectedDays.length > 0 &&
+        wdOh && wdOm && wdCh && wdCm &&
+        weOh && weOm && weCh && weCm;
+
+      const noErrors = !dobErr && !phoneErr && !wdErr && !weErr;
+
+      const isValid = fieldsFilled && noErrors;
+      document.getElementById('next-submit-btn').disabled = !isValid;
+    }
+
+    function submitRegistration() {
+      const submitSpinner = document.getElementById('submit-spinner');
+      const submitBtnText = document.getElementById('t-nextButton');
+
+      submitSpinner.style.display = 'inline-block';
+      submitBtnText.innerText = translations[currentLang].registering;
+      document.getElementById('next-submit-btn').disabled = true;
+
+      setTimeout(() => {
+        submitSpinner.style.display = 'none';
+        submitBtnText.innerText = translations[currentLang].nextButton;
+        document.getElementById('next-submit-btn').disabled = false;
+        alert(translations[currentLang].successMsg);
+      }, 2000);
+    }
+
+    // Initialize UI on load
+    applyTranslations();
+  </script>
+</body>
+</html>

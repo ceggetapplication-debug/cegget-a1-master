@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Interactif : AddProductModal</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #1a1a1a;
+            margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* LE BOUTON DE SWITCHAGE */
+        .switcher {
+            background: #333;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn-s {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            background: #555;
+            color: white;
+        }
+        .btn-s.active { background: #15616d; }
+
+        /* Le Modal */
+        .card {
+            width: 360px;
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .title { color: #15616d; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+        .lbl { font-size: 13px; font-weight: bold; margin-top: 15px; display: block; color: #333; }
+        .fld { width: 100%; box-sizing: border-box; padding: 10px; border: 2px solid #15616d; border-radius: 6px; margin-top: 5px; background: #eee; }
+        
+        .details-area { border: 1px dashed #999; padding: 10px; margin-top: 10px; border-radius: 8px; }
+        .btn-confirm { background: #15616d; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer; display: none; }
+
+        .footer { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-f { flex: 1; padding: 12px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="switcher">
+    <button class="btn-s active" id="b1" onclick="go('add', this)">AJOUT</button>
+    <button class="btn-s" onclick="go('edit', this)">MODIF</button>
+    <button class="btn-s" onclick="go('promo', this)">PROMO</button>
+</div>
+
+<div class="card">
+    <div id="tit" class="title">Ajouter un produit</div>
+    
+    <span class="lbl">Nom du produit</span>
+    <input type="text" class="fld" placeholder="Nom...">
+
+    <span class="lbl">Détails (Nouveaux ajouts)</span>
+    <div class="details-area">
+        <span style="font-size:10px;">FRANÇAIS</span>
+        <textarea id="f" class="fld" style="height:50px;" oninput="ck()"></textarea>
+        <span style="font-size:10px;">TAQBAYLIT</span>
+        <textarea id="k" class="fld" style="height:50px;" oninput="ck()"></textarea>
+        <button id="cf" class="btn-confirm" onclick="this.style.display='none'">Confirmer les détails</button>
+    </div>
+
+    <div id="dyn"></div>
+
+    <div class="footer">
+        <button class="btn-f" style="background:#ff7d00;">Annuler</button>
+        <button id="ok" class="btn-f" style="background:#001524; color:white;">Enregistrer</button>
+    </div>
+</div>
+
+<script>
+    function go(m, b) {
+        document.querySelectorAll('.btn-s').forEach(x => x.classList.remove('active'));
+        if(b) b.classList.add('active');
+        
+        const t = document.getElementById('tit');
+        const d = document.getElementById('dyn');
+        const k = document.getElementById('ok');
+
+        if(m === 'add') {
+            t.innerText = "Ajouter un produit";
+            k.innerText = "Enregistrer";
+            d.innerHTML = '<span class="lbl">Prix</span><input type="number" class="fld" placeholder="0.00">';
+        } else if(m === 'edit') {
+            t.innerText = "Modifier le produit";
+            k.innerText = "Modifier";
+            d.innerHTML = '<span class="lbl">Modifier le prix</span><input type="number" class="fld" placeholder="0.00">';
+        } else if(m === 'promo') {
+            t.innerText = "Offre Promotionnelle";
+            k.innerText = "Enregistrer";
+            d.innerHTML = `
+                <span class="lbl">Ancien prix</span>
+                <input type="text" class="fld" value="1200.00 DZD" disabled>
+                <span class="lbl">Prix PROMO</span>
+                <input type="number" class="fld" placeholder="0.00">
+                <span class="lbl">Date de Fin</span>
+                <input type="date" class="fld" value="2024-12-31">
+            `;
+        }
+    }
+
+    function ck() {
+        const v1 = document.getElementById('f').value.trim();
+        const v2 = document.getElementById('k').value.trim();
+        document.getElementById('cf').style.display = (v1 && v2) ? 'block' : 'none';
+    }
+
+    // Lancer au démarrage
+    window.onload = function() {
+        go('add', document.getElementById('b1'));
+    };
+</script>
+
+</body>
+</html>
