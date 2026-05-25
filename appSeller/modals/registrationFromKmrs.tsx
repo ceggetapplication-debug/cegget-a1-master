@@ -551,6 +551,7 @@ const viewRate = commissionPercentage / 10;
         maxLength={14}
         editable={!isLoading}
       />
+      {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
 
       <Text style={styles.sidetitle}>{t('connectionInfo')}</Text>
       <Text style={styles.label}>{t('emailLabel')} :</Text>
@@ -596,7 +597,6 @@ const viewRate = commissionPercentage / 10;
         autoCapitalize="words"
         editable={!isLoading}
       />
-      {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
       <Text style={styles.label}>{t('storePhotoLabel')} :</Text>
       <TouchableOpacity
         style={styles.customButton}
