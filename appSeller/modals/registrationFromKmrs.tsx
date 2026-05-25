@@ -4,10 +4,11 @@ import { Picker } from '@react-native-picker/picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import MapView, { Marker, Region } from 'react-native-maps';
-import { account, databases, config, ID, r2Config } from '@/app/(main)/calculation-logic/appwriteConfig';
+import { account, databases, config, ID, r2Config, functions } from '@/app/(main)/calculation-logic/appwriteConfig';
 import { useAppTranslation } from '@/app/(main)/translations/data/translationCentralization';
 import { uploadToR2, R2File } from '@/app/(main)/calculation-logic/imagesLogic';
 import { Colors } from '../appSellerColors';
+import { COMMERCE_PERCENTAGES } from '../logic/gainSellerLogic';
 
 interface Time {
   hour: string;
@@ -67,10 +68,15 @@ const RegistrationForm: React.FC = () => {
   const [weekendTimeError, setWeekendTimeError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [tempSelectedLocation, setTempSelectedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [currentStep, setCurrentStep] = useState<'form' | 'commission'>('form');
 
-  const storeTypes = ['fast', 'rest', 'sup', 'alim', 'frleg', 'pzpat', 'blnj', 'gatrad', 'prodcos', 'brtbc', 'bcvr', 'bcvb', 'pss', 'epss', 'cremerie'];
+  const storeTypes: string[] = ['fast', 'rest', 'sup', 'alim', 'frleg', 'pzpat', 'blnj', 'gatrad', 'prodcos', 'brtbc', 'bcvr', 'bcvb', 'pss', 'epss', 'cremerie'];
   const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const commerceKey = storeTypes[formData.storeType || ''] as keyof typeof COMMERCE_PERCENTAGES;
+const commissionPercentage = commerceKey ? COMMERCE_PERCENTAGES[commerceKey] : 0;
+const viewRate = commissionPercentage / 10;
 
   const handleInputChange = <K extends keyof RegistrationFormState>(field: K, value: RegistrationFormState[K]) => {
     setFormData({
@@ -355,7 +361,29 @@ const RegistrationForm: React.FC = () => {
   }
 
   const isNextButtonEnabled = isFormValid() && !isLoading;
-  const handleNext = async () => {
+    const handleNext = () => {
+    if (isFormValid()) {
+      setCurrentStep('commission');
+    } else {
+      const missingFields = [];
+      if (formData.name.trim() === '') missingFields.push(t('nameLabel'));
+      if (formData.dob.trim() === '' || dobError !== '') missingFields.push(t('dobLabel') + (dobError ? ` (${dobError})` : ''));
+      if (formData.phoneNumber.trim() === '' || phoneError !== '') missingFields.push(t('phoneLabel') + (phoneError ? ` (${phoneError})` : ''));
+      if (formData.email.trim() === '') missingFields.push(t('emailLabel'));
+      if (formData.password.trim() === '') missingFields.push(t('passwordLabel'));
+      if (formData.commercialRegistrationNumber.trim() === '') missingFields.push(t('commercialRegLabel'));
+      if (formData.location === null) missingFields.push(t('tab.gps'));
+      if (formData.idPhotoUri === null) missingFields.push(t('idPhotoLabel'));
+      if (formData.workDays.length === 0) missingFields.push(t('workDaysLabel'));
+      if (formData.weekdayOpening.hour.trim() === '' || formData.weekdayOpening.minute.trim() === '' || weekdayTimeError !== '') missingFields.push(t('workHoursLabel') + ` (${t('weekdaysText')})` + (weekdayTimeError ? ` (${weekdayTimeError})` : ''));
+      if (formData.weekendOpening.hour.trim() === '' || formData.weekendOpening.minute.trim() === '' || weekendTimeError !== '') missingFields.push(t('workHoursLabel') + ` (${t('weekendText')})` + (weekendTimeError ? ` (${weekendTimeError})` : ''));
+      if (formData.storeType === undefined) missingFields.push(t('storeTypes'));
+      let errorMessage = t('missingFieldsPrompt') + '\n\n' + missingFields.join('\n');
+      Alert.alert(t('formIncompleteTitle'), errorMessage);
+    }
+  };
+
+  const handleRegister = async () => {
     if (isFormValid()) {
       setIsLoading(true);
       try {
@@ -442,6 +470,48 @@ const RegistrationForm: React.FC = () => {
   const handleMapPress = (event: { nativeEvent: { coordinate: { latitude: number; longitude: number } } }) => {
     setTempSelectedLocation(event.nativeEvent.coordinate);
   };
+
+  if (currentStep === 'commission') {
+    return (
+      <ScrollView style={styles.container}>
+        <Text style={styles.title}>{t('commissionTitle')}</Text>
+        <Text style={styles.sidetitle}>{t('storeTypes')} :</Text>
+        <Text style={styles.label}>{t(formData.storeType || '')}</Text>
+        <Text style={styles.sidetitle}>{t('commissionOrders')}</Text>
+        <Text style={styles.label}>{commissionPercentage}%</Text>
+        <Text style={styles.infoText}>{t('commissionOrdersDesc')}</Text>
+        <Text style={styles.sidetitle}>{t('commissionViews')}</Text>
+        <Text style={styles.label}>{viewRate.toFixed(3)} DA / {t('perView')}</Text>
+        <Text style={styles.infoText}>{t('commissionViewsDesc')}</Text>
+        <Text style={styles.infoText}>({commissionPercentage}% / 10) × {t('totalViews')} — {t('pickupMultiplier')}</Text>
+        <TouchableOpacity
+          onPress={() => setTermsAccepted(!termsAccepted)}
+          disabled={isLoading}
+          style={styles.passwordInputContainer}
+        >
+          <Ionicons
+            name={termsAccepted ? 'checkbox' : 'square-outline'}
+            size={24}
+            color={termsAccepted ? theme.green : theme.greyDes}
+          />
+          <Text style={styles.passwordInput}>{t('termsAcceptance')}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.customButton, styles.nextButton, (!termsAccepted || isLoading) && styles.nextButtonDisabled]}
+          onPress={handleRegister}
+          disabled={!termsAccepted || isLoading}
+        >
+          <Text style={styles.customButtonText}>
+            {isLoading ? <ActivityIndicator color={theme.accent} /> : t('acceptAndRegister')}
+          </Text>
+        </TouchableOpacity>
+
+        <Text style={styles.infoText}>{t('commissionNote')}</Text>
+        <View style={{ height: 50 }} />
+      </ScrollView>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -824,6 +894,8 @@ const createStyles = (theme: typeof Colors.light) => StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 15,
+    width: '30%',
+    selfAlign: 'center',
   },
   customButtonText: {
     color: theme.accent,
@@ -929,10 +1001,14 @@ const createStyles = (theme: typeof Colors.light) => StyleSheet.create({
   nextButton: {
     backgroundColor: theme.green,
     marginTop: 20,
+    width: '30%',
+    selfAlign: 'center',
   },
   nextButtonDisabled: {
     backgroundColor: theme.greyDes,
+    width: '30%',
     opacity: 0.5,
+    selfAlign: 'center',
   },
 });
 
