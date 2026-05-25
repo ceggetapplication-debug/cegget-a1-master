@@ -1,1006 +1,512 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aperçu Inscription Vendeur - Cegget</title>
-  <!-- Google Fonts: Inter & Outfit -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
-  <!-- Ionicons for modern icons styling -->
-  <script src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-  <!-- Leaflet CSS & JS for fully interactive map simulation -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscrire mon magasin</title>
   <style>
-    /* Design Tokens matching appSellerColors.ts */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      /* Palette */
-      --orangeRed: #78290f;
-      --platinum: #e8e9eb;
-      --timberwolf: #e0dfd5;
-      --onyx: #001524;
-      --sandy: #ffecd1;
-      --punk: rgba(221, 30, 59, 1);
-      --white: #f9f9f9;
+      --background: #f9f9f9;
+      --surface: #e8e9eb;
+      --text: #001524;
+      --tint: #78290f;
       --green: #15616d;
-      --grey: #313630;
-      --nwar: #000000;
-      --acvhan: #fff;
-      --rouge: red;
-
-      /* Active theme variables (Light Mode default) */
-      --background: var(--white);
-      --text: var(--onyx);
-      --textNormal: var(--nwar);
-      --tint: var(--orangeRed);
-      --surface: var(--platinum);
-      --accent: var(--sandy);
-      --greenColor: var(--green);
-      --greyDes: var(--grey);
-      --errorText: var(--rouge);
-      --cardBg: #ffffff;
-      --border: var(--textNormal);
+      --accent: #ffecd1;
+      --greyDes: #313630;
+      --textNormal: #000000;
+      --errorText: red;
     }
 
-    [data-theme="dark"] {
-      --background: var(--onyx);
-      --text: var(--timberwolf);
-      --textNormal: var(--acvhan);
-      --tint: var(--orangeRed);
-      --surface: #3d4244;
-      --accent: var(--sandy);
-      --greenColor: var(--green);
-      --greyDes: #aaa;
-      --errorText: var(--punk);
-      --cardBg: #0c1c28;
-      --border: var(--text);
-    }
+    body { background-color: var(--background); font-family: sans-serif; display: flex; justify-content: center; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    }
+    .container { flex: 1; padding: 20px; background-color: var(--background); width: 100%; max-width: 420px; }
 
-    body {
-      background-color: var(--background);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-      min-height: 100vh;
-    }
+    .title { font-size: 28px; font-weight: bold; margin-bottom: 30px; text-align: center; color: var(--text); }
 
-    /* Device frame simulation for ultra premium look */
-    .device-container {
-      width: 100%;
-      max-width: 480px;
-      background-color: var(--background);
-      border: 8px solid var(--greyDes);
-      border-radius: 40px;
-      overflow: hidden;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-      display: flex;
-      flex-direction: column;
-      height: 900px;
-      position: relative;
-    }
+    .sidetitle { font-size: 18px; color: var(--tint); font-weight: bold; margin-bottom: 10px; margin-top: 20px; text-decoration: underline; }
 
-    /* Top bar & switchers container */
-    .top-header {
-      background-color: var(--background);
-      padding: 12px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--surface);
-      z-index: 100;
-      gap: 8px;
-    }
+    .label { font-size: 16px; margin-bottom: 5px; margin-top: 10px; color: var(--text); font-weight: bold; }
 
-    .header-buttons {
-      display: flex;
-      gap: 6px;
-    }
+    .input { border: 1.5px solid var(--textNormal); border-radius: 8px; padding: 12px; font-size: 16px; margin-bottom: 15px; background-color: var(--surface); width: 100%; color: var(--text); outline: none; }
+    .input::placeholder { color: #888; }
 
-    .theme-toggle, .lang-toggle {
-      background-color: var(--surface);
-      color: var(--textNormal);
-      border: none;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 11px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+    .error-text { color: var(--errorText); font-size: 12px; margin-top: 0; margin-bottom: 15px; }
 
-    .theme-toggle:hover, .lang-toggle:hover {
-      opacity: 0.9;
-    }
+    .password-input-container { display: flex; flex-direction: row; align-items: center; border: 1.5px solid var(--green); border-radius: 8px; margin-bottom: 15px; background-color: var(--surface); }
 
-    /* Scrollable form content matching ScrollView */
-    .scroll-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-      padding-bottom: 80px;
-    }
+    .password-input { flex: 1; padding: 12px; font-size: 16px; border: none; background: transparent; outline: none; color: var(--text); }
+    .password-input::placeholder { color: #888; }
 
-    .title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 24px;
-      text-align: center;
-      color: var(--text);
-    }
+    .password-toggle { padding: 12px; cursor: pointer; background: none; border: none; font-size: 20px; color: var(--textNormal); }
 
-    .sidetitle {
-      font-family: 'Outfit', sans-serif;
-      font-size: 16px;
-      color: var(--tint);
-      font-weight: 700;
-      margin-top: 24px;
-      margin-bottom: 12px;
-      text-decoration: underline;
-    }
+    .info-text { font-size: 12px; color: var(--greyDes); margin-top: 0; margin-bottom: 15px; font-style: italic; }
 
-    .label {
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      margin-top: 12px;
-      color: var(--text);
-      display: block;
-    }
+    /* customButton: width 30%, alignSelf center */
+    .custom-button { background-color: var(--green); padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; border: none; margin-bottom: 15px; width: 30%; display: block; margin-left: auto; margin-right: auto; }
 
-    .input-field {
-      width: 100%;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 14px;
-      margin-bottom: 12px;
-      background-color: var(--surface);
-      color: var(--textNormal);
-      outline: none;
-    }
+    .custom-button-text { color: var(--accent); font-size: 16px; font-weight: bold; }
 
-    .input-field:focus {
-      border-color: var(--tint);
-      box-shadow: 0 0 0 3px rgba(120, 41, 15, 0.2);
-    }
+    .id-photo-preview { width: 150px; height: 100px; border-radius: 8px; margin-top: 10px; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; object-fit: cover; }
 
-    .error-text {
-      color: var(--errorText);
-      font-size: 11px;
-      margin-top: -8px;
-      margin-bottom: 12px;
-      font-weight: 600;
-      display: none;
-    }
+    .picker-container { border: 1px solid var(--text); border-radius: 8px; overflow: hidden; margin-bottom: 15px; background-color: var(--surface); }
 
-    /* Password container styling */
-    .password-container {
-      position: relative;
-      margin-bottom: 12px;
-    }
+    .picker { height: 50px; width: 100%; border: none; background-color: var(--surface); font-size: 16px; color: var(--text); padding: 0 8px; outline: none; }
 
-    .password-container .input-field {
-      margin-bottom: 0;
-      padding-right: 50px;
-    }
+    .map-instruction-text { font-size: 14px; color: var(--textNormal); margin-bottom: 10px; text-align: center; }
 
-    .password-toggle-btn {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--textNormal);
-      cursor: pointer;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .map-container { height: 300px; width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 15px; border: 1.5px solid var(--tint); background-color: #d0e8f0; position: relative; display: flex; align-items: center; justify-content: center; cursor: crosshair; }
 
-    /* Buttons styling */
-    .custom-button {
-      background-color: var(--greenColor);
-      color: var(--accent);
-      padding: 14px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 14px;
-      text-align: center;
-      cursor: pointer;
-      border: none;
-      width: 100%;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
-    }
+    .map-placeholder { color: #555; font-size: 14px; text-align: center; pointer-events: none; user-select: none; }
 
-    .custom-button:hover {
-      opacity: 0.95;
-    }
+    .map-marker { position: absolute; font-size: 28px; transform: translate(-50%, -100%); pointer-events: none; }
 
-    .id-photo-preview {
-      width: 150px;
-      height: 100px;
-      border-radius: 8px;
-      margin: 10px auto 15px auto;
-      display: none;
-      background-size: cover;
-      background-position: center;
-      border: 1.5px dashed var(--tint);
-    }
+    .confirm-location-button { background-color: var(--tint) !important; }
 
-    /* Map container styling */
-    .map-instruction {
-      font-size: 12px;
-      color: var(--textNormal);
-      margin-bottom: 8px;
-      text-align: center;
-      font-style: italic;
-    }
+    .location-selected-text { font-size: 14px; color: var(--textNormal); text-align: center; margin-bottom: 15px; white-space: pre-line; }
 
-    .map-container {
-      height: 200px;
-      width: 100%;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 12px;
-      border: 1.5px solid var(--tint);
-      z-index: 1;
-    }
+    .work-days-container { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
 
-    .confirm-location-btn {
-      background-color: var(--tint);
-      color: var(--accent);
-      display: none;
-    }
+    .day-button { padding: 8px 12px; border: 1.5px solid var(--tint); border-radius: 20px; margin: 4px; cursor: pointer; background: none; }
+    .day-button.selected { background-color: var(--green); }
+    .day-button-text { color: var(--tint); font-size: 14px; }
+    .day-button.selected .day-button-text { color: var(--accent); }
 
-    .location-selected-text {
-      font-size: 12px;
-      color: var(--textNormal);
-      text-align: center;
-      margin-bottom: 12px;
-      font-weight: 600;
-      display: none;
-    }
+    /* timeInputContainer: selfAlign center */
+    .time-input-container { display: flex; flex-direction: row; align-items: center; margin-bottom: 15px; justify-content: center; }
 
-    /* Weekdays selection grid */
-    .workdays-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 6px;
-      margin-bottom: 16px;
-    }
+    .time-input { width: 50px; border: 1.5px solid var(--textNormal); border-radius: 8px; padding: 12px; font-size: 16px; text-align: center; background-color: var(--surface); outline: none; color: var(--text); }
+    .time-input::placeholder { color: #888; }
 
-    .day-button {
-      padding: 6px 12px;
-      border: 1.5px solid var(--tint);
-      border-radius: 20px;
-      background: none;
-      color: var(--tint);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .time-separator { font-size: 18px; margin: 0 5px; color: var(--textNormal); }
+    .time-range-text { font-size: 16px; margin: 0 10px; color: var(--textNormal); }
 
-    .day-button.selected {
-      background-color: var(--greenColor);
-      color: var(--accent);
-      border-color: var(--greenColor);
-    }
+    /* nextButton: width 30%, marginTop 20 */
+    .next-button { margin-top: 20px; width: 30% !important; }
+    .next-button.disabled { background-color: var(--greyDes) !important; opacity: 0.5; cursor: not-allowed; width: 30% !important; }
 
-    /* Time inputs grid matching style={styles.timeInput} exactly */
-    .time-input-container {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
+    /* checkbox row uses passwordInputContainer style */
+    .checkbox-row { display: flex; flex-direction: row; align-items: center; border: 1.5px solid var(--green); border-radius: 8px; margin-bottom: 15px; background-color: var(--surface); cursor: pointer; }
+    .checkbox-icon { padding: 12px; font-size: 24px; user-select: none; }
+    .checkbox-label { flex: 1; padding: 12px; font-size: 16px; color: var(--text); }
 
-    .time-input {
-      width: 50px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 14px;
-      text-align: center;
-      background-color: var(--surface);
-      color: var(--textNormal);
-      outline: none;
-    }
-
-    .time-input:focus {
-      border-color: var(--tint);
-    }
-
-    .time-separator {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--textNormal);
-    }
-
-    .time-range-text {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--textNormal);
-      margin: 0 4px;
-    }
-
-    /* Footer Suivant button */
-    .next-btn {
-      background-color: var(--greenColor);
-      margin-top: 16px;
-    }
-
-    .next-btn:disabled {
-      background-color: var(--greyDes) !important;
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .info-text {
-      font-size: 11px;
-      color: var(--greyDes);
-      margin-top: 8px;
-      margin-bottom: 12px;
-      font-style: italic;
-      text-align: center;
-    }
-
-    /* Spinner style inside buttons */
-    .spinner {
-      border: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top: 3px solid var(--accent);
-      width: 18px;
-      height: 18px;
-      animation: spin 0.8s linear infinite;
-      display: none;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    .spacer { height: 50px; }
   </style>
 </head>
 <body>
+<div class="container">
 
-  <div class="device-container">
-    <!-- Header top bar -->
-    <div class="top-header">
-      <div style="font-weight: 800; font-family: 'Outfit'; font-size: 15px; color: var(--tint);">Cegget Seller</div>
-      <div class="header-buttons">
-        <button class="lang-toggle" onclick="toggleLanguage()">
-          <ion-icon name="globe-outline"></ion-icon>
-          <span id="lang-text">Taqbaylit</span>
-        </button>
-        <button class="theme-toggle" onclick="toggleTheme()">
-          <ion-icon id="theme-icon" name="moon-outline"></ion-icon>
-          <span id="theme-text">Sombre</span>
-        </button>
-      </div>
+  <!-- ══════════════════ FORM SCREEN ══════════════════ -->
+  <div id="form-screen">
+
+    <p class="title">Inscrire mon magasin</p>
+
+    <!-- aboutYou -->
+    <p class="sidetitle">À propos de vous:</p>
+
+    <!-- nameLabel -->
+    <p class="label">Nom et Prénom * :</p>
+    <input class="input" type="text" placeholder="Votre nom et prénom" id="name" oninput="updateNextButton()" />
+
+    <!-- dobLabel -->
+    <p class="label">Date de naissance * :</p>
+    <input class="input" type="text" placeholder="JJ/MM/AAAA" maxlength="10" id="dob" oninput="handleDateInput(this)" />
+    {dobError}
+    <p class="error-text" id="dob-error" style="display:none;"></p>
+
+    <!-- phoneLabel -->
+    <p class="label">Numéro de téléphone :</p>
+    <input class="input" type="tel" placeholder="0XXXXXXXXX" maxlength="14" id="phone" oninput="handlePhoneInput(this)" />
+    {phoneError}
+    <p class="error-text" id="phone-error" style="display:none;"></p>
+
+    <!-- connectionInfo -->
+    <p class="sidetitle">Informations de connexion:</p>
+
+    <!-- emailLabel -->
+    <p class="label">Adresse email * :</p>
+    <input class="input" type="email" placeholder="adresse.email@exemple.com" id="email" oninput="updateNextButton()" />
+
+    <!-- passwordLabel -->
+    <p class="label">Mot de passe * :</p>
+    <div class="password-input-container">
+      <input class="password-input" type="password" placeholder="********" id="password" oninput="updateNextButton()" />
+      <button class="password-toggle" onclick="togglePassword()" id="eye-btn">👁</button>
     </div>
 
-    <!-- Scrollable content -->
-    <div class="scroll-content">
-      <h1 class="title" id="t-titleMgz">Inscrire mon magasin</h1>
+    <!-- activityInfo -->
+    <p class="sidetitle">Sur votre activité:</p>
 
-      <!-- Section: À propos de vous -->
-      <h2 class="sidetitle" id="t-aboutYou">À propos de vous:</h2>
-      
-      <label class="label" id="t-nameLabel">Nom et Prénom *</label>
-      <input type="text" class="input-field" id="name" placeholder="" oninput="validateForm()">
+    <!-- storeNameLabel -->
+    <p class="label">Nom du magasin :</p>
+    <input class="input" type="text" placeholder="Nom de votre magasin" id="storeName" oninput="updateNextButton()" />
 
-      <label class="label" id="t-dobLabel">Date de naissance *</label>
-      <input type="text" class="input-field" id="dob" placeholder="" maxlength="10" oninput="handleDobInput(this)">
-      <div class="error-text" id="dob-error">Date de naissance invalide ou moins de 19 ans.</div>
+    <!-- storePhotoLabel -->
+    <p class="label">Photo du magasin :</p>
+    <button class="custom-button" onclick="handleImportPhoto()">
+      <span class="custom-button-text">Importer une Photo</span>
+    </button>
+    <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="handlePhotoSelected(this)" />
+    <img id="id-photo-preview" class="id-photo-preview" src="" alt="" style="display:none;" />
 
-      <label class="label" id="t-phoneLabel">Numéro de téléphone *</label>
-      <input type="text" class="input-field" id="phone" placeholder="0XXXXXXXXX" maxlength="14" oninput="handlePhoneInput(this)">
-      <div class="error-text" id="phone-error">Numéro de téléphone invalide.</div>
-
-      <label class="label" id="t-idPhotoLabel">Photo de la CDI</label>
-      <button class="custom-button" onclick="triggerPhotoUpload()">
-        <span class="spinner" id="photo-spinner"></span>
-        <span id="t-importPhotoBtn">Importer une Photo</span>
-      </button>
-      <input type="file" id="photo-file" style="display: none;" accept="image/*" onchange="handlePhotoFile(this)">
-      <div class="id-photo-preview" id="photo-preview"></div>
-
-      <!-- Section: Connexion -->
-      <h2 class="sidetitle" id="t-connectionInfo">Informations de connexion:</h2>
-
-      <label class="label" id="t-emailLabel">Adresse email *</label>
-      <input type="email" class="input-field" id="email" placeholder="" oninput="validateForm()">
-
-      <label class="label" id="t-passwordLabel">Mot de passe *</label>
-      <div class="password-container">
-        <input type="password" class="input-field" id="password" placeholder="" oninput="validateForm()">
-        <button class="password-toggle-btn" onclick="togglePasswordVisibility()">
-          <ion-icon id="password-eye" name="eye-outline"></ion-icon>
-        </button>
-      </div>
-
-      <!-- Section: Activité -->
-      <h2 class="sidetitle" id="t-activityInfo">Sur votre activité:</h2>
-
-      <label class="label" id="t-storeNameLabel">Nom du magasin</label>
-      <input type="text" class="input-field" id="storeName" placeholder="" oninput="validateForm()">
-
-      <label class="label" id="t-storeTypes">Type de magasin</label>
-      <select class="input-field" id="storeType" onchange="validateForm()">
-        <!-- Populated dynamically via JS translations -->
+    <!-- storeTypes -->
+    <p class="label">Type de magasin :</p>
+    <div class="picker-container">
+      <select class="picker" id="storeType" onchange="updateNextButton()">
+        <option value="" disabled selected>-- Sélectionner un type --</option>
+        <option value="fast">Fast-food</option>
+        <option value="rest">Restaurant</option>
+        <option value="sup">Superette</option>
+        <option value="alim">Alimentation générale</option>
+        <option value="frleg">Fruits et légumes</option>
+        <option value="pzpat">Pizzeria et pâtisserie</option>
+        <option value="blnj">Boulangerie</option>
+        <option value="gatrad">Gâteaux traditionnels</option>
+        <option value="prodcos">Produits cosmétiques</option>
+        <option value="brtbc">Bureau-tabac</option>
+        <option value="bcvr">Boucherie (viande rouge)</option>
+        <option value="bcvb">Boucherie (viande blanche)</option>
+        <option value="pss">Poissonnerie</option>
+        <option value="epss">Épicerie</option>
+        <option value="cremerie">Crèmerie</option>
       </select>
-
-      <label class="label" id="t-commercialRegLabel">Numéro du registre de commerce *</label>
-      <input type="text" class="input-field" id="rcNumber" placeholder="" oninput="validateForm()">
-
-      <!-- Section: Adresse -->
-      <label class="label" id="t-communeLabel">Commune</label>
-      <input type="text" class="input-field" id="commune" placeholder="" oninput="validateForm()">
-
-      <label class="label" id="t-villageLabel">Chef-lieu / Village</label>
-      <input type="text" class="input-field" id="village" placeholder="" oninput="validateForm()">
-
-      <!-- Section: GPS -->
-      <label class="label" id="t-tab.gps">Localisation GPS</label>
-      <div class="map-instruction" id="t-simulateMapText">Cliquez sur la carte pour sélectionner</div>
-      <div class="map-container" id="map"></div>
-      
-      <button class="custom-button confirm-location-btn" id="confirm-gps" onclick="confirmLocation()">
-        <span id="t-confirmLocationBtn">Confirmer la Position sur la carte</span>
-      </button>
-      <div class="location-selected-text" id="gps-text">Position sélectionnée !</div>
-
-      <!-- Section: Jours d'ouverture -->
-      <h2 class="sidetitle" id="t-workDaysLabel">Journées de travail</h2>
-      <div class="workdays-container" id="days-container">
-        <!-- Populated dynamically to match translation -->
-      </div>
-
-      <!-- Section: Horaires -->
-      <h2 class="sidetitle" id="t-workHoursLabel">Horaire de travail</h2>
-
-      <label class="label" id="t-weekdaysText">Jours de semaine</label>
-      <div class="time-input-container">
-        <input type="text" class="time-input" id="wd-oh" placeholder="HH" maxlength="2" oninput="handleTimeInput(this, 'weekday')">
-        <span class="time-separator">:</span>
-        <input type="text" class="time-input" id="wd-om" placeholder="MM" maxlength="2" oninput="handleTimeInput(this, 'weekday')">
-        <span class="time-range-text">-</span>
-        <input type="text" class="time-input" id="wd-ch" placeholder="HH" maxlength="2" oninput="handleTimeInput(this, 'weekday')">
-        <span class="time-separator">:</span>
-        <input type="text" class="time-input" id="wd-cm" placeholder="MM" maxlength="2" oninput="handleTimeInput(this, 'weekday')">
-      </div>
-      <div class="error-text" id="weekday-time-error">Format ou ordre des heures invalide.</div>
-
-      <label class="label" id="t-weekendText">Weekend</label>
-      <div class="time-input-container">
-        <input type="text" class="time-input" id="we-oh" placeholder="HH" maxlength="2" oninput="handleTimeInput(this, 'weekend')">
-        <span class="time-separator">:</span>
-        <input type="text" class="time-input" id="we-om" placeholder="MM" maxlength="2" oninput="handleTimeInput(this, 'weekend')">
-        <span class="time-range-text">-</span>
-        <input type="text" class="time-input" id="we-ch" placeholder="HH" maxlength="2" oninput="handleTimeInput(this, 'weekend')">
-        <span class="time-separator">:</span>
-        <input type="text" class="time-input" id="we-cm" placeholder="MM" maxlength="2" oninput="handleTimeInput(this, 'weekend')">
-      </div>
-      <div class="error-text" id="weekend-time-error">Format ou ordre des heures invalide.</div>
-
-      <!-- Action Button -->
-      <button class="custom-button next-btn" id="next-submit-btn" disabled onclick="submitRegistration()">
-        <span class="spinner" id="submit-spinner"></span>
-        <span id="t-nextButton">Suivant</span>
-      </button>
-
-      <div class="info-text" id="t-noteVerification">Les informations comportant une * ne seront pas rendues publiques, elles serviront pour la vérification de votre identité.</div>
     </div>
+
+    <!-- commercialRegLabel — keyboardType="default" donc type="text" -->
+    <p class="label">Numéro du registre de commerce * :</p>
+    <input class="input" type="text" placeholder="Entrez le numéro" id="commercialReg" oninput="updateNextButton()" />
+
+    <!-- storeAddressLabel -->
+    <p class="label">Adresse du magasin :</p>
+
+    <!-- communeLabel -->
+    <p class="label">Commune :</p>
+    <input class="input" type="text" placeholder="Entrez la commune" id="commune" oninput="updateNextButton()" />
+
+    <!-- villageLabel -->
+    <p class="label">Chef-lieu / Village :</p>
+    <input class="input" type="text" placeholder="Entrez le chef-lieu ou village" id="village" oninput="updateNextButton()" />
+
+    <!-- tab.gps -->
+    <p class="label">Localisation GPS :</p>
+    <p class="map-instruction-text">Touchez la carte pour sélectionner</p>
+    <div class="map-container" id="map" onclick="handleMapPress(event)">
+      <p class="map-placeholder">🗺️ Carte interactive<br/>(Cliquez pour sélectionner une position)</p>
+      <div class="map-marker" id="map-marker" style="display:none;">📍</div>
+    </div>
+
+    <!-- confirmLocationButton — visible si tempSelectedLocation -->
+    <button class="custom-button confirm-location-button" id="confirm-location-btn" style="display:none;" onclick="handleConfirmLocation()">
+      <span class="custom-button-text">Confirmer la Position sur la carte</span>
+    </button>
+
+    <!-- locationSelectedText — visible si location confirmée -->
+    <p class="location-selected-text" id="location-selected-text" style="display:none;"></p>
+
+    <!-- workDaysLabel -->
+    <p class="sidetitle">Journées de travail :</p>
+    <div class="work-days-container">
+      <button class="day-button" onclick="toggleDay(this,'Sunday')"><span class="day-button-text">Dimanche</span></button>
+      <button class="day-button" onclick="toggleDay(this,'Monday')"><span class="day-button-text">Lundi</span></button>
+      <button class="day-button" onclick="toggleDay(this,'Tuesday')"><span class="day-button-text">Mardi</span></button>
+      <button class="day-button" onclick="toggleDay(this,'Wednesday')"><span class="day-button-text">Mercredi</span></button>
+      <button class="day-button" onclick="toggleDay(this,'Thursday')"><span class="day-button-text">Jeudi</span></button>
+      <button class="day-button" onclick="toggleDay(this,'Friday')"><span class="day-button-text">Vendredi</span></button>
+      <button class="day-button" onclick="toggleDay(this,'Saturday')"><span class="day-button-text">Samedi</span></button>
+    </div>
+
+    <!-- workHoursLabel -->
+    <p class="sidetitle">Horaire de travail :</p>
+
+    <!-- weekdaysText -->
+    <p class="label">Jours de semaine :</p>
+    <div class="time-input-container">
+      <input class="time-input" type="text" placeholder="HH" maxlength="2" id="wd-oh" oninput="handleTimeInput('weekday','open','h',this)" />
+      <span class="time-separator">:</span>
+      <input class="time-input" type="text" placeholder="MM" maxlength="2" id="wd-om" oninput="handleTimeInput('weekday','open','m',this)" />
+      <span class="time-range-text"> - </span>
+      <input class="time-input" type="text" placeholder="HH" maxlength="2" id="wd-ch" oninput="handleTimeInput('weekday','close','h',this)" />
+      <span class="time-separator">:</span>
+      <input class="time-input" type="text" placeholder="MM" maxlength="2" id="wd-cm" oninput="handleTimeInput('weekday','close','m',this)" />
+    </div>
+    <p class="error-text" id="weekday-time-error" style="display:none;"></p>
+
+    <!-- weekendText -->
+    <p class="label">Weekend :</p>
+    <div class="time-input-container">
+      <input class="time-input" type="text" placeholder="HH" maxlength="2" id="we-oh" oninput="handleTimeInput('weekend','open','h',this)" />
+      <span class="time-separator">:</span>
+      <input class="time-input" type="text" placeholder="MM" maxlength="2" id="we-om" oninput="handleTimeInput('weekend','open','m',this)" />
+      <span class="time-range-text"> - </span>
+      <input class="time-input" type="text" placeholder="HH" maxlength="2" id="we-ch" oninput="handleTimeInput('weekend','close','h',this)" />
+      <span class="time-separator">:</span>
+      <input class="time-input" type="text" placeholder="MM" maxlength="2" id="we-cm" oninput="handleTimeInput('weekend','close','m',this)" />
+    </div>
+    <p class="error-text" id="weekend-time-error" style="display:none;"></p>
+
+    <!-- nextButton -->
+    <button class="custom-button next-button disabled" id="next-btn" onclick="handleNext()">
+      <span class="custom-button-text">Suivant</span>
+    </button>
+
+    <!-- noteVerification -->
+    <p class="info-text">Les informations comportant une * ne seront pas rendues publiques, elles serviront pour la vérification de votre identité.</p>
+    <div class="spacer"></div>
   </div>
 
-  <script>
-    // Exact translation dictionary matching fr.json and kab.json
-    const translations = {
-      fr: {
-        "titleMgz": "Inscrire mon magasin",
-        "aboutYou": "À propos de vous:",
-        "nameLabel": "Nom et Prénom *",
-        "placeholderFullName": "Votre nom et prénom",
-        "dobLabel": "Date de naissance *",
-        "dobPlaceholder": "JJ/MM/AAAA",
-        "phoneLabel": "Numéro de téléphone *",
-        "idPhotoLabel": "Photo de la CDI",
-        "importPhotoBtn": "Importer une Photo",
-        "connectionInfo": "Informations de connexion:",
-        "emailLabel": "Adresse email *",
-        "emailPlaceholder": "Entrez votre email",
-        "passwordLabel": "Mot de passe *",
-        "passwordPlaceholder": "Créez votre mot de passe",
-        "activityInfo": "Sur votre activité:",
-        "storeNameLabel": "Nom du magasin",
-        "storeNamePlaceholder": "Nom de votre magasin",
-        "storeTypes": "Type de magasin",
-        "storeTypePlaceholder": "-- Sélectionner un type --",
-        "commercialRegLabel": "Numéro du registre de commerce *",
-        "commercialRegPlaceholder": "Entrez le numéro",
-        "communeLabel": "Commune",
-        "communePlaceholder": "Entrez la commune",
-        "villageLabel": "Chef-lieu / Village",
-        "villagePlaceholder": "Entrez le chef-lieu ou village",
-        "tab.gps": "Localisation GPS",
-        "simulateMapText": "Cliquez sur la carte pour sélectionner",
-        "confirmLocationBtn": "Confirmer la Position sur la carte",
-        "workDaysLabel": "Journées de travail",
-        "workHoursLabel": "Horaire de travail",
-        "weekdaysText": "Jours de semaine",
-        "weekendText": "Weekend",
-        "nextButton": "Suivant",
-        "noteVerification": "Les informations comportant une * ne seront pas rendues publiques, elles serviront pour la vérification de votre identité.",
-        "dobError": "Date de naissance invalide.",
-        "errorBirthDateAgeTooYoung": "Vous devez avoir au moins 19 ans.",
-        "phoneError": "Numéro de téléphone invalide.",
-        "errorPhoneStart": "Le numéro doit commencer par 05, 06 ou 07.",
-        "timeOrderError": "L'heure de fermeture doit être après l'heure d'ouverture.",
-        "locationSelected": "Position sélectionnée !",
-        "uploading": "Téléchargement...",
-        "registering": "Inscription en cours...",
-        "successMsg": "🎉 Compte Magasin créé avec succès ! Vos données ont été enregistrées sur le serveur Appwrite et l'image d'identité a été hébergée sur Cloudflare R2.",
-        "days": {
-          "Sunday": "Dimanche",
-          "Monday": "Lundi",
-          "Tuesday": "Mardi",
-          "Wednesday": "Mercredi",
-          "Thursday": "Jeudi",
-          "Friday": "Vendredi",
-          "Saturday": "Samedi"
-        },
-        "types": {
-          "fast": "Fast-food",
-          "rest": "Restaurant",
-          "sup": "Superette",
-          "alim": "Alimentation générale",
-          "frleg": "Fruits et légumes",
-          "pzpat": "Pizzeria et pâtisserie",
-          "blnj": "Boulangerie",
-          "pss": "Poissonnerie",
-          "cremerie": "Crèmerie"
-        }
-      },
-      kab: {
-        "titleMgz": "Ad jerdeɣ taḥanuţ-iw",
-        "aboutYou": "Ɣef yiman-iw:",
-        "nameLabel": "Tafamilt d yisem *",
-        "placeholderFullName": "Tafamilt d yisem",
-        "dobLabel": "Ass n tlalit *",
-        "dobPlaceholder": "ASS/AGGUR/ASEGGAS",
-        "phoneLabel": "Uṭṭun n tilifun*",
-        "idPhotoLabel": "Tugna n nnekwa",
-        "importPhotoBtn": "Aggʷay n tugna",
-        "connectionInfo": "I unekcum:",
-        "emailLabel": "L'email *",
-        "emailPlaceholder": "Aru-d l'email-ik/im",
-        "passwordLabel": "Awal uffir *",
-        "passwordPlaceholder": "Snulfu-d awal uffir",
-        "activityInfo": "Ɣef ixeddim-ik/im:",
-        "storeNameLabel": "Isem n tḥanuţ",
-        "storeNamePlaceholder": "Aru-d isem n tḥanuţ-ik/im",
-        "storeTypes": "Ṣṣifa n tḥanuţ",
-        "storeTypePlaceholder": "-- Xtaṛed yiwet --",
-        "commercialRegLabel": "Uṭṭun n Registre de commerce *",
-        "commercialRegPlaceholder": "Ssekcem uṭṭun",
-        "communeLabel": "Taɣiwant",
-        "communePlaceholder": "Ssekcem taɣiwant",
-        "villageLabel": "Chef-lieu / Taddart",
-        "villagePlaceholder": "Ssekcem Chef-lieu neɣ taddart",
-        "tab.gps": "Imukan s GPS",
-        "simulateMapText": "Nnal lkaṛta i wakken ad xtiṛeḍ",
-        "confirmLocationBtn": "D wagi i d amekkan ɣef lkaṛta",
-        "workDaysLabel": "Ussan n lxedma",
-        "workHoursLabel": "Sswayeɛ n lxedma",
-        "weekdaysText": "Ussan n smana",
-        "weekendText": "Tagara n dduṛt",
-        "nextButton": "Ɣer zdat",
-        "noteVerification": "Ayen akk i yesɛan * ad yeţwasexdam kan i wakken ad nẓer ma tzemreḍ ad tiliḍ di CEGGET, ad yeqqim kan gar-aneɣ ur tnezuzzur ara.",
-        "dobError": "Ass n tlalit ur iwulem ara.",
-        "errorBirthDateAgeTooYoung": "Ilaq ad tesɛuḍ 19 n yiseggasen neɣ uger.",
-        "phoneError": "Uṭṭun n tilifun ur iwulem ara.",
-        "errorPhoneStart": "Uṭṭun ilaq ad yebdu s 05, 06 neɣ 07.",
-        "timeOrderError": "Ssaɛar n umdal, ilaq ad tili umbaɛd tin n ulday.",
-        "locationSelected": "Amekkan yeţwaxtar !",
-        "uploading": "Aceggaɛ...",
-        "registering": "Ad jerdeɣ...",
-        "successMsg": "🎉 Dayen! Taḥnuţ-ik/im teţwajered s tewlelyt deg Appwrite u tugna teţwaceggeɛ ɣer Cloudflare R2.",
-        "days": {
-          "Sunday": "Lḥed",
-          "Monday": "Letniyen",
-          "Tuesday": "Ţlata",
-          "Wednesday": "Laṛevɛa",
-          "Thursday": "Lexmis",
-          "Friday": "Lǧemɛa",
-          "Saturday": "Ssebt"
-        },
-        "types": {
-          "fast": "Fast-food",
-          "rest": "Asečči",
-          "sup": "Superette",
-          "alim": "Alimentation générale",
-          "frleg": "Tidelt d ugama",
-          "pzpat": "Pizzeria d pâtisserie",
-          "blnj": "Lkuca",
-          "pss": "Lḥut",
-          "cremerie": "Asečči d uyefki"
-        }
-      }
-    };
+  <!-- ══════════════════ COMMISSION SCREEN ══════════════════ -->
+  <div id="commission-screen" style="display:none;">
 
-    let currentLang = 'fr';
-    let selectedLocation = null;
-    let selectedDays = [];
-    let idPhotoImported = false;
+    <p class="title" id="commission-title">Commissions</p>
 
-    // Load active language translations
-    function applyTranslations() {
-      const data = translations[currentLang];
+    <p class="sidetitle">Type de magasin :</p>
+    <p class="label" id="commission-store-type-label"></p>
 
-      // Update basic text contents
-      document.getElementById('t-titleMgz').innerText = data.titleMgz;
-      document.getElementById('t-aboutYou').innerText = data.aboutYou;
-      document.getElementById('t-nameLabel').innerText = data.nameLabel;
-      document.getElementById('name').placeholder = data.placeholderFullName;
-      document.getElementById('t-dobLabel').innerText = data.dobLabel;
-      document.getElementById('dob').placeholder = data.dobPlaceholder;
-      document.getElementById('t-phoneLabel').innerText = data.phoneLabel;
-      document.getElementById('t-idPhotoLabel').innerText = data.idPhotoLabel;
-      document.getElementById('t-importPhotoBtn').innerText = idPhotoImported ? (currentLang === 'fr' ? 'Modifier la Photo' : 'Veddel tugna') : data.importPhotoBtn;
-      document.getElementById('t-connectionInfo').innerText = data.connectionInfo;
-      document.getElementById('t-emailLabel').innerText = data.emailLabel;
-      document.getElementById('email').placeholder = data.emailPlaceholder || "email@cegget.com";
-      document.getElementById('t-passwordLabel').innerText = data.passwordLabel;
-      document.getElementById('password').placeholder = data.passwordPlaceholder;
-      document.getElementById('t-activityInfo').innerText = data.activityInfo;
-      document.getElementById('t-storeNameLabel').innerText = data.storeNameLabel;
-      document.getElementById('storeName').placeholder = data.storeNamePlaceholder;
-      document.getElementById('t-storeTypes').innerText = data.storeTypes;
-      document.getElementById('t-commercialRegLabel').innerText = data.commercialRegLabel;
-      document.getElementById('rcNumber').placeholder = data.commercialRegPlaceholder;
-      document.getElementById('t-communeLabel').innerText = data.communeLabel;
-      document.getElementById('commune').placeholder = data.communePlaceholder;
-      document.getElementById('t-villageLabel').innerText = data.villageLabel;
-      document.getElementById('village').placeholder = data.villagePlaceholder;
-      document.getElementById('t-tab.gps').innerText = data["tab.gps"];
-      document.getElementById('t-simulateMapText').innerText = data.simulateMapText;
-      document.getElementById('t-confirmLocationBtn').innerText = data.confirmLocationBtn;
-      document.getElementById('t-workDaysLabel').innerText = data.workDaysLabel;
-      document.getElementById('t-workHoursLabel').innerText = data.workHoursLabel;
-      document.getElementById('t-weekdaysText').innerText = data.weekdaysText;
-      document.getElementById('t-weekendText').innerText = data.weekendText;
-      document.getElementById('t-nextButton').innerText = data.nextButton;
-      document.getElementById('t-noteVerification').innerText = data.noteVerification;
+    <p class="sidetitle" id="lbl-commission-orders">Commissions sur commandes</p>
+    <p class="label" id="commission-percentage-label"></p>
+    <p class="info-text" id="commission-orders-desc"></p>
 
-      // Populate store type options
-      const storeSelect = document.getElementById('storeType');
-      const currentVal = storeSelect.value;
-      storeSelect.innerHTML = `<option value="" disabled selected>${data.storeTypePlaceholder}</option>`;
-      for (const [key, label] of Object.entries(data.types)) {
-        storeSelect.innerHTML += `<option value="${key}">${label}</option>`;
-      }
-      if (currentVal) storeSelect.value = currentVal;
+    <p class="sidetitle" id="lbl-commission-views">Commissions sur vues</p>
+    <p class="label" id="commission-view-rate-label"></p>
+    <p class="info-text" id="commission-views-desc"></p>
+    <p class="info-text" id="commission-formula"></p>
 
-      // Populate opening days buttons
-      const daysContainer = document.getElementById('days-container');
-      daysContainer.innerHTML = '';
-      for (const [key, label] of Object.entries(data.days)) {
-        const isSelected = selectedDays.includes(key);
-        daysContainer.innerHTML += `
-          <button class="day-button ${isSelected ? 'selected' : ''}" onclick="toggleDay(this, '${key}')">
-            ${label}
-          </button>
-        `;
-      }
+    <!-- termsAcceptance — passwordInputContainer style -->
+    <div class="checkbox-row" onclick="toggleTerms()">
+      <span class="checkbox-icon" id="checkbox-icon">☐</span>
+      <span class="checkbox-label">J'accepte les conditions</span>
+    </div>
 
-      // Re-trigger active validation check in active lang
-      validateForm();
+    <!-- acceptAndRegister -->
+    <button class="custom-button next-button disabled" id="register-btn" onclick="handleRegister()">
+      <span class="custom-button-text">Accepter et s'inscrire</span>
+    </button>
+
+    <p class="info-text" id="commission-note"></p>
+    <div class="spacer"></div>
+  </div>
+
+</div>
+
+<script>
+  const state = {
+    dob: '', phoneNumber: '', photo: null, location: null, workDays: [],
+    weekdayOpening: { hour: '', minute: '' }, weekdayClosing: { hour: '', minute: '' },
+    weekendOpening: { hour: '', minute: '' }, weekendClosing: { hour: '', minute: '' },
+  };
+  let dobError = '', phoneError = '', weekdayTimeError = '', weekendTimeError = '';
+  let passwordVisible = false, tempSelectedLocation = null, termsAccepted = false;
+
+  const COMMISSION_MAP = {
+    fast: 2.51, rest: 2.8, sup: 3.458, alim: 1.9, frleg: 2.51,
+    pzpat: 2.6, blnj: 1.43, gatrad: 2.45, prodcos: 2.825,
+    brtbc: 2.45, bcvr: 2.83, bcvb: 2.5, pss: 2.2, epss: 2.0, cremerie: 2.55,
+  };
+
+  function togglePassword() {
+    passwordVisible = !passwordVisible;
+    document.getElementById('password').type = passwordVisible ? 'text' : 'password';
+    document.getElementById('eye-btn').textContent = passwordVisible ? '🙈' : '👁';
+  }
+
+  function daysInMonth(m, y) { return new Date(y, m, 0).getDate(); }
+
+  function validateDate(s) {
+    if (!s) return '';
+    const parts = s.split('/').map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return 'Date de naissance invalide.';
+    const [day, month, year] = parts;
+    if (month < 1 || month > 12) return 'Le mois doit être compris entre 01 et 12.';
+    if (day < 1 || day > daysInMonth(month, year)) return 'Jour invalide pour ce mois.';
+    const bd = new Date(year, month - 1, day);
+    const today = new Date();
+    let age = today.getFullYear() - bd.getFullYear();
+    const m2 = today.getMonth() - bd.getMonth();
+    if (m2 < 0 || (m2 === 0 && today.getDate() < bd.getDate())) age--;
+    if (age < 19) return 'Vous devez avoir au moins 19 ans';
+    if (age > 100) return 'Vous avez plus que ce qui est permis sur cette application.';
+    return '';
+  }
+
+  function handleDateInput(el) {
+    let v = el.value.replace(/[^0-9]/g, '');
+    if (v.length >= 2) v = v.slice(0,2) + '/' + v.slice(2);
+    if (v.length >= 5) v = v.slice(0,5) + '/' + v.slice(5);
+    if (v.length > 10) v = v.slice(0,10);
+    el.value = v; state.dob = v;
+    dobError = (v.length === 10 || v.length === 0) ? validateDate(v) : '';
+    showError('dob-error', dobError);
+    updateNextButton();
+  }
+
+  function validatePhone(s) {
+    if (!s) return '';
+    const c = s.replace(/\s/g,'');
+    if (c.length !== 10) return 'Numéro incomplet (10 chiffres requis).';
+    if (!/^(05|06|07)\d{8}$/.test(c)) return 'Le numéro doit commencer par 05, 06 ou 07.';
+    return '';
+  }
+
+  function handlePhoneInput(el) {
+    let v = el.value.replace(/\D/g,'');
+    if (v.length > 10) v = v.slice(0,10);
+    let d = '';
+    if (v.length > 0) d += v.slice(0,2);
+    if (v.length > 2) d += ' ' + v.slice(2,4);
+    if (v.length > 4) d += ' ' + v.slice(4,6);
+    if (v.length > 6) d += ' ' + v.slice(6,8);
+    if (v.length > 8) d += ' ' + v.slice(8,10);
+    el.value = d; state.phoneNumber = d;
+    const c = d.replace(/\s/g,'');
+    phoneError = (c.length === 10 || c.length === 0) ? validatePhone(c) : '';
+    showError('phone-error', phoneError);
+    updateNextButton();
+  }
+
+  function handleImportPhoto() { document.getElementById('photo-input').click(); }
+
+  function handlePhotoSelected(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        state.photo = e.target.result;
+        const img = document.getElementById('id-photo-preview');
+        img.src = e.target.result; img.style.display = 'block';
+        updateNextButton();
+      };
+      reader.readAsDataURL(input.files[0]);
     }
+  }
 
-    // Toggle between French and Kabyle
-    function toggleLanguage() {
-      const btnText = document.getElementById('lang-text');
-      if (currentLang === 'fr') {
-        currentLang = 'kab';
-        btnText.innerText = 'Français';
-      } else {
-        currentLang = 'fr';
-        btnText.innerText = 'Taqbaylit';
-      }
-      applyTranslations();
+  function handleMapPress(event) {
+    const map = document.getElementById('map');
+    const rect = map.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const lat = (36.7 + (0.5 - y / rect.height) * 0.2).toFixed(6);
+    const lng = (3.05 + (x / rect.width - 0.5) * 0.2).toFixed(6);
+    tempSelectedLocation = { latitude: parseFloat(lat), longitude: parseFloat(lng) };
+    const marker = document.getElementById('map-marker');
+    marker.style.display = 'block';
+    marker.style.left = x + 'px';
+    marker.style.top  = y + 'px';
+    document.getElementById('confirm-location-btn').style.display = 'block';
+    updateNextButton();
+  }
+
+  function handleConfirmLocation() {
+    if (tempSelectedLocation) {
+      state.location = { ...tempSelectedLocation };
+      const el = document.getElementById('location-selected-text');
+      el.style.display = 'block';
+      el.textContent = 'Localisation sélectionnée:\nLat: ' + state.location.latitude + '\nLng: ' + state.location.longitude;
+      updateNextButton();
     }
+  }
 
-    // Theme toggle
-    function toggleTheme() {
-      const body = document.body;
-      const currentTheme = body.getAttribute('data-theme');
-      const icon = document.getElementById('theme-icon');
-      const text = document.getElementById('theme-text');
+  function toggleDay(btn, day) {
+    const idx = state.workDays.indexOf(day);
+    if (idx >= 0) { state.workDays.splice(idx,1); btn.classList.remove('selected'); }
+    else          { state.workDays.push(day);      btn.classList.add('selected'); }
+    updateNextButton();
+  }
 
-      if (currentTheme === 'dark') {
-        body.removeAttribute('data-theme');
-        icon.setAttribute('name', 'moon-outline');
-        text.innerText = 'Sombre';
-      } else {
-        body.setAttribute('data-theme', 'dark');
-        icon.setAttribute('name', 'sunny-outline');
-        text.innerText = 'Clair';
-      }
+  function validateTime(t) {
+    if (!t.hour && !t.minute) return '';
+    const h = parseInt(t.hour,10), m = parseInt(t.minute,10);
+    if (t.hour.length!==2||t.minute.length!==2||isNaN(h)||isNaN(m)) return 'Format invalide (HH:MM).';
+    if (h<0||h>23) return 'Heure doit être entre entre 00 et 23.';
+    if (m<0||m>59) return 'Minutes doivent être entre 00 et 59.';
+    return '';
+  }
+
+  function validateTimePair(open, close) {
+    const oe = validateTime(open); if (oe) return oe;
+    const ce = validateTime(close); if (ce) return ce;
+    if ((!open.hour||!open.minute)&&(!close.hour||!close.minute)) return '';
+    if ((!open.hour||!open.minute)||(!close.hour||!close.minute)) return 'Format invalide (HH:MM).';
+    const om = parseInt(open.hour,10)*60+parseInt(open.minute,10);
+    const cm = parseInt(close.hour,10)*60+parseInt(close.minute,10);
+    if (cm < om) return "L'heure de fermeture doit être après l'heure d'ouverture.";
+    return '';
+  }
+
+  function handleTimeInput(day, oc, part, el) {
+    let v = el.value.replace(/\D/g,'');
+    if (v.length > 2) v = v.slice(0,2);
+    el.value = v;
+    const field = day==='weekday'
+      ? (oc==='open' ? 'weekdayOpening' : 'weekdayClosing')
+      : (oc==='open' ? 'weekendOpening' : 'weekendClosing');
+    state[field][part==='h'?'hour':'minute'] = v;
+    if (day==='weekday') {
+      weekdayTimeError = validateTimePair(state.weekdayOpening, state.weekdayClosing);
+      showError('weekday-time-error', weekdayTimeError);
+    } else {
+      weekendTimeError = validateTimePair(state.weekendOpening, state.weekendClosing);
+      showError('weekend-time-error', weekendTimeError);
     }
+    updateNextButton();
+  }
 
-    // Initialize Mapbox/Leaflet Map
-    const map = L.map('map').setView([36.72, 4.05], 13); // Default centered on Tizi Ouzou area
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+  function isFormValid() {
+    const name  = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const pass  = document.getElementById('password').value.trim();
+    const crn   = document.getElementById('commercialReg').value.trim();
+    const st    = document.getElementById('storeType').value;
+    const filled =
+      name !== '' && state.dob.trim() !== '' && state.phoneNumber.trim() !== '' &&
+      email !== '' && pass !== '' && crn !== '' &&
+      state.location !== null && state.photo !== null &&
+      state.workDays.length > 0 &&
+      state.weekdayOpening.hour !== '' && state.weekdayOpening.minute !== '' &&
+      state.weekdayClosing.hour !== '' && state.weekdayClosing.minute !== '' &&
+      state.weekendOpening.hour !== '' && state.weekendOpening.minute !== '' &&
+      state.weekendClosing.hour !== '' && state.weekendClosing.minute !== '';
+    const noErrors = dobError===''&&phoneError===''&&weekdayTimeError===''&&weekendTimeError==='';
+    return filled && noErrors && st !== '';
+  }
 
-    let marker = null;
+  function updateNextButton() {
+    const btn = document.getElementById('next-btn');
+    isFormValid() ? btn.classList.remove('disabled') : btn.classList.add('disabled');
+  }
 
-    map.on('click', function(e) {
-      const lat = e.latlng.lat.toFixed(6);
-      const lng = e.latlng.lng.toFixed(6);
-      
-      if (marker) {
-        marker.setLatLng(e.latlng);
-      } else {
-        // Red marker matching theme.errorText
-        const redIcon = L.icon({
-          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
-        });
-        marker = L.marker(e.latlng, { icon: redIcon }).addTo(map);
-      }
+  function handleNext() {
+    if (!isFormValid()) return;
+    const sel = document.getElementById('storeType');
+    const storeTypeVal   = sel.value;
+    const storeTypeLabel = sel.options[sel.selectedIndex].text;
+    const commPct  = COMMISSION_MAP[storeTypeVal] || 0;
+    const viewRate = (commPct / 10).toFixed(3);
+    document.getElementById('commission-store-type-label').textContent = storeTypeLabel;
+    document.getElementById('commission-percentage-label').textContent = commPct + '%';
+    document.getElementById('commission-view-rate-label').textContent  = viewRate + ' DA / vue';
+    document.getElementById('commission-formula').textContent =
+      '(' + commPct + '% / 10) × total des vues — multiplicateur pickup ×5';
+    document.getElementById('form-screen').style.display = 'none';
+    document.getElementById('commission-screen').style.display = 'block';
+  }
 
-      selectedLocation = { lat, lng };
-      document.getElementById('confirm-gps').style.display = 'flex';
-      validateForm();
-    });
+  function toggleTerms() {
+    termsAccepted = !termsAccepted;
+    document.getElementById('checkbox-icon').textContent = termsAccepted ? '☑' : '☐';
+    const btn = document.getElementById('register-btn');
+    termsAccepted ? btn.classList.remove('disabled') : btn.classList.add('disabled');
+  }
 
-    function confirmLocation() {
-      if (selectedLocation) {
-        const text = translations[currentLang].locationSelected;
-        document.getElementById('gps-text').innerText = `${text} Lat: ${selectedLocation.lat}, Lng: ${selectedLocation.lng}`;
-        document.getElementById('gps-text').style.display = 'block';
-        validateForm();
-      }
-    }
+  function handleRegister() {
+    if (!termsAccepted) return;
+    alert('Succès\nInscription réussie! Bienvenu parmi nous.');
+  }
 
-    // Input masks & validations
-    function handleDobInput(el) {
-      let value = el.value.replace(/\D/g, '');
-      if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2);
-      if (value.length > 5) value = value.slice(0, 5) + '/' + value.slice(5);
-      el.value = value.slice(0, 10);
-
-      const errorDiv = document.getElementById('dob-error');
-      if (el.value.length === 10) {
-        const parts = el.value.split('/');
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10);
-        const year = parseInt(parts[2], 10);
-
-        const birthDate = new Date(year, month - 1, day);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-
-        if (month < 1 || month > 12 || day < 1 || day > 31 || isNaN(age) || age < 19 || age > 100) {
-          errorDiv.innerText = translations[currentLang].dobError;
-          errorDiv.style.display = 'block';
-        } else {
-          errorDiv.style.display = 'none';
-        }
-      } else {
-        errorDiv.style.display = 'none';
-      }
-      validateForm();
-    }
-
-    function handlePhoneInput(el) {
-      let value = el.value.replace(/\D/g, '');
-      if (value.length > 10) value = value.slice(0, 10);
-
-      let formatted = '';
-      if (value.length > 0) formatted += value.slice(0, 2);
-      if (value.length > 2) formatted += ' ' + value.slice(2, 4);
-      if (value.length > 4) formatted += ' ' + value.slice(4, 6);
-      if (value.length > 6) formatted += ' ' + value.slice(6, 8);
-      if (value.length > 8) formatted += ' ' + value.slice(8, 10);
-
-      el.value = formatted;
-
-      const errorDiv = document.getElementById('phone-error');
-      const cleaned = value;
-      if (cleaned.length === 10) {
-        if (!/^(05|06|07)\d{8}$/.test(cleaned)) {
-          errorDiv.innerText = translations[currentLang].errorPhoneStart;
-          errorDiv.style.display = 'block';
-        } else {
-          errorDiv.style.display = 'none';
-        }
-      } else {
-        errorDiv.style.display = 'none';
-      }
-      validateForm();
-    }
-
-    function triggerPhotoUpload() {
-      document.getElementById('photo-file').click();
-    }
-
-    function handlePhotoFile(input) {
-      if (input.files && input.files[0]) {
-        const spinner = document.getElementById('photo-spinner');
-        const btnText = document.getElementById('t-importPhotoBtn');
-        
-        spinner.style.display = 'inline-block';
-        btnText.innerText = translations[currentLang].uploading;
-
-        setTimeout(() => {
-          spinner.style.display = 'none';
-          idPhotoImported = true;
-          btnText.innerText = currentLang === 'fr' ? 'Modifier la Photo' : 'Veddel tugna';
-
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const preview = document.getElementById('photo-preview');
-            preview.style.backgroundImage = `url(${e.target.result})`;
-            preview.style.display = 'block';
-          };
-          reader.readAsDataURL(input.files[0]);
-          validateForm();
-        }, 1200);
-      }
-    }
-
-    function togglePasswordVisibility() {
-      const passwordInput = document.getElementById('password');
-      const eyeIcon = document.getElementById('password-eye');
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        eyeIcon.setAttribute('name', 'eye-off-outline');
-      } else {
-        passwordInput.type = 'password';
-        eyeIcon.setAttribute('name', 'eye-outline');
-      }
-    }
-
-    function toggleDay(button, day) {
-      button.classList.toggle('selected');
-      if (selectedDays.includes(day)) {
-        selectedDays = selectedDays.filter(d => d !== day);
-      } else {
-        selectedDays.push(day);
-      }
-      validateForm();
-    }
-
-    function handleTimeInput(el, type) {
-      el.value = el.value.replace(/\D/g, '').slice(0, 2);
-      
-      const errorDiv = document.getElementById(`${type}-time-error`);
-      const oh = document.getElementById(`${type === 'weekday' ? 'wd' : 'we'}-oh`).value;
-      const om = document.getElementById(`${type === 'weekday' ? 'wd' : 'we'}-om`).value;
-      const ch = document.getElementById(`${type === 'weekday' ? 'wd' : 'we'}-ch`).value;
-      const cm = document.getElementById(`${type === 'weekday' ? 'wd' : 'we'}-cm`).value;
-
-      if (oh && om && ch && cm) {
-        const openH = parseInt(oh, 10);
-        const openM = parseInt(om, 10);
-        const closeH = parseInt(ch, 10);
-        const closeM = parseInt(cm, 10);
-
-        if (openH > 23 || closeH > 23 || openM > 59 || closeM > 59) {
-          errorDiv.innerText = currentLang === 'fr' ? 'Heure invalide.' : 'Ur twulem ara ssaɛa-agi.';
-          errorDiv.style.display = 'block';
-        } else if ((openH * 60 + openM) >= (closeH * 60 + closeM)) {
-          errorDiv.innerText = translations[currentLang].timeOrderError;
-          errorDiv.style.display = 'block';
-        } else {
-          errorDiv.style.display = 'none';
-        }
-      } else {
-        errorDiv.style.display = 'none';
-      }
-      validateForm();
-    }
-
-    function validateForm() {
-      const name = document.getElementById('name').value.trim();
-      const dob = document.getElementById('dob').value.trim();
-      const phone = document.getElementById('phone').value.replace(/\s/g, '').trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const storeName = document.getElementById('storeName').value.trim();
-      const storeType = document.getElementById('storeType').value;
-      const rcNumber = document.getElementById('rcNumber').value.trim();
-      const commune = document.getElementById('commune').value.trim();
-      const village = document.getElementById('village').value.trim();
-
-      const wdOh = document.getElementById('wd-oh').value;
-      const wdOm = document.getElementById('wd-om').value;
-      const wdCh = document.getElementById('wd-ch').value;
-      const wdCm = document.getElementById('wd-cm').value;
-
-      const weOh = document.getElementById('we-oh').value;
-      const weOm = document.getElementById('we-om').value;
-      const weCh = document.getElementById('we-ch').value;
-      const weCm = document.getElementById('we-cm').value;
-
-      const dobErr = document.getElementById('dob-error').style.display === 'block';
-      const phoneErr = document.getElementById('phone-error').style.display === 'block';
-      const wdErr = document.getElementById('weekday-time-error').style.display === 'block';
-      const weErr = document.getElementById('weekend-time-error').style.display === 'block';
-
-      const fieldsFilled = 
-        name !== '' &&
-        dob !== '' &&
-        phone !== '' &&
-        email !== '' &&
-        password !== '' &&
-        storeName !== '' &&
-        storeType !== '' &&
-        rcNumber !== '' &&
-        commune !== '' &&
-        village !== '' &&
-        idPhotoImported &&
-        selectedLocation !== null &&
-        selectedDays.length > 0 &&
-        wdOh && wdOm && wdCh && wdCm &&
-        weOh && weOm && weCh && weCm;
-
-      const noErrors = !dobErr && !phoneErr && !wdErr && !weErr;
-
-      const isValid = fieldsFilled && noErrors;
-      document.getElementById('next-submit-btn').disabled = !isValid;
-    }
-
-    function submitRegistration() {
-      const submitSpinner = document.getElementById('submit-spinner');
-      const submitBtnText = document.getElementById('t-nextButton');
-
-      submitSpinner.style.display = 'inline-block';
-      submitBtnText.innerText = translations[currentLang].registering;
-      document.getElementById('next-submit-btn').disabled = true;
-
-      setTimeout(() => {
-        submitSpinner.style.display = 'none';
-        submitBtnText.innerText = translations[currentLang].nextButton;
-        document.getElementById('next-submit-btn').disabled = false;
-        alert(translations[currentLang].successMsg);
-      }, 2000);
-    }
-
-    // Initialize UI on load
-    applyTranslations();
-  </script>
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+  }
+</script>
 </body>
 </html>
