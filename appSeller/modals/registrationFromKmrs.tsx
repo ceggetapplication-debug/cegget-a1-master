@@ -264,7 +264,7 @@ const viewRate = commissionPercentage / 10;
   const handleConfirmLocation = () => {
     if (tempSelectedLocation) {
       setFormData({ ...formData, location: tempSelectedLocation });
-      Alert.alert(t('confirmLocationBtn'), t('locationSelectedText', { lat: tempSelectedLocation.latitude, lng: tempSelectedLocation.longitude }));
+      Alert.alert(t('general.confirm'), t('locationSelectedText', { lat: tempSelectedLocation.latitude, lng: tempSelectedLocation.longitude }));
     } else {
       Alert.alert(t('general.error'), t('noLocationSelected'));
     }
@@ -635,7 +635,7 @@ const viewRate = commissionPercentage / 10;
         value={formData.commercialRegistrationNumber}
         onChangeText={(text: string) => handleInputChange('commercialRegistrationNumber', text)}
         placeholder={t('commercialRegPlaceholder')}
-        keyboardType="number-pad"
+        keyboardType="default"
         editable={!isLoading}
       />
       <Text style={styles.label}>{t('storeAddressLabel')} :</Text>
@@ -978,6 +978,7 @@ const createStyles = (theme: typeof Colors.light) => StyleSheet.create({
   timeInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    selfAlign: 'center',
     marginBottom: 15,
   },
   timeInput: {
