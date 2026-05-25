@@ -19,7 +19,8 @@ interface RegistrationFormState {
   name: string;
   dob: string;
   phoneNumber: string;
-  idPhotoUri: string | null;
+  photo: string;
+  imageId?: string | null;
   email: string;
   password: string;
   storeName: string;
@@ -40,7 +41,8 @@ const RegistrationForm: React.FC = () => {
     name: '',
     dob: '',
     phoneNumber: '',
-    idPhotoUri: null,
+    photo: '',
+    imageId: '',
     email: '',
     password: '',
     storeName: '',
@@ -550,23 +552,6 @@ const viewRate = commissionPercentage / 10;
         editable={!isLoading}
       />
 
-      {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
-      <Text style={styles.label}>{t('idPhotoLabel')} :</Text>
-      <TouchableOpacity
-        style={styles.customButton}
-        onPress={handleImportPhoto}
-        disabled={isLoading}
-      >
-        <Text style={styles.customButtonText}>{isLoading ? <ActivityIndicator color={theme.accent} size="small" /> : t('importPhotoBtn')}</Text>
-      </TouchableOpacity>
-
-      {formData.idPhotoUri && (
-        <Image
-          source={{ uri: formData.idPhotoUri }}
-          style={styles.idPhotoPreview}
-          resizeMode="cover"
-        />
-      )}
       <Text style={styles.sidetitle}>{t('connectionInfo')}</Text>
       <Text style={styles.label}>{t('emailLabel')} :</Text>
       <TextInput
@@ -611,6 +596,23 @@ const viewRate = commissionPercentage / 10;
         autoCapitalize="words"
         editable={!isLoading}
       />
+      {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+      <Text style={styles.label}>{t('storePhotoLabel')} :</Text>
+      <TouchableOpacity
+        style={styles.customButton}
+        onPress={handleImportPhoto}
+        disabled={isLoading}
+      >
+        <Text style={styles.customButtonText}>{isLoading ? <ActivityIndicator color={theme.accent} size="small" /> : t('importPhotoBtn')}</Text>
+      </TouchableOpacity>
+
+      {formData.idPhotoUri && (
+        <Image
+          source={{ uri: formData.idPhotoUri }}
+          style={styles.idPhotoPreview}
+          resizeMode="cover"
+        />
+      )}
       <Text style={styles.label}>{t('storeTypes')} :</Text>
       <View style={styles.pickerContainer}>
         <Picker
